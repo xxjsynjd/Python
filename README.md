@@ -96,15 +96,15 @@ GenerateAll.py 歌.mp3 --modes spectrum3d,pitch,lyrics
 
 常用参数
 
-参数 | 说明 | 默认
---width / --height | 分辨率 | 1280x720
---fps | 帧率 | 60
---auto-vocals | 用Demucs分离人声 | 关
---cache-dir | 人声缓存目录 | .vocals_cache
---model Whisper | 模型(AI歌词用) | base
---lang | 语言 | zh
---lrc | 手动指定LRC文件 | —
---font |中文字体路径 |自动查找
+| 参数 | 说明 | 默认 |
+| --width / --height | 分辨率 | 1280x720 |
+| --fps | 帧率 | 60 |
+| --auto-vocals | 用Demucs分离人声 | 关 |
+| --cache-dir | 人声缓存目录 | .vocals_cache |
+| --model Whisper | 模型(AI歌词用) | base |
+| --lang | 语言 | zh |
+| --lrc | 手动指定LRC文件 | — |
+| --font |中文字体路径 |自动查找 |
 更多参数用 --help 查看。
 
 ---
