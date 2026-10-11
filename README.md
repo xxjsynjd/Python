@@ -15,19 +15,16 @@
 |---|---|---|
 | `Spectrum3DAudacious.py` | 3D 频谱墙 | Audacious gl-spectrum 风格 |
 | `Spectrum_2d.py` | 2D 频谱竖条 | 经典 FFT 频谱 |
-| `WaterfallWMP.py` | 瀑布图 | Windows Media Player XP 风格 |
-| `Waterfall3D.py` | 3D 瀑布 | 立体声频谱墙 |
+| `WMPVisualizer.py` | 瀑布图 | Windows Media Player XP 风格 |
 | `VU_Meter.py` | 电平表 | 带回落 + 峰值保持 |
 | `LoudMeter.py` | 响度计 | BS.1770 LUFS |
 | `ThrustMeter.py` | 推力计 | 低频冲击感 |
 | `VibrationMeter.py` | 震力计 | 低频震动波纹 |
 | `NoiseGateMeter.py` | 噪声门 | 开关指示灯 |
-| `PhaseMeter.py` | 相位表 | 立体声利萨茹图形 |
 | `SpeakerMeter.py` | 低音炮 + 高音喇叭 | 分频驱动双喇叭 |
-| `SpeakerPhysics.py` | 纸盆物理仪 | 二阶微分方程 + 相空间 |
 | `ProgressBar.py` | 播放进度条 | 纯横条 |
-| `TimelineRoll.py` | 滚动时间轴 | 波形 + 刻度 + BPM 小节线 |
-| `PitchMeter1.py` | 音符计 | YIN 音高检测 + 滑音连音 |
+| `TimelineRoll.py` | 滚动时间轴 | 波形+刻度线 |
+| `PitchMeter1.py` | 音符计 | YIN 音高检测+滑音连音+BPM小节 |
 | `WMPVisualizer.py` | 随机场景可视化 | 瀑布 / 漩涡 / 粒子 / 圆环 / 竖条 |
 
 ### AI 歌词逐字对齐
