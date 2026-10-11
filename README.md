@@ -51,7 +51,7 @@ cp -v Python/*.py $PREFIX/bin
 附加：AI 歌词对齐
 
 ```bash
-pip install faster-whisper ctranslate2 tokenizers huggingface-hub
+pip install faster-whisper tokenizers huggingface-hub
 ```
 
 注意：Termux 上 ctranslate2 需要自己编译（源码里带 pthread_setaffinity_np 的坑，需要手动 patch）。
