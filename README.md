@@ -44,6 +44,10 @@
 pkg install python ffmpeg
 pip install numpy pillow soundfile
 ```
+
+```bash
+cp -v Python/*.py $PREFIX/bin
+```
 附加：AI 歌词对齐
 
 ```bash
