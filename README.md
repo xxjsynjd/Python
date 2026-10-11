@@ -46,6 +46,7 @@
 ```bash
 pkg install python ffmpeg
 pip install numpy pillow soundfile
+```
 附加：AI 歌词对齐
 
 ```bash
@@ -99,22 +100,13 @@ GenerateAll.py 歌.mp3 --modes spectrum3d,pitch,lyrics
 常用参数
 参数 | 说明 | 默认
 --width / --height | 分辨率 | 1280x720
---fps 帧率 60
---auto-vocals 用 Demucs 分离人声 关
---cache-dir 人声缓存目录 .vocals_cache
---model Whisper 模型（AI 歌词用） base
---lang 语言 zh
---lrc 手动指定 LRC 文件 —
---font 中文字体路径 自动查找
-参数 说明 默认
---width / --height 分辨率 1280x720
---fps 帧率 60
---auto-vocals 用 Demucs 分离人声 关
---cache-dir 人声缓存目录 .vocals_cache
---model Whisper 模型（AI 歌词用） base
---lang 语言 zh
---lrc 手动指定 LRC 文件 —
---font 中文字体路径 自动查找
+--fps | 帧率 | 60
+--auto-vocals | 用Demucs分离人声 | 关
+--cache-dir | 人声缓存目录 | .vocals_cache
+--model Whisper | 模型(AI歌词用) | base
+--lang | 语言 | zh
+--lrc | 手动指定LRC文件 | —
+--font |中文字体路径 |自动查找
 更多参数用 --help 查看。
 
 ---
@@ -205,4 +197,4 @@ QQ频道号：疑难解答访问台、Termux交流社区
 
 学校：江苏商贸职业学院-人工智能学院系部-计算机网络[2503]
 
-下面这些东西我告诉你们：不好用、病毒、盗版这些的，我直接死妈得了！(除非有的确实是没上传或者爆内存。)
+下面这些东西我告诉你们：不好用、病毒、盗版这些的，我直接死妈得了！(除非有的确实是没上传或者爆内存，诈骗电话勿扰。)
