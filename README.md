@@ -131,22 +131,22 @@ Spectrum3DAudacious.py 歌.mp3 -o out.mp4 \
 
 依赖说明
 
-依赖 用途
-numpy FFT、RMS、YIN
-Pillow 逐帧绘制
-soundfile 读音频
-ffmpeg 解码音频 + 编码视频
-faster-whisper + ctranslate2 AI 歌词逐字对齐
-demucs AI 人声分离
+| 依赖 | 用途
+| numpy | FFT、RMS、YIN
+| Pillow | 逐帧绘制
+| soundfile | 读音频
+| ffmpeg | 解码音频+编码视频
+| faster-whisper + ctranslate2 | AI歌词逐字对齐
+| demucs | AI人声分离
 
 ---
 
 已知坑
 
-· 内存：AI 歌词对齐 + 4K 渲染时会吃 2GB 左右内存，手机容易 OOM
+· 内存：AI歌词对齐+4K渲染时会吃2GB左右内存，手机容易OOM(Out of Memory Killer，通常在低内存情况下出手，如果你的Termux正好在后台，那么你下一秒进Termux看到的一幕很有可能就是Termux启动画面，这个过程也叫冷启动，通常是进程被OOM Killer强制终止过后的点进去的一个画面，通常如果更恶劣的情况，会直接导致你的手机冷重启，直接导致你的手机冷重启的这玩意儿也叫内核恐慌。)
 · 硬盘：批量跑的时候注意空间，视频和缓存会迅速占满
-· ctranslate2：Termux 仓库里的版本阉割了 Whisper 模型，需要自己从源码编译
-· 字体：不指定 --font 时脚本会自动找系统中文字体，找不到会显示方块
+· ctranslate2：Termux仓库里的版本阉割了Whisper模型，需要自己从源码编译
+· 字体：不指定--font时脚本会自动找系统中文字体，找不到会显示方块
 
 ---
 
