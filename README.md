@@ -161,7 +161,7 @@ Spectrum3DAudacious.py 歌.mp3 -o out.mp4 \
  [ Exit ] [ Acquire wakelock ]
 ```
 
-如果你看到这条通知没了，那么就是被杀掉了，Android在退出应用的时候会圣诞清理该应用的全部通知。
+如果你看到这条通知没了，那么就是被杀掉了，Android在退出应用的时候会顺带清理该应用的全部通知。
 
 ---
 
