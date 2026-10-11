@@ -56,7 +56,7 @@ generator = ctranslate2.Generator(generation_model_path)
 generator.generate_batch(start_tokens)
 ```
 
-有关更多信息和示例，请参阅文档。
+有关更多信息和示例，请参阅[文档](https://opennmt.net/CTranslate2/)。
 
 如果您有 AMD ROCm GPU，我们在发布页面上提供了特定的 Python 轮子文件。
 
