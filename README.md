@@ -131,13 +131,14 @@ Spectrum3DAudacious.py 歌.mp3 -o out.mp4 \
 
 依赖说明
 
-| 依赖 | 用途
-| numpy | FFT、RMS、YIN
-| Pillow | 逐帧绘制
-| soundfile | 读音频
-| ffmpeg | 解码音频+编码视频
-| faster-whisper + ctranslate2 | AI歌词逐字对齐
-| demucs | AI人声分离
+| 依赖 | 用途 |
+|---|---|
+| numpy | FFT、RMS、YIN |
+| Pillow | 逐帧绘制 |
+| soundfile | 读音频 |
+| ffmpeg | 解码音频+编码视频 |
+| faster-whisper + ctranslate2 | AI歌词逐字对齐 |
+| demucs | AI人声分离 |
 
 ---
 
@@ -149,12 +150,12 @@ Spectrum3DAudacious.py 歌.mp3 -o out.mp4 \
 · 字体：不指定--font时脚本会自动找系统中文字体，找不到会显示方块
 
 那么如何判断Termux是否在你切换到后台的时候被杀掉了呢？其实有一点非常好判断：Termux在运行的过程当中会有一条常驻通知，长这样：
-
+```text
 >_ Termux
-
 1 session
 
  [ Exit ] [ Acquire wakelock ]
+```
 
 如果你看到这条通知没了，那么就是被杀掉了，Android在退出应用的时候会圣诞清理该应用的全部通知。
 
