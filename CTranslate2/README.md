@@ -58,19 +58,19 @@ generator.generate_batch(start_tokens)
 
 有关更多信息和示例，请参阅[文档](https://opennmt.net/CTranslate2/)。
 
-如果您有 AMD ROCm GPU，我们在发布页面上提供了特定的 Python 轮子文件。
+如果您有 AMD ROCm GPU，我们在[发布页面](https://github.com/OpenNMT/CTranslate2/releases)上提供了特定的 Python 轮子文件。
 
 Web 服务器
 
-ctranslate2-web-server 是一个构建在 CTranslate2 之上的 Web 服务器，它暴露了一个兼容 OpenAI 的 REST API，使得将 CTranslate2 模型集成到已支持 OpenAI API 的应用程序中变得容易。
+[ctranslate2-web-server](https://github.com/jordimas/ctranslate2-web-server) 是一个构建在 CTranslate2 之上的 Web 服务器，它暴露了一个兼容 OpenAI 的 REST API，使得将 CTranslate2 模型集成到已支持 OpenAI API 的应用程序中变得容易。
 
 基准测试
 
 我们使用多个模型翻译 En->De 测试集 newstest2014：
 
-· OpenNMT-tf WMT14：在 WMT14 数据集（450 万行）上使用 OpenNMT-tf 训练的基础 Transformer
-· OpenNMT-py WMT14：在 WMT14 数据集（450 万行）上使用 OpenNMT-py 训练的基础 Transformer
-· OPUS-MT：在 2020-02-26 可用的所有 OPUS 数据（8190 万行）上使用 Marian 训练的基础 Transformer
+· [OpenNMT-tf WMT14](https://opennmt.net/Models-tf/#translation)：在 WMT14 数据集（450 万行）上使用 OpenNMT-tf 训练的基础 Transformer
+· [OpenNMT-py WMT14](https://opennmt.net/Models-py/#translation)：在 WMT14 数据集（450 万行）上使用 OpenNMT-py 训练的基础 Transformer
+· [OPUS-MT](https://github.com/Helsinki-NLP/OPUS-MT-train/tree/master/models%2Fen-de)：在 2020-02-26 可用的所有 OPUS 数据（8190 万行）上使用 Marian 训练的基础 Transformer
 
 基准测试报告了每秒生成的目标 token 数量（越高越好）。结果是在多次运行中汇总得出的。有关更多详细信息并重现这些数字，请参阅基准测试脚本。
 
