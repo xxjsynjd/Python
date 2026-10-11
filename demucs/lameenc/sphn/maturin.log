@@ -1,0 +1,17 @@
+📦 Including license file `LICENSE`
+🍹 Building a mixed python/rust project
+🐍 Found CPython 3.14 at /data/data/com.termux/files/usr/bin/python3
+🔗 Found pyo3 bindings
+📡 Using build options features, bindings from pyproject.toml
+   Compiling audiopus_sys v0.2.2 (/data/data/com.termux/files/home/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/audiopus_sys-0.2.2)
+   Compiling regex-automata v0.4.18
+   Compiling pyo3 v0.27.2
+   Compiling ndarray v0.17.2
+   Compiling rayon v1.12.0
+   Compiling opus v0.3.1
+   Compiling regex v1.13.1
+   Compiling kaudio v0.2.1
+   Compiling numpy v0.27.1
+   Compiling sphn v0.2.1 (/data/data/com.termux/files/home/demucs/lameenc/sphn)
+    Finished `release` profile [optimized + debuginfo] target(s) in 2m 43s
+📦 Built wheel for CPython 3.14 to /data/data/com.termux/files/home/demucs/lameenc/sphn/target/wheels/sphn-0.2.1-cp314-cp314-android_24_arm64_v8a.whl
