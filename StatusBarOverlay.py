@@ -21,11 +21,13 @@ def find_chinese_font():
             return path
     return None
 
-def format_path(filepath, max_len=30):
-    """如果路径太长，截取末尾并加上省略号"""
-    if len(filepath) <= max_len:
-        return filepath
-    return "..." + filepath[-(max_len-3):]
+def format_time(seconds):
+    """将秒数转换为 00:00:00 格式"""
+    total_seconds = int(seconds)
+    h = total_seconds // 3600
+    m = (total_seconds % 3600) // 60
+    s = total_seconds % 60
+    return f"{h:02d}:{m:02d}:{s:02d}"
 
 def main():
     parser = argparse.ArgumentParser(description="状态栏插件 - 混音版")
@@ -56,8 +58,10 @@ def main():
     
     try:
         if font_path and os.path.exists(font_path):
+            # 时间与作者字号稍微大一点
             font = ImageFont.truetype(font_path, int(bar_height * 0.45))
-            small_font = ImageFont.truetype(font_path, int(bar_height * 0.35))
+            # 路径字号稍微小一点，以免占满状态栏
+            small_font = ImageFont.truetype(font_path, int(bar_height * 0.30))
         else:
             font = ImageFont.load_default()
             small_font = font
@@ -71,7 +75,7 @@ def main():
         base_name = os.path.splitext(os.path.basename(args.audio))[0]
         output_path = f"{base_name}_status.mp4"
 
-    # ================= 3. 配置 FFmpeg (核心混音逻辑) =================
+    # ================= 3. 配置 FFmpeg (混音逻辑) =================
     ffmpeg_cmd = [
         'ffmpeg', '-y',
         '-f', 'rawvideo',
@@ -104,7 +108,6 @@ def main():
     print(f"      分辨率: {args.width}x{args.height} @ {args.fps}fps, 总计 {total_frames} 帧")
     print(f"[3/3] 渲染中...")
 
-    display_path = format_path(os.path.basename(args.audio), max_len=35)
     img = Image.new('RGB', (args.width, args.height), (0, 0, 0))
     draw = ImageDraw.Draw(img)
 
@@ -112,23 +115,34 @@ def main():
         draw.rectangle([(0, 0), (args.width, args.height - bar_height)], fill=(0, 0, 0))
         
         current_sec = frame_idx / args.fps
-        remaining_sec = total_seconds - current_sec
-        if remaining_sec < 0:
-            remaining_sec = 0.0
+        remaining_sec = max(0, total_seconds - current_sec)
 
-        time_str = f"{current_sec:.2f}s  -{remaining_sec:.2f}s  {total_seconds:.2f}s"
+        # 格式化时间 (冒号格式)
+        current_time_str = format_time(current_sec)
+        remaining_time_str = "-" + format_time(remaining_sec)
+        total_time_str = format_time(total_seconds)
+        time_str = f"{current_time_str}  {remaining_time_str}  {total_time_str}"
 
+        # 绘制底部状态栏
         bar_y_start = args.height - bar_height
         draw.rectangle([(0, bar_y_start), (args.width, args.height)], fill=(15, 15, 15))
 
         text_y = bar_y_start + (bar_height - int(bar_height * 0.45)) // 2
 
+        # 绘制作者 (左侧)
         draw.text((15, text_y), args.author, font=font, fill=(180, 180, 180))
+
+        # 绘制完整文件路径 (作者右侧，字号自适应)
         author_width = draw.textlength(args.author, font=font)
-        draw.text((15 + author_width + 20, text_y + 2), display_path, font=small_font, fill=(120, 120, 120))
+        path_x = 15 + author_width + 15
+        # 路径直接使用 args.audio，不截断
+        draw.text((path_x, text_y + 2), args.audio, font=small_font, fill=(120, 120, 120))
+
+        # 绘制时间 (右侧，右对齐)
         time_width = draw.textlength(time_str, font=font)
         draw.text((args.width - time_width - 15, text_y), time_str, font=font, fill=(255, 255, 255))
 
+        # 发送到 FFmpeg
         process.stdin.write(img.tobytes())
         
         if frame_idx % args.fps == 0:
