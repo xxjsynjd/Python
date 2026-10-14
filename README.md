@@ -62,6 +62,7 @@ pip install faster-whisper tokenizers huggingface-hub
 
 ```bash
 pip install demucs
+pip install --force-reinstall xet-core/hf_xet/target/wheels/hf_xet-1.7.0-cp314-cp314-android_24_arm64_v8a.whl
 ```
 
 第一次跑会自动下载模型（约 80 MB），缓存到 .vocals_cache/，之后秒读。

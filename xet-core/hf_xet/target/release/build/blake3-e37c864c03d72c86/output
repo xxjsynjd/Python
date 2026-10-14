@@ -48,7 +48,7 @@ HOST_ARFLAGS = None
 ARFLAGS_aarch64_linux_android = None
 ARFLAGS_aarch64-linux-android = None
 cargo:rustc-link-lib=static=blake3_neon
-cargo:rustc-link-search=native=/data/data/com.termux/files/home/xet-core/hf_xet/target/release/build/blake3-e37c864c03d72c86/out
+cargo:rustc-link-search=native=/data/data/com.termux/files/home/xet-new/xet-core/hf_xet/target/release/build/blake3-e37c864c03d72c86/out
 cargo:rerun-if-env-changed=CC
 cargo:rerun-if-env-changed=CFLAGS
 cargo:rerun-if-changed=c/.gitignore
