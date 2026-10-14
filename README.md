@@ -258,9 +258,9 @@ QQ频道号：疑难解答访问台、Termux交流社区
 
 记住了：我沈诗淳是个极其有爱心的人，有什么问题都可以随时来找我，凌晨一两点打爆我电话也都没关系。
 
-我是一个计算机爱好者，我比较喜欢去研究计算机软件底层的算法，并且将它用高级语言重新编写出来，比如说c sharp、C++、Python、Java、HTML，等等等等。但是我最喜欢的电脑软件。还得是VMware Workstation(因为那里可以玩Kali。)，听歌软件还得是Audacious，因为那个3D频谱太抽象了，它的gl-spectrum插件的设计是所有电竞玩家的喜爱。
+我是一个计算机爱好者，我比较喜欢去研究计算机软件底层的算法，并且将它用高级语言重新编写出来，比如说c sharp、C++、Python、Java、HTML，等等等等。但是我最喜欢的电脑软件。还得是VMware Workstation(因为那里可以玩Kali。)，听歌软件还得是Audacious，因为那个3D频谱太抽象了，它的gl-spectrum插件的设计是所有电竞玩家的喜爱。但是要说我最喜欢的Android终端跟Windows录屏软件，那就非Termux跟OBS Studio莫属了。
 
-除此之外，我还会Adobe Premiere Pro视频剪辑、Adobe Photoshop/GNU Image Manipulation Program修图、Adobe Audition/Audacity音频剪辑、Adobe Dreamweaver网页设计的CSS样式表设计...
+除此之外，我还会Adobe Premiere Pro视频剪辑、Adobe Photoshop/GNU Image Manipulation Program修图、Adobe Audition/Audacity音频剪辑、Adobe Dreamweaver网页设计的CSS样式表设计、Adobe After Effects、Adobe Lightroom Classic、FL Studio...。
 
 那么今年2026年，我也是21岁了，那么在课余时间我都会选择听音乐来陶冶情操。那么同时我也是一个乐于助人的人，每次同学遇到事情，我都会第一个上前去帮忙。
 
@@ -274,3 +274,4 @@ QQ频道号：疑难解答访问台、Termux交流社区
 那么这两张照片呢是我一直去的那个食堂的附近。(这个是江苏商院的本部。)
 
 那么之前的话呢，我也是海门中专毕业的，那么目前为止在读大专。换句话说呢我是海门中专毕业的中专生。(海门市中等专业学校-信息-计算机应用[22CZ02])
+
