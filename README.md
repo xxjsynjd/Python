@@ -1,9 +1,9 @@
-# Python 音频可视化工具集
+# Python音频可视化工具集
 
-在 Android 平板上用 Termux + Python 手搓的一套音频可视化工具。
-不依赖 GPU，不依赖 X11，不用电脑，手机就能跑。
+在Android平板上用Termux+Python手搓的一套音频可视化工具。
+不依赖GPU，不依赖X11，不用电脑，手机就能跑。
 
-输入一首歌，输出一整套可视化的 MP4。
+输入一首歌，输出一整套可视化的MP4。
 
 ---
 
@@ -13,32 +13,32 @@
 
 | 脚本 | 功能 | 风格 |
 |---|---|---|
-| `Spectrum3DAudacious.py` | 3D 频谱墙 | Audacious gl-spectrum 风格 |
-| `Spectrum_2d.py` | 2D 频谱竖条 | 经典 FFT 频谱 |
-| `WMPVisualizer.py` | 瀑布图 | Windows Media Player XP 风格 |
-| `VU_Meter.py` | 电平表 | 带回落 + 峰值保持 |
+| `Spectrum3DAudacious.py` | 3D频谱墙 | Audacious gl-spectrum风格 |
+| `Spectrum_2d.py` | 2D频谱竖条 | 经典FFT频谱 |
+| `WMPVisualizer.py` | 瀑布图 | Windows Media Player XP风格 |
+| `VU_Meter.py` | 电平表 | 带回落+峰值保持 |
 | `LoudMeter.py` | 响度计 | BS.1770 LUFS |
 | `ThrustMeter.py` | 推力计 | 低频冲击感 |
 | `VibrationMeter.py` | 震力计 | 低频震动波纹 |
 | `NoiseGateMeter.py` | 噪声门 | 开关指示灯 |
-| `SpeakerMeter.py` | 低音炮 + 高音喇叭 | 分频驱动双喇叭 |
+| `SpeakerMeter.py` | 低音+高音喇叭 | 分频驱动双喇叭 |
 | `ProgressBar.py` | 播放进度条 | 纯横条 |
 | `TimelineRoll.py` | 滚动时间轴 | 波形+刻度线 |
-| `PitchMeter1.py` | 音符计 | YIN 音高检测+滑音连音+BPM小节 |
-| `WMPVisualizer.py` | 随机场景可视化 | 瀑布 / 漩涡 / 粒子 / 圆环 / 竖条 |
+| `PitchMeter1.py` | 音符计 | YIN音高检测+滑音连音+BPM小节 |
+| `WMPVisualizer.py` | 随机场景可视化 | 瀑布/漩涡/粒子/圆环/竖条 |
 
 ### AI 歌词逐字对齐
 
 | 脚本 | 功能 |
 |---|---|
-| `LyricsDisplayAI.py` | 读取 LRC，用 Whisper 逐字对齐，唱到哪弹哪 |
+| `LyricsDisplayAI.py` | 读取LRC，用Whisper逐字对齐，唱到哪弹哪 |
 | `GenerateAll.py` | 一首歌，一键跑全套 |
 
 ---
 
 ## 安装
 
-### Termux（Android）
+### Termux(Android)
 
 ```bash
 pkg install python ffmpeg
@@ -49,23 +49,23 @@ dpkg -i *.deb # 或者：dpkg -i [要安装的包的文件名]
 ```bash
 cp -v Python/*.py $PREFIX/bin
 ```
-附加：AI 歌词对齐
+附加：AI歌词对齐
 
 ```bash
 pip install faster-whisper tokenizers huggingface-hub
 ```
 
-注意：Termux 上 ctranslate2 需要自己编译（源码里带 pthread_setaffinity_np 的坑，需要手动 patch）。
-不想折腾的话，LyricsDisplayAI.py 会自动降级为整句均分模式。
+注意：Termux上ctranslate2需要自己编译(源码里带pthread_setaffinity_np的坑，需要手动patch)。
+不想折腾的话，LyricsDisplayAI.py会自动降级为整句均分模式。
 
-附加：AI 人声分离（Demucs）
+附加：AI人声分离(Demucs)
 
 ```bash
 pip install demucs
 pip install --force-reinstall xet-core/hf_xet/target/wheels/hf_xet-1.7.0-cp314-cp314-android_24_arm64_v8a.whl
 ```
 
-第一次跑会自动下载模型（约 80 MB），缓存到 .vocals_cache/，之后秒读。
+第一次跑会自动下载模型(约80MB)，缓存到.vocals_cache/，之后秒读。
 
 ---
 
@@ -90,7 +90,7 @@ LyricsDisplayAI.py 歌.mp3 -o out.mp4 --auto-vocals --model base --lang zh
 GenerateAll.py 歌.mp3
 ```
 
-输出到 歌_videos/ 目录，17 个仪表全在里面。
+输出到"歌_videos/"目录，17个仪表全在里面。
 
 只跑其中几个
 
@@ -112,11 +112,11 @@ GenerateAll.py 歌.mp3 --modes spectrum3d,pitch,lyrics
 | --lang | 语言 | zh |
 | --lrc | 手动指定LRC文件 | — |
 | --font |中文字体路径 |自动查找 |
-更多参数用 --help 查看。
+更多参数用--help查看。
 
 ---
 
-3D 频谱参数速查
+3D频谱参数速查
 
 ```bash
 Spectrum3DAudacious.py 歌.mp3 -o out.mp4 \
@@ -138,7 +138,7 @@ Spectrum3DAudacious.py 歌.mp3 -o out.mp4 \
 | Pillow | 逐帧绘制 |
 | soundfile | 读音频 |
 | ffmpeg | 解码音频+编码视频 |
-| faster-whisper + ctranslate2 | AI歌词逐字对齐 |
+| faster-whisper+ctranslate2 | AI歌词逐字对齐 |
 | demucs | AI人声分离 |
 
 ---
