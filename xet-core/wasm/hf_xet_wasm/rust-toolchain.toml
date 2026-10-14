@@ -1,0 +1,5 @@
+# Pinned to the same nightly + wasm32 target as the other wasm/* crates.
+[toolchain]
+channel = "nightly"
+components = ["rust-src", "rustfmt"]
+targets = ["wasm32-unknown-unknown"]

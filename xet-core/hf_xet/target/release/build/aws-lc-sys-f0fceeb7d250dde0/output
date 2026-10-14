@@ -193,7 +193,7 @@ cargo:warning=Building with: CC
 cargo:warning=Symbol Prefix: Some("aws_lc_0_45_0")
 cargo:rerun-if-env-changed=CARGO_FEATURE_SSL
 cargo:warning=Target platform: 'aarch64-linux-android'
-cargo:root=/data/data/com.termux/files/home/xet-core/hf_xet/target/release/build/aws-lc-sys-f0fceeb7d250dde0/out
+cargo:root=/data/data/com.termux/files/home/xet-new/xet-core/hf_xet/target/release/build/aws-lc-sys-f0fceeb7d250dde0/out
 cargo:rerun-if-env-changed=AWS_LC_SYS_HOST_CFLAGS_aarch64_linux_android
 cargo:rerun-if-env-changed=AWS_LC_SYS_HOST_CFLAGS
 cargo:rerun-if-env-changed=HOST_CFLAGS_aarch64_linux_android
@@ -279,7 +279,7 @@ cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
 CFLAGS_aarch64_linux_android = None
 cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
 CFLAGS_aarch64-linux-android = None
-cargo:warning=Compilation of 'c11.c' succeeded - Ok(["/data/data/com.termux/files/home/xet-core/hf_xet/target/release/build/aws-lc-sys-f0fceeb7d250dde0/out/out-c11/7dfda64fdf5a526c-c11.o"]).
+cargo:warning=Compilation of 'c11.c' succeeded - Ok(["/data/data/com.termux/files/home/xet-new/xet-core/hf_xet/target/release/build/aws-lc-sys-f0fceeb7d250dde0/out/out-c11/7dfda64fdf5a526c-c11.o"]).
 cargo:rerun-if-env-changed=AWS_LC_SYS_HOST_CC_aarch64_linux_android
 cargo:rerun-if-env-changed=AWS_LC_SYS_HOST_CC
 cargo:rerun-if-env-changed=HOST_CC_aarch64_linux_android
@@ -356,7 +356,7 @@ cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
 CFLAGS_aarch64_linux_android = None
 cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
 CFLAGS_aarch64-linux-android = None
-cargo:warning=Compilation of 'stdalign_check.c' succeeded - Ok(["/data/data/com.termux/files/home/xet-core/hf_xet/target/release/build/aws-lc-sys-f0fceeb7d250dde0/out/out-stdalign_check/7dfda64fdf5a526c-stdalign_check.o"]).
+cargo:warning=Compilation of 'stdalign_check.c' succeeded - Ok(["/data/data/com.termux/files/home/xet-new/xet-core/hf_xet/target/release/build/aws-lc-sys-f0fceeb7d250dde0/out/out-stdalign_check/7dfda64fdf5a526c-stdalign_check.o"]).
 cargo:rerun-if-env-changed=CC_aarch64-linux-android
 CC_aarch64-linux-android = None
 cargo:rerun-if-env-changed=CC_aarch64_linux_android
@@ -396,7 +396,7 @@ cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
 CFLAGS_aarch64_linux_android = None
 cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
 CFLAGS_aarch64-linux-android = None
-cargo:warning=Compilation of 'builtin_swap_check.c' succeeded - Ok(["/data/data/com.termux/files/home/xet-core/hf_xet/target/release/build/aws-lc-sys-f0fceeb7d250dde0/out/out-builtin_swap_check/7dfda64fdf5a526c-builtin_swap_check.o"]).
+cargo:warning=Compilation of 'builtin_swap_check.c' succeeded - Ok(["/data/data/com.termux/files/home/xet-new/xet-core/hf_xet/target/release/build/aws-lc-sys-f0fceeb7d250dde0/out/out-builtin_swap_check/7dfda64fdf5a526c-builtin_swap_check.o"]).
 cargo:rerun-if-env-changed=CC_aarch64-linux-android
 CC_aarch64-linux-android = None
 cargo:rerun-if-env-changed=CC_aarch64_linux_android
@@ -436,7 +436,7 @@ cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
 CFLAGS_aarch64_linux_android = None
 cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
 CFLAGS_aarch64-linux-android = None
-cargo:warning=Compilation of 'neon_sha3_check.c' succeeded - Ok(["/data/data/com.termux/files/home/xet-core/hf_xet/target/release/build/aws-lc-sys-f0fceeb7d250dde0/out/out-neon_sha3_check/7dfda64fdf5a526c-neon_sha3_check.o"]).
+cargo:warning=Compilation of 'neon_sha3_check.c' succeeded - Ok(["/data/data/com.termux/files/home/xet-new/xet-core/hf_xet/target/release/build/aws-lc-sys-f0fceeb7d250dde0/out/out-neon_sha3_check/7dfda64fdf5a526c-neon_sha3_check.o"]).
 cargo:rerun-if-env-changed=CC_aarch64-linux-android
 CC_aarch64-linux-android = None
 cargo:rerun-if-env-changed=CC_aarch64_linux_android
@@ -476,7 +476,7 @@ cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
 CFLAGS_aarch64_linux_android = None
 cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
 CFLAGS_aarch64-linux-android = None
-cargo:warning=Compilation of 'linux_random_h.c' succeeded - Ok(["/data/data/com.termux/files/home/xet-core/hf_xet/target/release/build/aws-lc-sys-f0fceeb7d250dde0/out/out-linux_random_h/7dfda64fdf5a526c-linux_random_h.o"]).
+cargo:warning=Compilation of 'linux_random_h.c' succeeded - Ok(["/data/data/com.termux/files/home/xet-new/xet-core/hf_xet/target/release/build/aws-lc-sys-f0fceeb7d250dde0/out/out-linux_random_h/7dfda64fdf5a526c-linux_random_h.o"]).
 cargo:rerun-if-env-changed=CC_aarch64-linux-android
 CC_aarch64-linux-android = None
 cargo:rerun-if-env-changed=CC_aarch64_linux_android
@@ -553,1435 +553,6 @@ cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
 CFLAGS_aarch64_linux_android = None
 cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
 CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_FORCE_DISABLE
-CC_FORCE_DISABLE = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-cargo:rerun-if-env-changed=CC_FORCE_DISABLE
-CC_FORCE_DISABLE = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64-linux-android
-CC_aarch64-linux-android = None
-cargo:rerun-if-env-changed=CC_aarch64_linux_android
-CC_aarch64_linux_android = None
-cargo:rerun-if-env-changed=HOST_CC
-HOST_CC = None
-cargo:rerun-if-env-changed=CC
-CC = None
-cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
-CRATE_CC_NO_DEFAULTS = None
-cargo:rerun-if-env-changed=CFLAGS
-CFLAGS = None
-cargo:rerun-if-env-changed=HOST_CFLAGS
-HOST_CFLAGS = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
-CFLAGS_aarch64_linux_android = None
-cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
-CFLAGS_aarch64-linux-android = None
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
 cargo:rerun-if-env-changed=CC_FORCE_DISABLE
 CC_FORCE_DISABLE = None
 cargo:rerun-if-env-changed=CC_aarch64-linux-android
@@ -2164,6 +735,140 @@ cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
 CFLAGS_aarch64_linux_android = None
 cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
 CFLAGS_aarch64-linux-android = None
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
 cargo:rerun-if-env-changed=CC_aarch64-linux-android
 CC_aarch64-linux-android = None
 cargo:rerun-if-env-changed=CC_aarch64_linux_android
@@ -2190,6 +895,96 @@ exit status: 0
 exit status: 0
 exit status: 0
 exit status: 0
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
 cargo:rerun-if-env-changed=CC_aarch64-linux-android
 CC_aarch64-linux-android = None
 cargo:rerun-if-env-changed=CC_aarch64_linux_android
@@ -2244,6 +1039,32 @@ cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
 CFLAGS_aarch64_linux_android = None
 cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
 CFLAGS_aarch64-linux-android = None
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
 cargo:rerun-if-env-changed=CC_aarch64-linux-android
 CC_aarch64-linux-android = None
 cargo:rerun-if-env-changed=CC_aarch64_linux_android
@@ -2378,6 +1199,1185 @@ exit status: 0
 exit status: 0
 exit status: 0
 exit status: 0
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+cargo:rerun-if-env-changed=CC_FORCE_DISABLE
+CC_FORCE_DISABLE = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+cargo:rerun-if-env-changed=CC_FORCE_DISABLE
+CC_FORCE_DISABLE = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64-linux-android
+CC_aarch64-linux-android = None
+cargo:rerun-if-env-changed=CC_aarch64_linux_android
+CC_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
+CFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
+CFLAGS_aarch64-linux-android = None
 cargo:rerun-if-env-changed=CC_aarch64-linux-android
 CC_aarch64-linux-android = None
 cargo:rerun-if-env-changed=CC_aarch64_linux_android
@@ -2790,6 +2790,14 @@ cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
 CFLAGS_aarch64_linux_android = None
 cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
 CFLAGS_aarch64-linux-android = None
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
 cargo:rerun-if-env-changed=CC_aarch64-linux-android
 CC_aarch64-linux-android = None
 cargo:rerun-if-env-changed=CC_aarch64_linux_android
@@ -2826,14 +2834,6 @@ cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
 CFLAGS_aarch64_linux_android = None
 cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
 CFLAGS_aarch64-linux-android = None
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
 cargo:rerun-if-env-changed=CC_aarch64-linux-android
 CC_aarch64-linux-android = None
 cargo:rerun-if-env-changed=CC_aarch64_linux_android
@@ -2942,14 +2942,6 @@ cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
 CFLAGS_aarch64_linux_android = None
 cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
 CFLAGS_aarch64-linux-android = None
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
 cargo:rerun-if-env-changed=CC_aarch64-linux-android
 CC_aarch64-linux-android = None
 cargo:rerun-if-env-changed=CC_aarch64_linux_android
@@ -2968,6 +2960,14 @@ cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
 CFLAGS_aarch64_linux_android = None
 cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
 CFLAGS_aarch64-linux-android = None
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
 cargo:rerun-if-env-changed=CC_aarch64-linux-android
 CC_aarch64-linux-android = None
 cargo:rerun-if-env-changed=CC_aarch64_linux_android
@@ -3416,14 +3416,6 @@ cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
 CFLAGS_aarch64_linux_android = None
 cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
 CFLAGS_aarch64-linux-android = None
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
 cargo:rerun-if-env-changed=CC_aarch64-linux-android
 CC_aarch64-linux-android = None
 cargo:rerun-if-env-changed=CC_aarch64_linux_android
@@ -3460,6 +3452,14 @@ cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
 CFLAGS_aarch64_linux_android = None
 cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
 CFLAGS_aarch64-linux-android = None
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
 cargo:rerun-if-env-changed=CC_aarch64-linux-android
 CC_aarch64-linux-android = None
 cargo:rerun-if-env-changed=CC_aarch64_linux_android
@@ -3586,6 +3586,14 @@ cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
 CFLAGS_aarch64_linux_android = None
 cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
 CFLAGS_aarch64-linux-android = None
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
 cargo:rerun-if-env-changed=CC_aarch64-linux-android
 CC_aarch64-linux-android = None
 cargo:rerun-if-env-changed=CC_aarch64_linux_android
@@ -3604,14 +3612,6 @@ cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
 CFLAGS_aarch64_linux_android = None
 cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
 CFLAGS_aarch64-linux-android = None
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
 cargo:rerun-if-env-changed=CC_aarch64-linux-android
 CC_aarch64-linux-android = None
 cargo:rerun-if-env-changed=CC_aarch64_linux_android
@@ -3890,6 +3890,14 @@ cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
 CFLAGS_aarch64_linux_android = None
 cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
 CFLAGS_aarch64-linux-android = None
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
 cargo:rerun-if-env-changed=CC_aarch64-linux-android
 CC_aarch64-linux-android = None
 cargo:rerun-if-env-changed=CC_aarch64_linux_android
@@ -3908,14 +3916,6 @@ cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
 CFLAGS_aarch64_linux_android = None
 cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
 CFLAGS_aarch64-linux-android = None
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
 cargo:rerun-if-env-changed=CC_aarch64-linux-android
 CC_aarch64-linux-android = None
 cargo:rerun-if-env-changed=CC_aarch64_linux_android
@@ -4024,14 +4024,6 @@ cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
 CFLAGS_aarch64_linux_android = None
 cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
 CFLAGS_aarch64-linux-android = None
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
 cargo:rerun-if-env-changed=CC_aarch64-linux-android
 CC_aarch64-linux-android = None
 cargo:rerun-if-env-changed=CC_aarch64_linux_android
@@ -4050,6 +4042,14 @@ cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
 CFLAGS_aarch64_linux_android = None
 cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
 CFLAGS_aarch64-linux-android = None
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
 cargo:rerun-if-env-changed=CC_aarch64-linux-android
 CC_aarch64-linux-android = None
 cargo:rerun-if-env-changed=CC_aarch64_linux_android
@@ -4498,6 +4498,14 @@ cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
 CFLAGS_aarch64_linux_android = None
 cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
 CFLAGS_aarch64-linux-android = None
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
 cargo:rerun-if-env-changed=CC_aarch64-linux-android
 CC_aarch64-linux-android = None
 cargo:rerun-if-env-changed=CC_aarch64_linux_android
@@ -4534,14 +4542,6 @@ cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
 CFLAGS_aarch64_linux_android = None
 cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
 CFLAGS_aarch64-linux-android = None
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
 cargo:rerun-if-env-changed=CC_aarch64-linux-android
 CC_aarch64-linux-android = None
 cargo:rerun-if-env-changed=CC_aarch64_linux_android
@@ -4650,14 +4650,6 @@ cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
 CFLAGS_aarch64_linux_android = None
 cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
 CFLAGS_aarch64-linux-android = None
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
 cargo:rerun-if-env-changed=CC_aarch64-linux-android
 CC_aarch64-linux-android = None
 cargo:rerun-if-env-changed=CC_aarch64_linux_android
@@ -4676,6 +4668,14 @@ cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
 CFLAGS_aarch64_linux_android = None
 cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
 CFLAGS_aarch64-linux-android = None
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
 cargo:rerun-if-env-changed=CC_aarch64-linux-android
 CC_aarch64-linux-android = None
 cargo:rerun-if-env-changed=CC_aarch64_linux_android
@@ -4802,14 +4802,6 @@ cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
 CFLAGS_aarch64_linux_android = None
 cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
 CFLAGS_aarch64-linux-android = None
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
 cargo:rerun-if-env-changed=CC_aarch64-linux-android
 CC_aarch64-linux-android = None
 cargo:rerun-if-env-changed=CC_aarch64_linux_android
@@ -4828,6 +4820,14 @@ cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
 CFLAGS_aarch64_linux_android = None
 cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
 CFLAGS_aarch64-linux-android = None
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
 cargo:rerun-if-env-changed=CC_aarch64-linux-android
 CC_aarch64-linux-android = None
 cargo:rerun-if-env-changed=CC_aarch64_linux_android
@@ -4936,6 +4936,14 @@ cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
 CFLAGS_aarch64_linux_android = None
 cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
 CFLAGS_aarch64-linux-android = None
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
 cargo:rerun-if-env-changed=CC_aarch64-linux-android
 CC_aarch64-linux-android = None
 cargo:rerun-if-env-changed=CC_aarch64_linux_android
@@ -4954,14 +4962,6 @@ cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
 CFLAGS_aarch64_linux_android = None
 cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
 CFLAGS_aarch64-linux-android = None
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
 cargo:rerun-if-env-changed=CC_aarch64-linux-android
 CC_aarch64-linux-android = None
 cargo:rerun-if-env-changed=CC_aarch64_linux_android
@@ -5392,6 +5392,14 @@ cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
 CFLAGS_aarch64_linux_android = None
 cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
 CFLAGS_aarch64-linux-android = None
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
 cargo:rerun-if-env-changed=CC_aarch64-linux-android
 CC_aarch64-linux-android = None
 cargo:rerun-if-env-changed=CC_aarch64_linux_android
@@ -5428,14 +5436,6 @@ cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
 CFLAGS_aarch64_linux_android = None
 cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
 CFLAGS_aarch64-linux-android = None
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
 cargo:rerun-if-env-changed=CC_aarch64-linux-android
 CC_aarch64-linux-android = None
 cargo:rerun-if-env-changed=CC_aarch64_linux_android
@@ -5562,14 +5562,6 @@ cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
 CFLAGS_aarch64_linux_android = None
 cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
 CFLAGS_aarch64-linux-android = None
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
 cargo:rerun-if-env-changed=CC_aarch64-linux-android
 CC_aarch64-linux-android = None
 cargo:rerun-if-env-changed=CC_aarch64_linux_android
@@ -5588,6 +5580,14 @@ cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
 CFLAGS_aarch64_linux_android = None
 cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
 CFLAGS_aarch64-linux-android = None
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
 cargo:rerun-if-env-changed=CC_aarch64-linux-android
 CC_aarch64-linux-android = None
 cargo:rerun-if-env-changed=CC_aarch64_linux_android
@@ -5732,6 +5732,14 @@ cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
 CFLAGS_aarch64_linux_android = None
 cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
 CFLAGS_aarch64-linux-android = None
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
 cargo:rerun-if-env-changed=CC_aarch64-linux-android
 CC_aarch64-linux-android = None
 cargo:rerun-if-env-changed=CC_aarch64_linux_android
@@ -5750,14 +5758,6 @@ cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
 CFLAGS_aarch64_linux_android = None
 cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
 CFLAGS_aarch64-linux-android = None
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
 cargo:rerun-if-env-changed=CC_aarch64-linux-android
 CC_aarch64-linux-android = None
 cargo:rerun-if-env-changed=CC_aarch64_linux_android
@@ -5884,6 +5884,14 @@ cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
 CFLAGS_aarch64_linux_android = None
 cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
 CFLAGS_aarch64-linux-android = None
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
 cargo:rerun-if-env-changed=CC_aarch64-linux-android
 CC_aarch64-linux-android = None
 cargo:rerun-if-env-changed=CC_aarch64_linux_android
@@ -5902,14 +5910,6 @@ cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
 CFLAGS_aarch64_linux_android = None
 cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
 CFLAGS_aarch64-linux-android = None
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
 cargo:rerun-if-env-changed=CC_aarch64-linux-android
 CC_aarch64-linux-android = None
 cargo:rerun-if-env-changed=CC_aarch64_linux_android
@@ -6000,6 +6000,14 @@ cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
 CFLAGS_aarch64_linux_android = None
 cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
 CFLAGS_aarch64-linux-android = None
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
 cargo:rerun-if-env-changed=CC_aarch64-linux-android
 CC_aarch64-linux-android = None
 cargo:rerun-if-env-changed=CC_aarch64_linux_android
@@ -6054,14 +6062,6 @@ cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
 CFLAGS_aarch64_linux_android = None
 cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
 CFLAGS_aarch64-linux-android = None
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
 cargo:rerun-if-env-changed=CC_aarch64-linux-android
 CC_aarch64-linux-android = None
 cargo:rerun-if-env-changed=CC_aarch64_linux_android
@@ -6170,14 +6170,6 @@ cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
 CFLAGS_aarch64_linux_android = None
 cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
 CFLAGS_aarch64-linux-android = None
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
-exit status: 0
 cargo:rerun-if-env-changed=CC_aarch64-linux-android
 CC_aarch64-linux-android = None
 cargo:rerun-if-env-changed=CC_aarch64_linux_android
@@ -6196,6 +6188,14 @@ cargo:rerun-if-env-changed=CFLAGS_aarch64_linux_android
 CFLAGS_aarch64_linux_android = None
 cargo:rerun-if-env-changed=CFLAGS_aarch64-linux-android
 CFLAGS_aarch64-linux-android = None
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
+exit status: 0
 cargo:rerun-if-env-changed=CC_aarch64-linux-android
 CC_aarch64-linux-android = None
 cargo:rerun-if-env-changed=CC_aarch64_linux_android
@@ -7608,6 +7608,25 @@ exit status: 0
 exit status: 0
 exit status: 0
 exit status: 0
+cargo:rerun-if-env-changed=AR_aarch64-linux-android
+AR_aarch64-linux-android = None
+cargo:rerun-if-env-changed=AR_aarch64_linux_android
+AR_aarch64_linux_android = None
+cargo:rerun-if-env-changed=HOST_AR
+HOST_AR = None
+cargo:rerun-if-env-changed=AR
+AR = None
+LLVM (http://llvm.org/):
+  LLVM version 21.1.8
+  Optimized build.
+cargo:rerun-if-env-changed=ARFLAGS
+ARFLAGS = None
+cargo:rerun-if-env-changed=HOST_ARFLAGS
+HOST_ARFLAGS = None
+cargo:rerun-if-env-changed=ARFLAGS_aarch64_linux_android
+ARFLAGS_aarch64_linux_android = None
+cargo:rerun-if-env-changed=ARFLAGS_aarch64-linux-android
+ARFLAGS_aarch64-linux-android = None
 cargo:rerun-if-env-changed=AR_aarch64-linux-android
 AR_aarch64-linux-android = None
 cargo:rerun-if-env-changed=AR_aarch64_linux_android
@@ -7875,12 +7894,12 @@ ARFLAGS_aarch64_linux_android = None
 cargo:rerun-if-env-changed=ARFLAGS_aarch64-linux-android
 ARFLAGS_aarch64-linux-android = None
 cargo:rustc-link-lib=static=aws_lc_0_45_0_crypto
-cargo:rustc-link-search=native=/data/data/com.termux/files/home/xet-core/hf_xet/target/release/build/aws-lc-sys-f0fceeb7d250dde0/out
-cargo:libdir=/data/data/com.termux/files/home/xet-core/hf_xet/target/release/build/aws-lc-sys-f0fceeb7d250dde0/out
+cargo:rustc-link-search=native=/data/data/com.termux/files/home/xet-new/xet-core/hf_xet/target/release/build/aws-lc-sys-f0fceeb7d250dde0/out
+cargo:libdir=/data/data/com.termux/files/home/xet-new/xet-core/hf_xet/target/release/build/aws-lc-sys-f0fceeb7d250dde0/out
 cargo:link_kind=static
-cargo:libcrypto_path=/data/data/com.termux/files/home/xet-core/hf_xet/target/release/build/aws-lc-sys-f0fceeb7d250dde0/out/libaws_lc_0_45_0_crypto.a
+cargo:libcrypto_path=/data/data/com.termux/files/home/xet-new/xet-core/hf_xet/target/release/build/aws-lc-sys-f0fceeb7d250dde0/out/libaws_lc_0_45_0_crypto.a
 cargo:system_libs=
-cargo:include=/data/data/com.termux/files/home/xet-core/hf_xet/target/release/build/aws-lc-sys-f0fceeb7d250dde0/out/include
+cargo:include=/data/data/com.termux/files/home/xet-new/xet-core/hf_xet/target/release/build/aws-lc-sys-f0fceeb7d250dde0/out/include
 cargo:libcrypto=aws_lc_0_45_0_crypto
 cargo:rerun-if-changed=aws-lc/
 cargo:conf=OPENSSL_NO_ASYNC,OPENSSL_NO_BF,OPENSSL_NO_BLAKE2,OPENSSL_NO_BUF_FREELISTS,OPENSSL_NO_CAMELLIA,OPENSSL_NO_CAPIENG,OPENSSL_NO_CAST,OPENSSL_NO_CMS,OPENSSL_NO_COMP,OPENSSL_NO_CRYPTO_MDEBUG,OPENSSL_NO_CT,OPENSSL_NO_DANE,OPENSSL_NO_DEPRECATED,OPENSSL_NO_DGRAM,OPENSSL_NO_DYNAMIC_ENGINE,OPENSSL_NO_EC_NISTP_64_GCC_128,OPENSSL_NO_EC2M,OPENSSL_NO_EGD,OPENSSL_NO_ENGINE,OPENSSL_NO_GMP,OPENSSL_NO_GOST,OPENSSL_NO_HEARTBEATS,OPENSSL_NO_HW,OPENSSL_NO_IDEA,OPENSSL_NO_JPAKE,OPENSSL_NO_KRB5,OPENSSL_NO_MD2,OPENSSL_NO_MDC2,OPENSSL_NO_OCB,OPENSSL_NO_RC2,OPENSSL_NO_RC5,OPENSSL_NO_RFC3779,OPENSSL_NO_RIPEMD,OPENSSL_NO_RMD160,OPENSSL_NO_SCTP,OPENSSL_NO_SEED,OPENSSL_NO_SM2,OPENSSL_NO_SM3,OPENSSL_NO_SM4,OPENSSL_NO_SRP,OPENSSL_NO_SSL_TRACE,OPENSSL_NO_SSL2,OPENSSL_NO_SSL3,OPENSSL_NO_SSL3_METHOD,OPENSSL_NO_STATIC_ENGINE,OPENSSL_NO_STORE,OPENSSL_NO_TS,OPENSSL_NO_WHIRLPOOL

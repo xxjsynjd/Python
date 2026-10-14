@@ -1,0 +1,55 @@
+[build-system]
+requires = ["maturin>=1.7,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "hf-xet"
+requires-python = ">=3.8"
+description = "Fast transfer of large files with the Hugging Face Hub."
+author = "Hugging Face, Inc."
+author_email = "julien@huggingface.co"
+maintainers = [
+    { name = "Rajat Arya", email = "rajat@rajatarya.com" },
+    { name = "Jared Sulzdorf", email = "j.sulzdorf@gmail.com" },
+    { name = "Di Xiao", email = "di@huggingface.co" },
+    { name = "Assaf Vayner", email = "assaf@huggingface.co" },
+    { name = "Hoyt Koepke", email = "hoytak@gmail.com" },
+]
+license = "Apache-2.0"
+license-file = "LICENSE"
+readme = "README.md"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Rust",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: Free Threading",
+    "Programming Language :: Python :: Free Threading :: 2 - Beta",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+tests = [
+    "pytest",
+]
+
+[project.urls]
+Homepage = "https://github.com/huggingface/xet-core"
+Documentation = "https://huggingface.co/docs/hub/xet/index"
+Issues = "https://github.com/huggingface/xet-core/issues"
+Repository = "https://github.com/huggingface/xet-core.git"
+
+[tool.maturin]
+features = ["pyo3/extension-module"]
+include = [{ path = "LICENSE", format = "sdist" }]
