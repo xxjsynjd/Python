@@ -164,6 +164,43 @@ Spectrum3DAudacious.py 歌.mp3 -o out.mp4 \
 
 如果你看到这条通知没了，那么就是被杀掉了，Android在退出应用的时候会顺带清理该应用的全部通知。
 
+##快速开始(懒人版)
+
+1.安装Termux:
+
+从F-Droid下载(推荐):
+https://f-droid.org/packages/com.termux/
+
+或从GitHubReleases:
+https://github.com/termux/termux-app/releases
+
+2.打开Termux,安装基础环境:
+
+```bash
+   pkg update && pkg upgrade
+   pkg install python ffmpeg mpv
+   pip install numpy pillow soundfile
+```
+
+3.克隆本项目:
+
+```bash
+   git clone https://github.com/xxjsynjd/Python
+   cd Python
+```
+
+4.安装hf_xet修复版(Termux+Python3.14必装):
+
+```bash
+   pip install hf_xet-1.7.0-cp314-cp314-android_24_arm64_v8a.whl
+```
+
+5.试跑:
+
+```bash
+   ./LoudMeter.py 你的歌.flac -o 输出.mp4
+```
+
 ---
 
 许可证
