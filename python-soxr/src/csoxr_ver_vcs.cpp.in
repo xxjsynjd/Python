@@ -1,0 +1,7 @@
+// versioning for bundled libsoxr
+
+#include "csoxr_version.h"
+
+const char * libsoxr_version() {
+    return "@VCS_VERSION@";
+}

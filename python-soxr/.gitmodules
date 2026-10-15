@@ -1,0 +1,3 @@
+[submodule "libsoxr"]
+	path = libsoxr
+	url = https://github.com/dofuuz/soxr.git

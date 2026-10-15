@@ -1,0 +1,16 @@
+name: rtd
+channels:
+  - numba/label/llvm
+  - defaults
+dependencies:
+  - python
+  # pip for installing llvmlite itself
+  - pip
+  - llvmdev=22
+  - cmake
+  - make
+  - docutils==0.16
+  - gcc_linux-64=11
+  - gxx_linux-64=11
+  - sphinx_rtd_theme
+

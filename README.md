@@ -44,6 +44,7 @@
 pkg install python ffmpeg
 pip install numpy pillow soundfile
 dpkg -i *.deb # 或者：dpkg -i [要安装的包的文件名]
+find . -name "*.whl" -exec pip install {} --force-reinstall \;
 ```
 
 ```bash

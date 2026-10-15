@@ -1,0 +1,236 @@
+#!/usr/bin/env python
+"""
+Build script for the shared library providing the C ABI bridge to LLVM.
+"""
+
+from __future__ import print_function
+
+import functools
+import os
+import platform
+import subprocess
+import shutil
+import sys
+import tempfile
+import warnings
+
+
+here_dir = os.path.abspath(os.path.dirname(__file__))
+build_dir = os.path.join(here_dir, 'build')
+target_dir = os.path.join(os.path.dirname(here_dir), 'llvmlite', 'binding')
+
+
+is_windows = sys.platform == "win32"
+is_arm64 = False
+is_64bit = False
+if is_windows:
+    machine = platform.machine().lower()
+    arch_env = os.environ.get("ARCH", "").lower()
+    if machine in ("arm64", "aarch64") or arch_env == "arm64":
+        is_arm64 = True
+    elif machine in ("amd64", "x86_64"):
+        is_64bit = True
+else:
+    is_64bit = sys.maxsize >= 2**32
+
+
+def env_var_options_to_cmake_options():
+    # This is not ideal, it exists to put env var options into CMake. Whilst it
+    # is possible to pass options through setuptools/distutils etc, this is not
+    # ideal either esp as the packaging system could do with an overhaul to meet
+    # modern standards. Also, adding these as options to the CMake configuration
+    # opposed to getting CMake to parse the env vars means that in the future it
+    # is easier to extract the `ffi` library as a `libllvmlite` package such
+    # that it can be built against multiple LLVM versions using a CMake
+    # driven toolchain.
+    cmake_options = []
+
+    env_vars = {"LLVMLITE_PACKAGE_FORMAT": ("conda", "wheel"),
+                "LLVMLITE_USE_RTTI": ("ON", "OFF", ""),
+                "LLVMLITE_CXX_STATIC_LINK": bool,
+                "LLVMLITE_SHARED": bool,
+                "LLVMLITE_LTO": bool,
+                "LLVMLITE_SKIP_LLVM_VERSION_CHECK": bool,}
+
+    for env_var in env_vars.keys():
+        env_value = os.environ.get(env_var, None)
+        if env_value is not None:
+            expected_value = env_vars[env_var]
+            if expected_value is bool:
+                if env_value.lower() in ("true",  "on", "yes", "1", "y"):
+                    cmake_options.append(f"-D{env_var}=ON")
+                elif env_value.lower() in ("false",  "off", "no", "0", "n", ""):
+                    cmake_options.append(f"-D{env_var}=OFF")
+                else:
+                    msg = ("Unexpected value found for build configuration "
+                           f"environment variable '{env_var}={env_value}', "
+                           "expected a boolean or unset.")
+                    raise ValueError(msg)
+            else:
+                if env_value in expected_value:
+                    cmake_options.append(f"-D{env_var}={env_value}")
+                elif env_value == "":
+                    # empty is fine
+                    pass
+                else:
+                    msg = ("Unexpected value found for build configuration "
+                           f"environment variable '{env_var}={env_value}', "
+                           f"expected one of {expected_value} or unset.")
+                    raise ValueError(msg)
+
+    # Are there any `LLVMLITE_` prefixed env vars which are unused? (perhaps a
+    # spelling mistake/typo)
+    llvmlite_env_vars = set(k for k in os.environ.keys()
+                            if k.startswith("LLVMLITE_"))
+    unknown_env_vars = llvmlite_env_vars - set(env_vars.keys())
+    if unknown_env_vars:
+        msg = "Unknown LLVMLITE_ prefixed environment variables found:\n"
+        msg += "\n".join([f"- {x}" for x in unknown_env_vars])
+        msg += "\nIs this intended?"
+        warnings.warn(msg)
+
+    return cmake_options
+
+
+@functools.cache
+def check_cmake():
+    try:
+        subprocess.run(("cmake", ), check=True, stdout=subprocess.PIPE,
+                       stderr=subprocess.PIPE, timeout=60)
+    except subprocess.CalledProcessError as e:
+        msg = ("llvmlite needs working CMake tools to build. There was an "
+               "issue when performing a test run of the 'cmake' binary.\n"
+               f"STDOUT: {e.stdout.decode('UTF-8')}\n"
+               f"STDERR: {e.stderr.decode('UTF-8')}\n"
+               "See the traceback for details.")
+        raise RuntimeError(msg) from e
+    except FileNotFoundError as e:
+        msg = ("llvmlite needs CMake tools to build. It appears that the "
+               "'cmake' tool is either not installed or not found on the path. "
+               "Please add CMake tools to the build environment and path, they "
+               "are available from many package managers.")
+        raise FileNotFoundError(msg) from e
+    # Timeout etc not handled, there's little advice that can be given and the
+    # traceback is self explanatory.
+
+
+def try_cmake(cmake_dir, build_dir, generator, arch=None, toolkit=None):
+    # first check that CMake tools are present and run ok.
+    check_cmake()
+    old_dir = os.getcwd()
+    args = ['cmake', '-G', generator]
+    if arch is not None:
+        args += ['-A', arch]
+    if toolkit is not None:
+        args += ['-T', toolkit]
+    args.append(cmake_dir)
+    cmake_options = env_var_options_to_cmake_options()
+    args += cmake_options
+    # Handle conda build/conda-style toolchain. These toolchains ship an `ar`
+    # and a `ranlib` under a different name, and then export these as cmake
+    # compatible `-D` defines in the `CMAKE_ARGS` env var. OSX and Linux both
+    # have this, the following fetches this variable from the environment and
+    # wires it through to cmake.
+    CMAKE_ARGS = [x for x in os.environ.get("CMAKE_ARGS", "").split(' ') if x]
+    args += CMAKE_ARGS
+    try:
+        os.chdir(build_dir)
+        print('Running:', ' '.join(args))
+        subprocess.check_call(args)
+    finally:
+        os.chdir(old_dir)
+
+
+def find_windows_generator():
+    """
+    Find a suitable cmake "generator" under Windows.
+    """
+    # XXX this assumes we will find a generator that's the same, or
+    # compatible with, the one which was used to compile LLVM... cmake
+    # seems a bit lacking here.
+    cmake_dir = os.path.join(here_dir, 'dummy')
+    # LLVM 9.0 and later needs VS 2017 minimum.
+    generators = []
+    env_generator = os.environ.get("CMAKE_GENERATOR", None)
+    if is_arm64:
+        arch = "ARM64"
+    elif is_64bit:
+        arch = "x64"
+    else:
+        arch = "Win32"
+
+    if env_generator is not None:
+        env_arch = os.environ.get("CMAKE_GENERATOR_ARCH", None)
+        env_toolkit = os.environ.get("CMAKE_GENERATOR_TOOLKIT", None)
+        if is_arm64 and env_arch and env_arch.lower() == "x64":
+            env_arch = "ARM64"
+        generators.append(
+            (env_generator, env_arch, env_toolkit)
+        )
+
+    generators.extend([
+        # use VS2026 first, with the v143 toolset: llvmdev packages are
+        # built with MSVC v14.44 (v143), and VS2026 ships a v143
+        # compatibility toolset alongside its native v14.5x
+        ('Visual Studio 18 2026', arch, 'v143'),
+        # try VS2022 next
+        ('Visual Studio 17 2022', arch, 'v143'),
+        # try VS2019 next
+        ('Visual Studio 16 2019', arch, 'v142'),
+        # # This is the generator configuration for VS2017
+        # ('Visual Studio 15 2017' + (' Win64' if is_64bit else ''), None, None)
+    ])
+    for generator in generators:
+        build_dir = tempfile.mkdtemp()
+        print("Trying generator %r" % (generator,))
+        try:
+            try_cmake(cmake_dir, build_dir, *generator)
+        except subprocess.CalledProcessError:
+            continue
+        else:
+            # Success
+            return generator
+        finally:
+            shutil.rmtree(build_dir)
+    raise RuntimeError("No compatible CMake generator could be found.")
+
+
+def main_windows():
+    generator = find_windows_generator()
+    config = 'Release'
+    if not os.path.exists(build_dir):
+        os.mkdir(build_dir)
+    # Run configuration step
+    try_cmake(here_dir, build_dir, *generator)
+    subprocess.check_call(['cmake', '--build', build_dir, '--config', config])
+    shutil.copy(os.path.join(build_dir, config, 'llvmlite.dll'), target_dir)
+
+
+def main_posix(library_ext):
+    generator = 'Unix Makefiles'
+    config = 'Release'
+    if not os.path.exists(build_dir):
+        os.mkdir(build_dir)
+    try_cmake(here_dir, build_dir, generator)
+    cmd = ['cmake', '--build', build_dir, "--parallel", '--config', config]
+    subprocess.check_call(cmd)
+    shutil.copy(os.path.join(build_dir, 'libllvmlite' + library_ext),
+                target_dir)
+
+
+def main():
+    ELF_systems = ('linux', 'gnu', 'freebsd', 'openbsd', 'netbsd')
+    if sys.platform == 'win32':
+        main_windows()
+    elif sys.platform.startswith(ELF_systems):
+        main_posix('.so')
+    elif sys.platform == 'darwin':
+        main_posix('.dylib')
+    elif sys.platform == 'android':
+        main_posix('.so')
+    else:
+        raise RuntimeError("unsupported platform: %r" % (sys.platform,))
+
+
+if __name__ == "__main__":
+    main()
