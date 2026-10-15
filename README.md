@@ -172,15 +172,15 @@ Spectrum3DAudacious.py 歌.mp3 -o out.mp4 \
 从F-Droid下载(推荐):
 https://f-droid.org/packages/com.termux/
 
-或从GitHubReleases:
+或从GitHub Releases:
 https://github.com/termux/termux-app/releases
 
 2.打开Termux,安装基础环境:
 
 ```bash
-   pkg update && pkg upgrade
-   pkg install python ffmpeg mpv
-   pip install numpy pillow soundfile
+   pkg update && pkg upgrade -y
+   pkg install python ffmpeg mpv -y
+   pip install numpy pillow soundfile -y
 ```
 
 3.克隆本项目:
