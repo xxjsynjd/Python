@@ -1,0 +1,84 @@
+{
+  "meta": {
+    "title": "WMP‑XP 5套可视化全部合一",
+    "version": "2.0‑generic",
+    "description": "条形、烈焰、魔幻放射、粒子、光球，全部图层在一个文件，从上往下叠加绘制"
+  },
+  "global": {
+    "fps": 30,
+    "width": 800,
+    "height": 450,
+    "trail": {
+      "enable": true,
+      "decay": 0.82
+    }
+  },
+  "layers": [
+    {
+      "type": "rect_bars",
+      "name": "XP‑条形频谱",
+      "count": 64,
+      "gap": 1,
+      "base_y": 0.98,
+      "max_bar_height": 0.95,
+      "alpha_trail": false
+    },
+    {
+      "type": "waterfall",
+      "name": "XP‑烈焰（色彩拖尾）",
+      "bands": 128,
+      "rows": 140
+    },
+    {
+      "type": "radial_lines",
+      "name": "XP‑魔幻放射",
+      "count": 120,
+      "rotate": {
+        "base": 0.002,
+        "bind": "treble",
+        "scale": 0.008
+      },
+      "radius_inner": 0.05,
+      "radius_outer": {
+        "base": 0.0,
+        "bind": "spectrum",
+        "scale": 0.45
+      },
+      "saturation": 0.90,
+      "brightness": {
+        "base": 0.30,
+        "bind": "spectrum",
+        "scale": 0.70
+      },
+      "line_width": {
+        "base": 1,
+        "bind": "spectrum",
+        "scale": 3
+      },
+      "alpha": 200
+    },
+    {
+      "type": "particle_system",
+      "name": "XP‑粒子",
+      "particle_count": 320
+    },
+    {
+      "type": "ellipse",
+      "name": "XP‑光球",
+      "cx": 0.5,
+      "cy": 0.5,
+      "radius": {
+        "base": 0.05,
+        "bind": "rms",
+        "scale": 0.35
+      },
+      "outline": false,
+      "outline_width": 3,
+      "alpha": {
+        "base": 80,
+        "bind": "bass",
+        "scale": 170
+      }
+    }
+  ]
+}
