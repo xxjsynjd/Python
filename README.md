@@ -289,7 +289,7 @@ QQ频道号：疑难解答访问台、Termux交流社区
   <img src="assests/教学楼02.jpg" width="45%">
 </p>
 
-再下面就是我们的宿舍：
+再下面就是我们的宿舍：(可能也不是)
 
 <p align="center">
   <img src="assests/宿舍楼01.jpg" width="45%">
