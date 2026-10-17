@@ -271,6 +271,14 @@ QQ频道号：疑难解答访问台、Termux交流社区
   <img src="assests/01.jpg" width="45%">
   <img src="assests/02.jpg" width="45%">
 </p>
+<p align="center">
+  <img src="assests/食堂.jpg" width="45%">
+  <img src="assests/食堂02.jpg" width="45%">
+</p>
+<p align="center">
+  <img src="assests/食堂03.jpg" width="45%">
+  <img src="assests/食堂04.jpg" width="45%">
+</p>
 
 那么这两张照片呢是我一直去的那个食堂的附近。(这个是江苏商院的本部。)
 
