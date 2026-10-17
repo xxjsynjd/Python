@@ -332,3 +332,4 @@ QQ频道号：疑难解答访问台、Termux交流社区
 
 https://github.com/user-attachments/assets/f84b497b-c3e1-4f08-9d81-465fba707602
 
+祝大家使用得愉快！喝水不忘挖井人，用这东西绝对不能忘了我沈诗淳！
