@@ -4,43 +4,11 @@ Installation
 Binary wheels
 -------------
 
-Since release 8.0.0 binary wheels are provided on PyPI for Linux, Mac and Windows linked against FFmpeg. The most straight-forward way to install PyAV is to run:
+PyAV requires Python 3.12 or later. Binary wheels are provided on PyPI for Linux, macOS, and Windows with FFmpeg bundled. The most straightforward way to install PyAV is to run:
 
 .. code-block:: bash
 
     pip install av
-
-
-Currently FFmpeg 5.1.2 is used with the following features enabled for all platforms:
-
-- fontconfig
-- gmp
-- libaom
-- libass
-- libbluray
-- libdav1d
-- libfreetype
-- libmp3lame
-- libopencore-amrnb
-- libopencore-amrwb
-- libopenjpeg
-- libopus
-- libspeex
-- libtheora
-- libtwolame
-- libvorbis
-- libvpx
-- libx264
-- libx265
-- libxml2
-- libxvid
-- lzma
-- zlib
-
-The following additional features are also enabled on Linux:
-
-- gnutls
-- libxcb
 
 
 Conda
@@ -50,13 +18,13 @@ Another way to install PyAV is via `conda-forge <https://conda-forge.github.io>`
 
     conda install av -c conda-forge
 
-See the `Conda quick install <https://conda.io/docs/install/quick.html>`_ docs to get started with (mini)Conda.
+See the `Conda quick install <https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html>`_ docs to get started with Miniconda.
 
 
 Bring your own FFmpeg
 ---------------------
 
-PyAV can also be compiled against your own build of FFmpeg ((version ``4.3`` or higher). You can force installing PyAV from source by running:
+PyAV can also be compiled against your own build of FFmpeg 8.x. You can force installing PyAV from source by running:
 
 .. code-block:: bash
 
@@ -78,69 +46,47 @@ and a few other tools in general:
 - Python's development headers
 
 
-Mac OS X
-^^^^^^^^
+macOS
+^^^^^
 
-On **Mac OS X**, Homebrew_ saves the day::
+On **macOS**, install the build dependencies with Homebrew_::
 
     brew install ffmpeg pkg-config
 
-.. _homebrew: http://brew.sh/
-
-
-Ubuntu >= 18.04 LTS
-^^^^^^^^^^^^^^^^^^^
-
-On **Ubuntu 18.04 LTS** everything can come from the default sources::
-
-    # General dependencies
-    sudo apt-get install -y python-dev pkg-config
-
-    # Library components
-    sudo apt-get install -y \
-        libavformat-dev libavcodec-dev libavdevice-dev \
-        libavutil-dev libswscale-dev libswresample-dev libavfilter-dev
+.. _homebrew: https://brew.sh/
 
 
 Windows
 ^^^^^^^
 
-It is possible to build PyAV on Windows without Conda by installing FFmpeg yourself, e.g. from the `shared and dev packages <https://ffmpeg.zeranoe.com/builds/>`_.
+The Windows build uses FFmpeg development files maintained by the PyAV project. From a PowerShell prompt, create a development environment, fetch the libraries into it, and pass their location to the build:
 
-Unpack them somewhere (like ``C:\ffmpeg``), and then :ref:`tell PyAV where they are located <build_on_windows>`.
+.. code-block:: powershell
+
+    conda create --name pyav-dev --channel conda-forge python=3.12 cython setuptools numpy pillow pytest
+    conda activate pyav-dev
+    $ffmpegDir = Join-Path $env:CONDA_PREFIX "Library"
+    python scripts\fetch-vendor.py --config-file scripts\ffmpeg-latest.json $ffmpegDir
+    python setup.py build_ext --inplace --ffmpeg-dir=$ffmpegDir
+    python -m pytest
+
+This is the same approach used by PyAV's Windows continuous-integration build.
 
 
-Building from the latest source
--------------------------------
+Building from the latest source on Linux or macOS
+-------------------------------------------------
 
 ::
 
     # Get PyAV from GitHub.
-    git clone git@github.com:PyAV-Org/PyAV.git
+    git clone https://github.com/PyAV-Org/PyAV.git
     cd PyAV
 
     # Prep a virtualenv.
     source scripts/activate.sh
-
-    # Install basic requirements.
-    pip install -r tests/requirements.txt
 
     # Optionally build FFmpeg.
     ./scripts/build-deps
 
     # Build PyAV.
     make
-    # or
-    python setup.py build_ext --inplace
-
-
-On **Mac OS X** you may have issues with regards to Python expecting gcc but finding clang. Try to export the following before installation::
-
-    export ARCHFLAGS=-Wno-error=unused-command-line-argument-hard-error-in-future
-
-
-.. _build_on_windows:
-
-On **Windows** you must indicate the location of your FFmpeg, e.g.::
-
-    python setup.py build --ffmpeg-dir=C:\ffmpeg

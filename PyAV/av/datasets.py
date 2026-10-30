@@ -1,15 +1,15 @@
-from urllib.request import urlopen
 import errno
 import logging
 import os
+import shutil
 import sys
-
+from collections.abc import Iterator
+from urllib.request import urlopen
 
 log = logging.getLogger(__name__)
 
 
-def iter_data_dirs(check_writable=False):
-
+def iter_data_dirs(check_writable: bool = False) -> Iterator[str]:
     try:
         yield os.environ["PYAV_TESTDATA_DIR"]
     except KeyError:
@@ -44,8 +44,7 @@ def iter_data_dirs(check_writable=False):
     yield os.path.join(os.path.expanduser("~"), ".pyav", "datasets")
 
 
-def cached_download(url, name):
-
+def cached_download(url: str, name: str) -> str:
     """Download the data at a URL, and cache it under the given name.
 
     The file is stored under `pyav/test` with the given name in the directory
@@ -62,7 +61,7 @@ def cached_download(url, name):
 
     clean_name = os.path.normpath(name)
     if clean_name != name:
-        raise ValueError("{} is not normalized.".format(name))
+        raise ValueError(f"{name} is not normalized.")
 
     for dir_ in iter_data_dirs():
         path = os.path.join(dir_, name)
@@ -72,11 +71,11 @@ def cached_download(url, name):
     dir_ = next(iter_data_dirs(True))
     path = os.path.join(dir_, name)
 
-    log.info("Downloading {} to {}".format(url, path))
+    log.info(f"Downloading {url} to {path}")
 
     response = urlopen(url)
     if response.getcode() != 200:
-        raise ValueError("HTTP {}".format(response.getcode()))
+        raise ValueError(f"HTTP {response.getcode()}")
 
     dir_ = os.path.dirname(path)
     try:
@@ -87,19 +86,14 @@ def cached_download(url, name):
 
     tmp_path = path + ".tmp"
     with open(tmp_path, "wb") as fh:
-        while True:
-            chunk = response.read(8196)
-            if chunk:
-                fh.write(chunk)
-            else:
-                break
+        shutil.copyfileobj(response, fh)
 
     os.rename(tmp_path, path)
 
     return path
 
 
-def fate(name):
+def fate(name: str) -> str:
     """Download and return a path to a sample from the FFmpeg test suite.
 
     Data is handled by :func:`cached_download`.
@@ -113,7 +107,7 @@ def fate(name):
     )
 
 
-def curated(name):
+def curated(name: str) -> str:
     """Download and return a path to a sample that is curated by the PyAV developers.
 
     Data is handled by :func:`cached_download`.

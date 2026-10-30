@@ -16,6 +16,8 @@ Dynamic Slicing
 
 .. automethod:: StreamContainer.get
 
+.. automethod:: StreamContainer.best
+
 
 Typed Collections
 ~~~~~~~~~~~~~~~~~
@@ -34,6 +36,10 @@ dynamic capabilities of :meth:`.get`:
 .. attribute:: StreamContainer.subtitles
 
     A tuple of :class:`SubtitleStream`.
+
+.. attribute:: StreamContainer.attachments
+
+    A tuple of :class:`AttachmentStream`.
 
 .. attribute:: StreamContainer.data
 
@@ -65,14 +71,6 @@ Basics
 .. autoattribute:: Stream.index
 
 
-Transcoding
-~~~~~~~~~~~
-
-.. automethod:: Stream.encode
-
-.. automethod:: Stream.decode
-
-
 Timing
 ~~~~~~
 
@@ -87,33 +85,14 @@ Timing
 .. autoattribute:: Stream.frames
 
 
-.. _frame_rates:
-
-Frame Rates
-...........
-
-
-These attributes are different ways of calculating frame rates.
-
-Since containers don't need to explicitly identify a frame rate, nor
-even have a static frame rate, these attributes are not guaranteed to be accurate.
-You must experiment with them with your media to see which ones work for you for your purposes.
-
-Whenever possible, we advise that you use raw timing instead of frame rates.
-
-.. autoattribute:: Stream.average_rate
-
-.. autoattribute:: Stream.base_rate
-
-.. autoattribute:: Stream.guessed_rate
-
-
 Others
 ~~~~~~
 
 .. autoattribute:: Stream.profile
 
 .. autoattribute:: Stream.language
+
+.. autoattribute:: Stream.discard
 
 
 

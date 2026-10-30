@@ -1,648 +1,100 @@
 Changelog
 =========
 
-We are operating with `semantic versioning <http://semver.org>`_.
+We are operating with `semantic versioning <https://semver.org>`_.
 
 ..
-    Please try to update this file in the commits that make the changes.
+    Update this file in your commit that makes a change (besides maintenance).
 
-    To make merging/rebasing easier, we don't manually break lines in here
-    when they are too long, so any particular change is just one line.
+    To make merging/rebasing easier, don't manually break lines in here when they are too long.
+    To make tracking easier, please add either ``closes #123`` or ``fixes #123`` to the first line of the commit message, when closing/fixing a GitHub issue.
+    Changelog entries will be limited to the latest major version and (next) to prevent exponential growth in file storage.
+    Use the Oxford comma.
 
-    To make tracking easier, please add either ``closes #123`` or ``fixes #123``
-    to the first line of the commit message. There are more syntaxes at:
-    <https://blog.github.com/2013-01-22-closing-issues-via-commit-messages/>.
+    Entries look like this:
 
-    Note that they these tags will not actually close the issue/PR until they
-    are merged into the "default" branch.
+    v21.67.42
+    ---------
+    Major:
 
-v10.0.0
+    - Breaking changes (MAJOR) go here, including for binary wheels.
+
+    Features:
+
+    - Features (MINOR) changes go here.
+
+    Fixes:
+
+    - Bug fixes (PATCH) go here. 
+    - $CHANGE by :gh-user:`mikeboers` in (:pr:`1`).
+
+
+v19.0.2
+-------
+
+Fixes:
+
+- Audio encoding now correctly passes the codec's ``thread_count`` to its internal :class:`.AudioResampler`, which takes a new ``threads`` argument, as video encoding does for its reformatter. Audio codecs without threading (e.g. MP3) resolve ``thread_count`` to ``1``, but the resampler ignored it and started an idle thread per CPU. By :gh-user:`tonyay163`.
+- Output containers now pass their options to ``avio_open2()`` before ``avformat_write_header()``, as the ``ffmpeg`` program does, so protocol options are used by the protocol. By :gh-user:`ANDYwyLEE`.
+- Fix memory corruption bug when decoding audio with custom channel layouts: :class:`.AudioLayout`, :class:`.AudioFrame`, and :class:`.AudioCodecContext` shallow-copied channel layouts, so custom-order layouts (e.g. ``"FR+FL"``) were double freed. Fixes (:issue:`2444`) by :gh-user:`WyattBlue`.
+
+
+v19.0.1
+-------
+
+Fixes:
+
+- Reading :attr:`.Frame.side_data` no longer holds the frame in a reference cycle, which kept its picture buffer alive until gc ran. By :gh-user:`WyattBlue`.
+- :class:`.MotionVectors` no longer memoizes the vectors it hands out, a cache that never evicted and put every one of them in a reference cycle with the side data, retaining 1640 objects for a single 640x360 frame. By :gh-user:`WyattBlue`.
+- :attr:`.Stream.index_entries` is now a view built on access rather than an object allocated for every stream whether or not anything reads it, which also takes the stream out of a reference cycle with it. Fixes (:issue:`2425`) by :gh-user:`WyattBlue`.
+- :class:`.Filter` and :class:`.FilterContext` pads are now built on access rather than cached, which takes a filter out of a reference cycle with its pads and makes a pad compare equal by what it denotes. By :gh-user:`WyattBlue`.
+
+
+v19.0.0
 -------
 
 Major:
 
-- Add support for FFmpeg 5.0 and 5.1 (:issue:`817`).
-- Drop support for FFmpeg < 4.3.
-- Deprecate `CodecContext.time_base` for decoders (:issue:`966`).
-- Deprecate `VideoStream.framerate` and `VideoStream.rate` (:issue:`1005`).
-- Stop proxying `Codec` from `Stream` instances (:issue:`1037`).
+- Drop support for Python 3.11. Binary wheels are now built for Python 3.12 and later.
+- Remove the undocumented ``CodecContext.hwaccel`` attribute. It held the ``HWAccel`` settings object passed in, not the live device context; use ``CodecContext.is_hwaccel`` to check whether hardware acceleration is in use.
+- Rational attributes (``time_base``, ``average_rate``, ``base_rate``, ``guessed_rate``, ``framerate``, ``rate``, ``sample_aspect_ratio``, and ``display_aspect_ratio``) now return :class:`av.AVRational` rather than ``fractions.Fraction``, and are never ``None``: an unset value is the falsy ``AVRational(0, 1)``. Test them with ``if not stream.time_base:`` instead of ``is None``. Setters still accept a ``fractions.Fraction``.
+- Closing an :class:`.OutputContainer` now frees its context, so using one afterwards raises ``Container is not open`` instead of continuing against a finished file. Muxing has no ``avformat_close_input()`` to do this for it, so ``add_stream()``, ``mux()``, ``start_encoding()`` and the rest kept working after ``close()``, and streams held from it stayed readable.
+- Remove ``Capabilities.hwaccel``, ``Capabilities.hwaccel_vdpau``, and ``Capabilities.neg_linesizes``, none of which FFmpeg defines any more.
+- Remove the ``metadata_encoding`` and ``metadata_errors`` arguments to :func:`av.open`, and the matching attributes. Metadata is now always read and written as UTF-8 with ``surrogateescape``, which is byte exact: a tag in another encoding survives as surrogates and is recovered per key with ``value.encode("utf-8", "surrogateescape").decode("cp1251")``. Previously one encoding had to be chosen for a whole container, so a file mixing encodings across tags could not be represented at all.
+- Remove the ``stream_options`` argument to :func:`av.open` and the matching attribute. They only ever reached ``avformat_find_stream_info()``, and only for formats that expose their streams before it runs, so they raised for MPEG and friends; output containers rejected them outright. Pass ``options`` for every stream, set ``stream.codec_context.options`` for one, and ``Container.add_stream(..., options={})`` when writing.
 
 Features:
 
-- Update FFmpeg to 5.1.2 for the binary wheels.
-- Provide binary wheels for Python 3.11 (:issue:`1019`).
-- Add VideoFrame ndarray operations for gbrp formats (:issue:`986`).
-- Add VideoFrame ndarray operations for gbrpf32 formats (:issue:`1028`).
-- Add VideoFrame ndarray operations for nv12 format (:issue:`996`).
+- ``av.dump_codecs()`` now lists every codec FFmpeg knows of rather than only those with an encoder or a decoder, so data and attachment codecs appear, matching ``ffmpeg -codecs``. Its legend gains the ``..D...`` and ``..T...`` media types.
+- ``ContainerFormat.fixed_framesize`` reports whether a format wants fixed size audio frames.
+- :class:`.CodecContext` exposes more of ``AVCodecContext``: ``pkt_timebase``, ``frame_num``, ``active_thread_type``, ``bits_per_raw_sample``, ``compression_level``, ``rc_buffer_size``, ``min_bit_rate``, a setter for ``max_bit_rate``, the audio ``initial_padding``, ``trailing_padding``, and ``seek_preroll``, and ``stats_in``/``stats_out`` for two-pass encoding. ``VideoCodecContext`` gains ``chroma_sample_location``, ``refs``, and ``mb_decision``; ``AudioCodecContext`` gains ``block_align``.
+- ``CodecContext.coded_side_data`` and ``CodecContext.decoded_side_data`` expose the context's global side data as dicts of ``bytes``, keyed by packet side data name and :class:`~av.sidedata.sidedata.Type` respectively. Stream wide HDR metadata, such as mastering display and content light level, arrives in ``decoded_side_data`` once a frame has been decoded.
+- ``VideoFrame.chroma_location`` exposes ``AVFrame.chroma_location``, the position of the chroma samples relative to the luma samples, and the new ``ChromaLocation`` enum names its values. Only the codec context side of the field was wrapped, as ``VideoCodecContext.chroma_sample_location``, so the siting a decoder actually reported per frame could not be read at all. Each property mirrors its C field name, which FFmpeg spells differently on the two structs.
+- Enums gained the members FFmpeg has since added: ``Properties.FIELDS``, ``Properties.ENHANCEMENT``, ``PixFmtLoss.EXCESS_RESOLUTION``, ``PixFmtLoss.EXCESS_DEPTH``, ``Flags2.icc_profiles``, ``format.Flags.experimental``, ``Interpolation.STRICT``, ``Interpolation.UNSTABLE``, ``ColorTrc.V_LOG``, ``ColorPrimaries.V_GAMUT``, the ``LCEVC``, ``VIEW_ID``, ``THREE_D_REFERENCE_DISPLAYS``, and ``EXIF`` members of ``sidedata.Type``, and the ``exif``, ``dynamic_hdr_smpte_2094_app5``, and ``hevc_conf`` packet side data names.
 
 Fixes:
 
-- Fix conversion to numpy array for multi-byte formats (:issue:`981`).
-- Safely iterate over filter pads (:issue:`1000`).
-
-v9.2.0
-------
-
-Features:
-
-- Update binary wheels to enable libvpx support.
-- Add an `io_open` argument to `av.open` for multi-file custom I/O.
-- Add support for AV_FRAME_DATA_SEI_UNREGISTERED (:issue:`723`).
-- Ship .pxd files to allow other libraries to `cimport av` (:issue:`716`).
-
-Fixes:
-
-- Fix an `ImportError` when using Python 3.8/3.9 via Conda (:issue:`952`).
-- Fix a muxing memory leak which was introduced in v9.1.0 (:issue:`959`).
-
-v9.1.1
-------
-
-Fixes:
-
-- Update binary wheels to update dependencies on Windows, disable ALSA on Linux.
-
-v9.1.0
-------
-
-Features:
-
-- Add VideoFrame ndarray operations for rgb48be, rgb48le, rgb64be, rgb64le pixel formats.
-- Add VideoFrame ndarray operations for gray16be, gray16le pixel formats (:issue:`674`).
-- Make it possible to use av.open() on a pipe (:issue:`738`).
-- Use the "ASS without timings" format when decoding subtitles.
-
-Fixes:
-
-- Update binary wheels to fix security vulnerabilities (:issue:`921`) and enable ALSA on Linux (:issue:`941`).
-- Fix crash when closing an output container an encountering an I/O error (:issue:`613`).
-- Fix crash when probing corrupt raw format files (:issue:`590`).
-- Fix crash when manipulating streams with an unknown codec (:issue:`689`).
-- Remove obsolete KEEP_SIDE_DATA and MP4A_LATM flags which are gone in FFmpeg 5.0.
-- Deprecate `to_bytes()` method of Packet, Plane and SideData, use `bytes(packet)` instead.
-
-v9.0.2
-------
-
-Minor:
-
-- Update FFmpeg to 4.4.1 for the binary wheels.
-- Fix framerate when writing video with FFmpeg 4.4 (:issue:`876`).
-
-v9.0.1
-------
-
-Minor:
-
-- Update binary wheels to fix security vulnerabilities (:issue:`901`).
-
-v9.0.0
-------
-
-Major:
-
-- Re-implement AudioResampler with aformat and buffersink (:issue:`761`).
-  AudioResampler.resample() now returns a list of frames.
-- Remove deprecated methods: AudioFrame.to_nd_array, VideoFrame.to_nd_array and Stream.seek.
-
-Minor:
-
-- Provide binary wheels for macOS/arm64 and Linux/aarch64.
-- Simplify setup.py, require Cython.
-- Update the installation instructions in favor of PyPI.
-- Fix VideoFrame.to_image with height & width (:issue:`878`).
-- Fix setting Stream time_base (:issue:`784`).
-- Replace deprecated av_init_packet with av_packet_alloc (:issue:`872`).
-- Validate pixel format in VideoCodecContext.pix_fmt setter (:issue:`815`).
-- Fix AudioFrame ndarray conversion endianness (:issue:`833`).
-- Improve time_base support with filters (:issue:`765`).
-- Allow flushing filters by sending `None` (:issue:`886`).
-- Avoid unnecessary vsnprintf() calls in log_callback() (:issue:`877`).
-- Make Frame.from_ndarray raise ValueError instead of AssertionError.
-
-v8.1.0
-------
-
-Minor:
-
-- Update FFmpeg to 4.3.2 for the binary wheels.
-- Provide binary wheels for Python 3.10 (:issue:`820`).
-- Stop providing binary wheels for end-of-life Python 3.6.
-- Fix args order in Frame.__repr__ (:issue:`749`).
-- Fix documentation to remove unavailable QUIET log level (:issue:`719`).
-- Expose codec_context.codec_tag (:issue:`741`).
-- Add example for encoding with a custom PTS (:issue:`725`).
-- Use av_packet_rescale_ts in Packet._rebase_time() (:issue:`737`).
-- Do not hardcode errno values in test suite (:issue:`729`).
-- Use av_guess_format for output container format (:issue:`691`).
-- Fix setting CodecContext.extradata (:issue:`658`, :issue:`740`).
-- Fix documentation code block indentation (:issue:`783`).
-- Fix link to Conda installation instructions (:issue:`782`).
-- Export AudioStream from av.audio (:issue:`775`).
-- Fix setting CodecContext.extradata (:issue:`801`).
-
-v8.0.3
-------
-
-Minor:
-
-- Update FFmpeg to 4.3.1 for the binary wheels.
-
-v8.0.2
-------
-
-Minor:
-
-- Enable GnuTLS support in the FFmpeg build used for binary wheels (:issue:`675`).
-- Make binary wheels compatible with Mac OS X 10.9+ (:issue:`662`).
-- Drop Python 2.x buffer protocol code.
-- Remove references to previous repository location.
-
-v8.0.1
-------
-
-Minor:
-
-- Enable additional FFmpeg features in the binary wheels.
-- Use os.fsencode for both input and output file names (:issue:`600`).
-
-v8.0.0
-------
-
-Major:
-
-- Drop support for Python 2 and Python 3.4.
-- Provide binary wheels for Linux, Mac and Windows.
-
-Minor:
-
-- Remove shims for obsolete FFmpeg versions (:issue:`588`).
-- Add yuvj420p format for :meth:`VideoFrame.from_ndarray` and :meth:`VideoFrame.to_ndarray` (:issue:`583`).
-- Add support for palette formats in :meth:`VideoFrame.from_ndarray` and :meth:`VideoFrame.to_ndarray` (:issue:`601`).
-- Fix Python 3.8 deprecation warning related to abstract base classes (:issue:`616`).
-- Remove ICC profiles from logos (:issue:`622`).
-
-Fixes:
-
-- Avoid infinite timeout in :func:`av.open` (:issue:`589`).
-
-v7.0.1
-------
-
-Fixes:
-
-- Removed deprecated ``AV_FRAME_DATA_QP_TABLE_*`` enums. (:issue:`607`)
-
-
-v7.0.0
-------
-
-Major:
-
-- Drop support for FFmpeg < 4.0. (:issue:`559`)
-- Introduce per-error exceptions, and mirror the builtin exception hierarchy. It is recommended to examine your error handling code, as common FFmpeg errors will result in `ValueError` baseclasses now. (:issue:`563`)
-- Data stream's `encode` and `decode` return empty lists instead of none allowing common API use patterns with data streams.
-- Remove ``whence`` parameter from :meth:`InputContainer.seek` as non-time seeking doesn't seem to actually be supported by any FFmpeg formats.
-
-Minor:
-
-- Users can disable the logging system to avoid lockups in sub-interpreters. (:issue:`545`)
-- Filters support audio in general, and a new :meth:`.Graph.add_abuffer`. (:issue:`562`)
-- :func:`av.open` supports `timeout` parameters. (:issue:`480` and :issue:`316`)
-- Expose :attr:`Stream.base_rate` and :attr:`Stream.guessed_rate`. (:issue:`564`)
-- :meth:`.VideoFrame.reformat` can specify interpolation.
-- Expose many sets of flags.
-
-Fixes:
-
-- Fix typing in :meth:`.CodecContext.parse` and make it more robust.
-- Fix wrong attribute in ByteSource. (:issue:`340`)
-- Remove exception that would break audio remuxing. (:issue:`537`)
-- Log messages include last FFmpeg error log in more helpful way.
-- Use AVCodecParameters so FFmpeg doesn't complain. (:issue:`222`)
-
-
-v6.2.0
-------
-
-Major:
-
-- Allow :meth:`av.open` to be used as a context manager.
-- Fix compatibility with PyPy, the full test suite now passes. (:issue:`130`)
-
-Minor:
-
-- Add :meth:`.InputContainer.close` method. (:issue:`317`, :issue:`456`)
-- Ensure audio output gets flushes when using a FIFO. (:issue:`511`)
-- Make Python I/O buffer size configurable. (:issue:`512`)
-- Make :class:`.AudioFrame` and :class:`VideoFrame` more garbage-collector friendly by breaking a reference cycle. (:issue:`517`)
-
-Build:
-
-- Do not install the `scratchpad` package.
-
-
-v6.1.2
-------
-
-Micro:
-
-- Fix a numpy deprecation warning in :meth:`.AudioFrame.to_ndarray`.
-
-
-v6.1.1
-------
-
-Micro:
-
-- Fix alignment in :meth:`.VideoFrame.from_ndarray`. (:issue:`478`)
-- Fix error message in :meth:`.Buffer.update`.
-
-Build:
-
-- Fix more compiler warnings.
-
-
-v6.1.0
-------
-
-Minor:
-
-- ``av.datasets`` for sample data that is pulled from either FFmpeg's FATE suite, or our documentation server.
-- :meth:`.InputContainer.seek` gets a ``stream`` argument to specify the ``time_base`` the requested ``offset`` is in.
-
-Micro:
-
-- Avoid infinite look in ``Stream.__getattr__``. (:issue:`450`)
-- Correctly handle Python I/O with no ``seek`` method.
-- Remove ``Datastream.seek`` override (:issue:`299`)
-
-Build:
-
-- Assert building against compatible FFmpeg. (:issue:`401`)
-- Lock down Cython lanaguage level to avoid build warnings. (:issue:`443`)
-
-Other:
-
-- Incremental improvements to docs and tests.
-- Examples directory will now always be runnable as-is, and embeded in the docs (in a copy-pastable form).
-
-
-v6.0.0
-------
-
-Major:
-
-- Drop support for FFmpeg < 3.2.
-- Remove ``VideoFrame.to_qimage`` method, as it is too tied to PyQt4. (:issue:`424`)
-
-Minor:
-
-- Add support for all known sample formats in :meth:`.AudioFrame.to_ndarray` and add :meth:`.AudioFrame.to_ndarray`. (:issue:`422`)
-- Add support for more image formats in :meth:`.VideoFrame.to_ndarray` and :meth:`.VideoFrame.from_ndarray`. (:issue:`415`)
-
-Micro:
-
-- Fix a memory leak in :meth:`.OutputContainer.mux_one`. (:issue:`431`)
-- Ensure :meth:`.OutputContainer.close` is called at destruction. (:issue:`427`)
-- Fix a memory leak in :class:`.OutputContainer` initialisation. (:issue:`427`)
-- Make all video frames created by PyAV use 8-byte alignment. (:issue:`425`)
-- Behave properly in :meth:`.VideoFrame.to_image` and :meth:`.VideoFrame.from_image` when ``width != line_width``. (:issue:`425`)
-- Fix manipulations on video frames whose width does not match the line stride. (:issue:`423`)
-- Fix several :attr:`.Plane.line_size` misunderstandings. (:issue:`421`)
-- Consistently decode dictionary contents. (:issue:`414`)
-- Always use send/recv en/decoding mechanism. This removes the ``count`` parameter, which was not used in the send/recv pipeline. (:issue:`413`)
-- Remove various deprecated iterators. (:issue:`412`)
-- Fix a memory leak when using Python I/O. (:issue:`317`)
-- Make :meth:`.OutputContainer.mux_one` call `av_interleaved_write_frame` with the GIL released.
-
-Build:
-
-- Remove the "reflection" mechanism, and rely on FFmpeg version we build against to decide which methods to call. (:issue:`416`)
-- Fix many more ``const`` warnings.
-
-
-v0.x.y
-------
-
-.. note::
-
-    Below here we used ``v0.x.y``.
-
-    We incremented ``x`` to signal a major change (i.e. backwards
-    incompatibilities) and incremented ``y`` as a minor change (i.e. backwards
-    compatible features).
-
-    Once we wanted more subtlety and felt we had matured enough, we jumped
-    past the implications of ``v1.0.0`` straight to ``v6.0.0``
-    (as if we had not been stuck in ``v0.x.y`` all along).
-
-
-v0.5.3
-------
-
-Minor:
-
-- Expose :attr:`.VideoFrame.pict_type` as :class:`.PictureType` enum.
-  (:pr:`402`)
-- Expose :attr:`.Codec.video_rates` and :attr:`.Codec.audio_rates`.
-  (:pr:`381`)
-
-Patch:
-
-- Fix :attr:`.Packet.time_base` handling during flush.
-  (:pr:`398`)
-- :meth:`.VideoFrame.reformat` can throw exceptions when requested colorspace
-  transforms aren't possible.
-- Wrapping the stream object used to overwrite the ``pix_fmt`` attribute.
-  (:pr:`390`)
-
-Runtime:
-
-- Deprecate ``VideoFrame.ptr`` in favour of :attr:`VideoFrame.buffer_ptr`.
-- Deprecate ``Plane.update_buffer()`` and ``Packet.update_buffer`` in favour of
-  :meth:`.Plane.update`.
-  (:pr:`407`)
-- Deprecate ``Plane.update_from_string()`` in favour of :meth:`.Plane.update`.
-  (:pr:`407`)
-- Deprecate ``AudioFrame.to_nd_array()`` and ``VideoFrame.to_nd_array()`` in
-  favour of :meth:`.AudioFrame.to_ndarray` and :meth:`.VideoFrame.to_ndarray`.
-  (:pr:`404`)
-
-Build:
-
-- CI covers more cases, including macOS.
-  (:pr:`373` and :pr:`399`)
-- Fix many compilation warnings.
-  (:issue:`379`, :pr:`380`, :pr:`387`, and :pr:`388`)
-
-Docs:
-
-- Docstrings for many commonly used attributes.
-  (:pr:`372` and :pr:`409`)
-
-
-v0.5.2
-------
-
-Build:
-
-- Fixed Windows build, which broke in v0.5.1.
-- Compiler checks are not cached by default. This behaviour is retained if you
-  ``source scripts/activate.sh`` to develop PyAV.
-  (:issue:`256`)
-- Changed to ``PYAV_SETUP_REFLECT_DEBUG=1`` from ``PYAV_DEBUG_BUILD=1``.
-
-
-v0.5.1
-------
-
-Build:
-
-- Set ``PYAV_DEBUG_BUILD=1`` to force a verbose reflection (mainly for being
-  installed via ``pip``, which is why this is worth a release).
-
-
-v0.5.0
-------
-
-Major:
-
-- Dropped support for Libav in general.
-  (:issue:`110`)
-- No longer uses libavresample.
-
-Minor:
-
-- ``av.open`` has ``container_options`` and ``stream_options``.
-- ``Frame`` includes ``pts`` in ``repr``.
-
-Patch:
-
-- EnumItem's hash calculation no longer overflows.
-  (:issue:`339`, :issue:`341` and :issue:`342`.)
-- Frame.time_base was not being set in most cases during decoding.
-  (:issue:`364`)
-- CodecContext.options no longer needs to be manually initialized.
-- CodexContext.thread_type accepts its enums.
-
-
-v0.4.1
-------
-
-Minor:
-
-- Add `Frame.interlaced_frame` to indicate if the frame is interlaced.
-  (:issue:`327` by :gh-user:`MPGek`)
-- Add FLTP support to ``Frame.to_nd_array()``.
-  (:issue:`288` by :gh-user:`rawler`)
-- Expose ``CodecContext.extradata`` for codecs that have extra data, e.g.
-  Huffman tables.
-  (:issue:`287` by :gh-user:`adavoudi`)
-
-Patch:
-
-- Packets retain their refcount after muxing.
-  (:issue:`334`)
-- `Codec` construction is more robust to find more codecs.
-  (:issue:`332` by :gh-user:`adavoudi`)
-- Refined frame corruption detection.
-  (:issue:`291` by :gh-user:`Litterfeldt`)
-- Unicode filenames are okay.
-  (:issue:`82`)
-
-
-v0.4.0
-------
-
-Major:
-
-- ``CodecContext`` has taken over encoding/decoding, and can work in isolation
-  of streams/containers.
-- ``Stream.encode`` returns a list of packets, instead of a single packet.
-- ``AudioFifo`` and ``AudioResampler`` will raise ``ValueError`` if input frames
-  inconsistant ``pts``.
-- ``time_base`` use has been revisited across the codebase, and may not be converted
-  bettween ``Stream.time_base`` and ``CodecContext.time_base`` at the same times
-  in the transcoding pipeline.
-- ``CodecContext.rate`` has been removed, but proxied to ``VideoCodecContext.framerate``
-  and ``AudioCodecContext.sample_rate``. The definition is effectively inverted from
-  the old one (i.e. for 24fps it used to be ``1/24`` and is now ``24/1``).
-- Fractions (e.g. ``time_base``, ``rate``) will be ``None`` if they are invalid.
-- ``InputContainer.seek`` and ``Stream.seek`` will raise TypeError if given
-  a float, when previously they converted it from seconds.
-
-Minor:
-
-- Added ``Packet.is_keyframe`` and ``Packet.is_corrupt``.
-  (:issue:`226`)
-- Many more ``time_base``, ``pts`` and other attributes are writeable.
-- ``Option`` exposes much more of the API (but not get/set).
-  (:issue:`243`)
-- Expose metadata encoding controls.
-  (:issue:`250`)
-- Expose ``CodecContext.skip_frame``.
-  (:issue:`259`)
-
-Patch:
-
-- Build doesn't fail if you don't have git installed.
-  (:issue:`184`)
-- Developer environment works better with Python3.
-  (:issue:`248`)
-- Fix Container deallocation resulting in segfaults.
-  (:issue:`253`)
-
-
-v0.3.3
-------
-
-Patch:
-
-- Fix segfault due to buffer overflow in handling of stream options.
-  (:issue:`163` and :issue:`169`)
-- Fix segfault due to seek not properly checking if codecs were open before
-  using avcodec_flush_buffers.
-  (:issue:`201`)
-
-
-v0.3.2
-------
-
-Minor:
-
-- Expose basics of avfilter via ``Filter``.
-- Add ``Packet.time_base``.
-- Add ``AudioFrame.to_nd_array`` to match same on ``VideoFrame``.
-- Update Windows build process.
-
-Patch:
-
-- Further improvements to the logging system.
-  (:issue:`128`)
-
-
-v0.3.1
-------
-
-Minor:
-
-- ``av.logging.set_log_after_shutdown`` renamed to ``set_print_after_shutdown``
-- Repeating log messages will be skipped, much like ffmpeg's does by default
-
-Patch:
-
-- Fix memory leak in logging system when under heavy logging loads while
-  threading.
-  (:issue:`128` with help from :gh-user:`mkassner` and :gh-user:`ksze`)
-
-
-v0.3.0
-------
-
-Major:
-
-- Python IO can write
-- Improve build system to use Python's C compiler for function detection;
-  build system is much more robust
-- MSVC support.
-  (:issue:`115` by :gh-user:`vidartf`)
-- Continuous integration on Windows via AppVeyor. (by :gh-user:`vidartf`)
-
-Minor:
-
-- Add ``Packet.decode_one()`` to skip packet flushing for codecs that would
-  otherwise error
-- ``StreamContainer`` for easier selection of streams
-- Add buffer protocol support to Packet
-
-Patch:
-
-- Fix bug when using Python IO on files larger than 2GB.
-  (:issue:`109` by :gh-user:`xxr3376`)
-- Fix usage of changed Pillow API
-
-Known Issues:
-
-- VideoFrame is suspected to leak memory in narrow cases on Linux.
-  (:issue:`128`)
-
-
-v0.2.4
-------
-
-- fix library search path for current Libav/Ubuntu 14.04.
-  (:issue:`97`)
-- explicitly include all sources to combat 0.2.3 release problem.
-  (:issue:`100`)
-
-
-v0.2.3
-------
-
-.. warning:: There was an issue with the PyPI distribution in which it required
-    Cython to be installed.
-
-Major:
-
-- Python IO.
-- Agressively releases GIL
-- Add experimental Windows build.
-  (:issue:`84`)
-
-Minor:
-
-- Several new Stream/Packet/Frame attributes
-
-Patch:
-
-- Fix segfault in audio handling.
-  (:issue:`86` and :issue:`93`)
-- Fix use of PIL/Pillow API.
-  (:issue:`85`)
-- Fix bad assumptions about plane counts.
-  (:issue:`76`)
-
-
-v0.2.2
-------
-
-- Cythonization in setup.py; mostly a development issue.
-- Fix for av.InputContainer.size over 2**31.
-
-
-v0.2.1
-------
-
-- Python 3 compatibility!
-- Build process fails if missing libraries.
-- Fix linking of libavdevices.
-
-
-v0.2.0
-------
-
-.. warning:: This version has an issue linking in libavdevices, and very likely
-    will not work for you.
-
-It sure has been a long time since this was released, and there was a lot of
-arbitrary changes that come with us wrapping an API as we are discovering it.
-Changes include, but are not limited to:
-
-- Audio encoding.
-- Exposing planes and buffers.
-- Descriptors for channel layouts, video and audio formats, etc..
-- Seeking.
-- Many many more properties on all of the objects.
-- Device support (e.g. webcams).
-
-
-v0.1.0
-------
-
-- FIRST PUBLIC RELEASE!
-- Container/video/audio formats.
-- Audio layouts.
-- Decoding video/audio/subtitles.
-- Encoding video.
-- Audio FIFOs and resampling.
+- ``Frame.side_data`` and ``PacketSideData.data_type`` no longer raise on side data types FFmpeg has added since PyAV last listed them. The packet side data names were missing three, so reading, say, the ``AV_PKT_DATA_HEVC_CONF`` an HEVC stream in MP4 or Matroska carries raised ``IndexError``. A frame side data type that no ``sidedata.Type`` member names, which is anything a newer FFmpeg than PyAV was built against added, now becomes an ``UNKNOWN_<value>`` member rather than raising ``ValueError``.
+- ``CodecContext.bit_rate_tolerance`` returns its value instead of always ``None``; the getter was missing its ``return``.
+- A rejected ``add_stream()`` or ``add_mux_stream()`` no longer breaks the container.
+- ``InputContainer.size`` returns ``None`` when the size cannot be determined rather than the negative ``AVERROR`` it was passing through, which read as a plausible byte count. A non-seekable input, such as a pipe, reported ``-78``.
+- ``av.dump_codecs()`` no longer drops the canonical names ``h264``, ``hevc``, ``av1``, ``dirac``, and ``ilbc``, each of which was overwritten by the row of whichever encoder it resolved to.
+- ``FilterLink.input`` and ``FilterLink.output`` now follow the filters the graph auto-inserts while configuring. They cached the pad they first resolved, so reading one before ``Graph.configure()`` reported the filter the link no longer pointed at.
+- Fix a segfault when a ``FilterLink`` outlives its ``Graph``. It held the graph by weak reference and dereferenced ``AVFilterLink`` before consulting it, so ``link.input`` and ``link.output`` read freed memory. It now holds the graph, as a ``FilterContext`` already did.
+- Reading a :class:`.Stream` or its :attr:`~av.stream.Stream.index_entries` after the container is closed now raises instead of reading freed memory, since ``avformat_close_input()`` frees the underlying ``AVStream``. Holding an ``index_entries`` also keeps its container alive, and an :class:`.IndexEntry` is a copy, so it stays readable after the close and is unaffected by the demuxer reallocating the index.
+- Attaching one object to the ``opaque`` of more than one frame or packet no longer loses it. The objects were keyed by ``id()``, so every holder shared an entry and whichever was freed first took it away from the rest.
+- ``Frame.side_data`` now satisfies the ``Mapping`` protocol it advertises: iteration yields :class:`~av.sidedata.sidedata.Type` keys, so ``items()``, ``keys()``, and ``values()`` work instead of raising ``KeyError``. Values remain reachable positionally by an integer or, for the first time, a slice. Its type stub was a ``TypedDict`` with a single literal key, and is now ``SideDataContainer``.
+- Fix crashes from indexes that were turned into C pointer arithmetic without being range checked. ``MotionVectors[i]`` only checked the upper bound, so a negative index read off the front of the buffer (``mvs[-1]`` now returns the last vector, as with any sequence); ``VideoFormatComponent`` and ``AudioPlane`` accepted any index at all; and ``BitmapSubtitlePlane`` and ``VideoBlockParams`` were missing their lower bounds.
+- Frames returned by flushing a codec context directly (``CodecContext.decode()`` with no packet) now carry the stream's ``time_base`` instead of ``None``.
+- ``VideoFrame.reformat()`` (and so ``to_ndarray(format=...)``, ``to_rgb()``, ``to_image()``) now shares one ``SwsContext`` per thread instead of allocating one per frame. FFmpeg 8's swscale retains megabytes of graph state per context, which showed up as large RSS growth when many frames were alive at once.
+- Writing to a network URL no longer blocks every other Python thread, and ``timeout`` now applies to opening an output container. ``avio_open()``, ``avformat_write_header()``, ``av_write_trailer()``, and ``avio_closep()`` held the GIL, so an unreachable RTMP server froze the whole process, and the interrupt callback was only installed for demuxing, so nothing could end the wait. :meth:`.OutputContainer.close` now raises rather than freeing a context another thread is still muxing or closing. By :gh-user:`adrianrfreedman` in (:pr:`2412`).
+- ``timeout`` now applies to muxing and closing an output container, not just to opening it. Only opening armed the interrupt callback, so a peer that accepted the connection and then stopped reading left ``av_interleaved_write_frame()`` and ``av_write_trailer()`` blocked forever. Each mux gets the full timeout, and a close shares one across writing the trailer and flushing, so neither can outlast it. Only unseekable outputs are covered: writing a seekable file takes as long as the file is big, so a deadline meant for a peer would abandon it part-written. By :gh-user:`adrianrfreedman` in (:pr:`2414`).
+- :meth:`.HWAccel.create` now passes ``flags`` on to the context it creates. They were dropped, so ``av_hwdevice_ctx_create()`` always got ``0`` and CUDA's ``AV_CUDA_USE_PRIMARY_CONTEXT`` could not be requested through them.
+
+
+18.X and Below
+--------------
+..
+  or see older git commits
+
+`18.X Changelog <https://pyav.basswood.io/docs/18.1/development/changelog.html>`

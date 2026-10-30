@@ -14,9 +14,6 @@ Generic
 
     .. attribute:: options
     .. attribute:: container_options
-    .. attribute:: stream_options
-    .. attribute:: metadata_encoding
-    .. attribute:: metadata_errors
     .. attribute:: open_timeout
     .. attribute:: read_timeout
 
@@ -60,7 +57,6 @@ Formats
 .. autoattribute:: ContainerFormat.name
 .. autoattribute:: ContainerFormat.long_name
 
-.. autoattribute:: ContainerFormat.options
 .. autoattribute:: ContainerFormat.input
 .. autoattribute:: ContainerFormat.output
 .. autoattribute:: ContainerFormat.is_input

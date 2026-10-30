@@ -1,2 +1,3 @@
-from .filter import Filter, FilterFlags, filter_descriptor, filters_available
-from .graph import Graph
+from .filter import Filter, filters_available
+from .graph import Graph as Graph
+from .loudnorm import stats as stats

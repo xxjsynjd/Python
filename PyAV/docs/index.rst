@@ -3,7 +3,7 @@
 
 **PyAV** is a Pythonic binding for FFmpeg_. We aim to provide all of the power and control of the underlying library, but manage the gritty details as much as possible.
 
-PyAV is for direct and precise access to your media via containers, streams, packets, codecs, and frames. It exposes a few transformations of that data, and helps you get your data to/from other packages (e.g. Numpy and Pillow).
+PyAV is for direct and precise access to your media via containers, streams, packets, codecs, and frames. It exposes a few transformations of that data, and helps you get your data to/from other packages (e.g. NumPy and Pillow).
 
 This power does come with some responsibility as working with media is horrendously complicated and PyAV can't abstract it away or make all the best decisions for you. If the ``ffmpeg`` command does the job without you bending over backwards, PyAV is likely going to be more of a hindrance than a help.
 
@@ -21,6 +21,7 @@ Currently we provide:
 - ``libavcodec``:
   :class:`.Codec`,
   :class:`.CodecContext`,
+  :class:`.BitStreamFilterContext`,
   audio/video :class:`frames <.Frame>`,
   :class:`data planes <.Plane>`,
   :class:`subtitles <.Subtitle>`;
@@ -52,10 +53,11 @@ Basic Demo
 
     import av
 
+    av.logging.set_level(av.logging.VERBOSE)
     container = av.open(path_to_video)
 
-    for frame in container.decode(video=0):
-        frame.to_image().save('frame-%04d.jpg' % frame.index)
+    for index, frame in enumerate(container.decode(video=0)):
+        frame.to_image().save(f"frame-{index:04d}.jpg")
 
 
 Overview

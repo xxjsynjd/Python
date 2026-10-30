@@ -1,4 +1,4 @@
-#!/bin/bash
+#! /usr/bin/env bash
 
 # Make sure this is sourced.
 if [[ "$0" == "${BASH_SOURCE[0]}" ]]; then
@@ -6,21 +6,31 @@ if [[ "$0" == "${BASH_SOURCE[0]}" ]]; then
     exit 1
 fi
 
-export PYAV_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.."; pwd)"
+if [[ -n "$ZSH_VERSION" ]]; then
+    export PYAV_ROOT="$(realpath -- "$(dirname -- "$(readlink -f -- "$0")")/..")"
+else
+    export PYAV_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.."; pwd)"
+fi
 
 if [[ ! "$PYAV_LIBRARY" ]]; then
-
-    # Pull from command line argument.
     if [[ "$1" ]]; then
-        PYAV_LIBRARY="$1"
+        if [[ "$1" == ffmpeg-* ]]; then
+            PYAV_LIBRARY="$1"
+        else
+            echo "Error: PYAV_LIBRARY must start with 'ffmpeg-'" >&2
+            return 1
+        fi
     else
-        PYAV_LIBRARY=ffmpeg-4.2
+        PYAV_LIBRARY=ffmpeg-9.0.2
         echo "No \$PYAV_LIBRARY set; defaulting to $PYAV_LIBRARY"
     fi
 fi
 export PYAV_LIBRARY
 
-if [[ ! "$PYAV_PYTHON" ]]; then
+if [[ "$VIRTUAL_ENV" ]]; then
+    PYAV_PYTHON="${VIRTUAL_ENV}/bin/python3"
+    echo "Using activated venv: $VIRTUAL_ENV"
+elif [[ ! "$PYAV_PYTHON" ]]; then
     PYAV_PYTHON="${PYAV_PYTHON-python3}"
     echo 'No $PYAV_PYTHON set; defaulting to python3.'
 fi
@@ -28,19 +38,22 @@ fi
 # Hack for PyPy on GitHub Actions.
 # This is because PYAV_PYTHON is constructed from "python${{ matrix.config.python }}"
 # resulting in "pythonpypy3", which won't work.
-# It would be nice to clean this up, but I want it to work ASAP.
 if [[ "$PYAV_PYTHON" == *pypy* ]]; then
     PYAV_PYTHON=python
 fi
 
 export PYAV_PYTHON
-export PYAV_PIP="${PYAV_PIP-$PYAV_PYTHON -m pip}"
+export UV_PYTHON="$PYAV_PYTHON"
+export PYAV_PIP="${PYAV_PIP-uv pip}"
 
 if [[ "$GITHUB_ACTION" ]]; then
 
     # GitHub has a very self-contained environment. Lets just work in that.
     echo "We're on CI, so not setting up another virtualenv."
 
+elif [[ "$VIRTUAL_ENV" ]]; then
+    # Using activated venv
+    true
 else
 
     export PYAV_VENV_NAME="$(uname -s).$(uname -r).$("$PYAV_PYTHON" -c '
@@ -52,8 +65,7 @@ print("{}{}.{}".format(platform.python_implementation().lower(), *sys.version_in
 
     if [[ ! -e "$PYAV_VENV/bin/python" ]]; then
         mkdir -p "$PYAV_VENV"
-        virtualenv -p "$PYAV_PYTHON" "$PYAV_VENV"
-        "$PYAV_VENV/bin/pip" install --upgrade pip setuptools
+        uv venv -p "$PYAV_PYTHON" "$PYAV_VENV"
     fi
 
     if [[ -e "$PYAV_VENV/bin/activate" ]]; then
@@ -64,7 +76,6 @@ print("{}{}.{}".format(platform.python_implementation().lower(), *sys.version_in
     fi
 
 fi
-
 
 # Just a flag so that we know this was supposedly run.
 export _PYAV_ACTIVATED=1

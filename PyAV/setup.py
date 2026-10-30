@@ -11,7 +11,6 @@ from Cython.Build import cythonize
 from Cython.Compiler.AutoDocTransforms import EmbedSignature
 from setuptools import Extension, find_packages, setup
 
-
 FFMPEG_LIBRARIES = [
     "avformat",
     "avcodec",
@@ -22,13 +21,20 @@ FFMPEG_LIBRARIES = [
     "swresample",
 ]
 
+if sys.implementation.name == "cpython" and (3, 14) > sys.version_info >= (3, 12):
+    py_limited_api = True
+    options = {"bdist_wheel": {"py_limited_api": "cp312"}}
+    define_macros = [("Py_LIMITED_API", 0x030C0000)]
+else:
+    py_limited_api = False
+    options = {}
+    define_macros = []
 
 # Monkey-patch Cython to not overwrite embedded signatures.
 old_embed_signature = EmbedSignature._embed_signature
 
 
 def new_embed_signature(self, sig, doc):
-
     # Strip any `self` parameters from the front.
     sig = re.sub(r"\(self(,\s+)?", "(", sig)
 
@@ -73,21 +79,22 @@ def get_config_from_pkg_config():
     """
     Get distutils-compatible extension arguments using pkg-config.
     """
+    pkg_config = os.environ.get("PKG_CONFIG", "pkg-config")
     try:
         raw_cflags = subprocess.check_output(
-            ["pkg-config", "--cflags", "--libs"]
+            [pkg_config, "--cflags", "--libs"]
             + ["lib" + name for name in FFMPEG_LIBRARIES]
         )
     except FileNotFoundError:
-        print("pkg-config is required for building PyAV")
+        print(f"{pkg_config} is required for building PyAV")
         exit(1)
     except subprocess.CalledProcessError:
-        print("pkg-config could not find libraries {}".format(FFMPEG_LIBRARIES))
+        print(f"{pkg_config} could not find libraries {FFMPEG_LIBRARIES}")
         exit(1)
 
     known, unknown = parse_cflags(raw_cflags.decode("utf-8"))
     if unknown:
-        print("pkg-config returned flags we don't understand: {}".format(unknown))
+        print(f"pkg-config returned flags we don't understand: {unknown}")
         if "-pthread" in unknown:
             print("Building PyAV against static FFmpeg libraries is not supported.")
         exit(1)
@@ -120,16 +127,10 @@ for i, arg in enumerate(sys.argv):
         FFMPEG_DIR = arg.split("=")[1]
         del sys.argv[i]
 
-# Do not cythonize or use pkg-config when cleaning.
-use_pkg_config = platform.system() != "Windows"
-if len(sys.argv) > 1 and sys.argv[1] == "clean":
-    cythonize = lambda ext, **kwargs: [ext]
-    use_pkg_config = False
-
-# Locate FFmpeg libraries and headers.
+# Locate ffmpeg libraries and headers.
 if FFMPEG_DIR is not None:
     extension_extra = get_config_from_directory(FFMPEG_DIR)
-elif use_pkg_config:
+elif platform.system() != "Windows":
     extension_extra = get_config_from_pkg_config()
 else:
     extension_extra = {
@@ -138,87 +139,87 @@ else:
         "library_dirs": [],
     }
 
-# Construct the modules that we find in the "av" directory.
-ext_modules = []
-for dirname, dirnames, filenames in os.walk("av"):
+IMPORT_NAME = "av"
+SHARED_MODULE_NAME = f"{IMPORT_NAME}._cyutil"
+
+compiler_directives = {
+    "c_string_type": "str",
+    "c_string_encoding": "utf8",
+    "embedsignature": True,
+    "binding": False,
+    "language_level": 3,
+    "freethreading_compatible": True,
+}
+
+
+def make_extension(name, sources, extra_include_dirs=()):
+    return Extension(
+        name,
+        sources=sources,
+        include_dirs=[*extra_include_dirs, *extension_extra["include_dirs"]],
+        libraries=extension_extra["libraries"],
+        library_dirs=extension_extra["library_dirs"],
+        define_macros=define_macros,
+        py_limited_api=py_limited_api,
+    )
+
+
+LOUDNORM_SOURCE = os.path.join(IMPORT_NAME, "filter", "loudnorm.py")
+
+extensions = [
+    Extension(
+        SHARED_MODULE_NAME,
+        sources=[],
+        define_macros=define_macros,
+        py_limited_api=py_limited_api,
+    ),
+    make_extension(
+        f"{IMPORT_NAME}.filter.loudnorm",
+        [LOUDNORM_SOURCE, os.path.join(IMPORT_NAME, "filter", "loudnorm_impl.c")],
+        [os.path.join(IMPORT_NAME, "filter")],
+    ),
+]
+
+for dirname, dirnames, filenames in os.walk(IMPORT_NAME):
     for filename in filenames:
-        # We are looking for Cython sources.
-        if filename.startswith(".") or os.path.splitext(filename)[1] != ".pyx":
+        if filename.startswith("."):
+            continue
+        if filename in {"__init__.py", "__main__.py", "about.py", "datasets.py"}:
+            continue
+        if os.path.splitext(filename)[1] not in {".pyx", ".py"}:
             continue
 
         pyx_path = os.path.join(dirname, filename)
+        if pyx_path == LOUDNORM_SOURCE:
+            continue
+
         base = os.path.splitext(pyx_path)[0]
 
         # Need to be a little careful because Windows will accept / or \
         # (where os.sep will be \ on Windows).
         mod_name = base.replace("/", ".").replace(os.sep, ".")
 
-        # Cythonize the module.
-        ext_modules += cythonize(
-            Extension(
-                mod_name,
-                include_dirs=extension_extra["include_dirs"],
-                libraries=extension_extra["libraries"],
-                library_dirs=extension_extra["library_dirs"],
-                sources=[pyx_path],
-            ),
-            compiler_directives=dict(
-                c_string_type="str",
-                c_string_encoding="ascii",
-                embedsignature=True,
-                language_level=2,
-            ),
-            build_dir="src",
-            include_path=["include"],
-        )
+        extensions.append(make_extension(mod_name, [pyx_path]))
+
+# Cythonize in one pass so that the shared module can be generated alongside the
+# modules that import from it.
+ext_modules = cythonize(
+    extensions,
+    compiler_directives=compiler_directives,
+    build_dir="src",
+    include_path=["include"],
+    shared_utility_qualified_name=SHARED_MODULE_NAME,
+)
 
 
-# Read package metadata
-about = {}
-about_file = os.path.join(os.path.dirname(__file__), "av", "about.py")
-with open(about_file, encoding="utf-8") as fp:
-    exec(fp.read(), about)
-
-package_folders = pathlib.Path("av").glob("**/")
-package_data = {".".join(pckg.parts): ["*.pxd"] for pckg in package_folders}
-
+package_folders = pathlib.Path(IMPORT_NAME).glob("**/")
+package_data = {
+    ".".join(pckg.parts): ["*.pxd", "*.pyi", "*.typed"] for pckg in package_folders
+}
 
 setup(
-    name="av",
-    version=about["__version__"],
-    description="Pythonic bindings for FFmpeg's libraries.",
-    author="Mike Boers",
-    author_email="pyav@mikeboers.com",
-    url="https://github.com/PyAV-Org/PyAV",
-    packages=find_packages(exclude=["build*", "examples*", "scratchpad*", "tests*"]),
+    packages=find_packages(include=[f"{IMPORT_NAME}*"]),
     package_data=package_data,
-    zip_safe=False,
     ext_modules=ext_modules,
-    test_suite="tests",
-    entry_points={
-        "console_scripts": [
-            "pyav = av.__main__:main",
-        ],
-    },
-    classifiers=[
-        "Development Status :: 5 - Production/Stable",
-        "Intended Audience :: Developers",
-        "License :: OSI Approved :: BSD License",
-        "Natural Language :: English",
-        "Operating System :: MacOS :: MacOS X",
-        "Operating System :: POSIX",
-        "Operating System :: Unix",
-        "Operating System :: Microsoft :: Windows",
-        "Programming Language :: Cython",
-        "Programming Language :: Python :: 3.7",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
-        "Programming Language :: Python :: 3.10",
-        "Programming Language :: Python :: 3.11",
-        "Topic :: Software Development :: Libraries :: Python Modules",
-        "Topic :: Multimedia :: Sound/Audio",
-        "Topic :: Multimedia :: Sound/Audio :: Conversion",
-        "Topic :: Multimedia :: Video",
-        "Topic :: Multimedia :: Video :: Conversion",
-    ],
+    options=options,
 )

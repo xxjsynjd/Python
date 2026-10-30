@@ -1,18 +1,26 @@
 #!/usr/bin/env python3
 
-from fractions import Fraction
 import colorsys
+from math import lcm
 
 import numpy as np
 
 import av
-
+from av import AVRational
 
 (width, height) = (640, 360)
 total_frames = 20
-fps = 30
+fps = AVRational(30, 1)
 
-container = av.open("generate_video_with_pts.mp4", mode="w")
+# MP4 stores a nonzero starting offset in an edit list using the movie timescale,
+# which defaults to 1000. Choose a timescale that can represent frame-aligned
+# offsets exactly; otherwise, a starting PTS such as 1 at 30 fps is rounded.
+movie_timescale = lcm(1000, fps.numerator)
+container = av.open(
+    "generate_video_with_pts.mp4",
+    mode="w",
+    container_options={"movie_timescale": str(movie_timescale)},
+)
 
 stream = container.add_stream("mpeg4", rate=fps)  # alibi frame rate
 stream.width = width
@@ -28,7 +36,7 @@ stream.pix_fmt = "yuv420p"
 # 1/2 means half a second (would be okay for the delays we use below)
 # 1/30 means ~33 milliseconds
 # you should use the least fraction that makes sense for you
-stream.codec_context.time_base = Fraction(1, fps)
+stream.codec_context.time_base = AVRational(fps.den, fps.num)
 
 # this says when to show the next frame
 # (increment by how long the current frame will be shown)
@@ -43,7 +51,6 @@ block_w2 = int(0.5 * width / total_frames * 0.75)
 block_h2 = int(0.5 * height / 4)
 
 for frame_i in range(total_frames):
-
     # move around the color wheel (hue)
     nice_color = colorsys.hsv_to_rgb(frame_i / total_frames, 1.0, 1.0)
     nice_color = (np.array(nice_color) * 255).astype(np.uint8)
@@ -51,9 +58,9 @@ for frame_i in range(total_frames):
     # draw blocks of a progress bar
     cx = int(width / total_frames * (frame_i + 0.5))
     cy = int(height / 2)
-    the_canvas[
-        cy - block_h2 : cy + block_h2, cx - block_w2 : cx + block_w2
-    ] = nice_color
+    the_canvas[cy - block_h2 : cy + block_h2, cx - block_w2 : cx + block_w2] = (
+        nice_color
+    )
 
     frame = av.VideoFrame.from_ndarray(the_canvas, format="rgb24")
 

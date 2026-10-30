@@ -1,19 +1,26 @@
+import pytest
+
 from av.dictionary import Dictionary
 
-from .common import TestCase
+
+def test_dictionary() -> None:
+    d = Dictionary()
+    d["key"] = "value"
+
+    assert d["key"] == "value"
+    assert "key" in d
+    assert len(d) == 1
+    assert list(d) == ["key"]
+
+    assert d.pop("key") == "value"
+    pytest.raises(KeyError, d.pop, "key")
+    assert len(d) == 0
 
 
-class TestDictionary(TestCase):
-    def test_basics(self):
+def test_dictionary_non_ascii() -> None:
+    d = Dictionary()
+    d["café"] = "naïve 日本語 🎵"
 
-        d = Dictionary()
-        d["key"] = "value"
-
-        self.assertEqual(d["key"], "value")
-        self.assertIn("key", d)
-        self.assertEqual(len(d), 1)
-        self.assertEqual(list(d), ["key"])
-
-        self.assertEqual(d.pop("key"), "value")
-        self.assertRaises(KeyError, d.pop, "key")
-        self.assertEqual(len(d), 0)
+    assert d["café"] == "naïve 日本語 🎵"
+    assert "café" in d
+    assert list(d) == ["café"]

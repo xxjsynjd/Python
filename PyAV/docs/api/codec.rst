@@ -15,7 +15,6 @@ Descriptors
 .. autoattribute:: Codec.is_decoder
 .. autoattribute:: Codec.is_encoder
 
-.. autoattribute:: Codec.descriptor
 .. autoattribute:: Codec.name
 .. autoattribute:: Codec.long_name
 .. autoattribute:: Codec.type
@@ -36,21 +35,26 @@ Flags
 
     Wraps :ffmpeg:`AVCodecDescriptor.props` (``AV_CODEC_PROP_*``).
 
-    .. enumtable:: av.codec.codec.Properties
-        :class: av.codec.codec.Codec
-
 .. autoattribute:: Codec.capabilities
 
 .. autoclass:: Capabilities
 
     Wraps :ffmpeg:`AVCodec.capabilities` (``AV_CODEC_CAP_*``).
 
-    Note that ``ffmpeg -codecs`` prefers the properties versions of
-    ``INTRA_ONLY`` and ``LOSSLESS``.
+    Note that ``ffmpeg -codecs`` prefers the properties versions of ``INTRA_ONLY`` and ``LOSSLESS``.
 
-    .. enumtable:: av.codec.codec.Capabilities
-        :class: av.codec.codec.Codec
+Pixel Format Selection
+----------------------
 
+.. autofunction:: find_best_pix_fmt_of_list
+
+.. autoclass:: PixFmtLoss
+
+    Wraps FFmpeg's ``FF_LOSS_*`` flags. Returned by
+    :func:`find_best_pix_fmt_of_list` to describe what is lost when converting
+    from the source pixel format to the chosen one. Being an
+    :class:`enum.IntFlag`, members can be combined and tested with bitwise
+    operators.
 
 Contexts
 --------
@@ -62,10 +66,16 @@ Contexts
 
 .. autoattribute:: CodecContext.codec
 .. autoattribute:: CodecContext.options
+.. autoattribute:: CodecContext.supported_options
+
+.. autoclass:: CodecOptionSet
+.. autoclass:: CodecOption
+.. autoclass:: CodecOptionChoice
+.. autoclass:: OptionType
+.. autoclass:: OptionFlags
 
 .. automethod:: CodecContext.create
 .. automethod:: CodecContext.open
-.. automethod:: CodecContext.close
 
 Attributes
 ~~~~~~~~~~
@@ -79,7 +89,6 @@ Attributes
 .. autoattribute:: CodecContext.profile
 
 .. autoattribute:: CodecContext.time_base
-.. autoattribute:: CodecContext.ticks_per_frame
 
 .. autoattribute:: CodecContext.bit_rate
 .. autoattribute:: CodecContext.bit_rate_tolerance
@@ -97,10 +106,11 @@ Transcoding
 .. automethod:: CodecContext.parse
 .. automethod:: CodecContext.encode
 .. automethod:: CodecContext.decode
+.. automethod:: CodecContext.flush_buffers
 
 
-Flags
-~~~~~
+Enums and Flags
+~~~~~~~~~~~~~~~
 
 .. autoattribute:: CodecContext.flags
 
@@ -116,10 +126,6 @@ Flags
     .. enumtable:: av.codec.context:Flags2
         :class: av.codec.context:CodecContext
 
-
-Enums
-~~~~~
-
 .. autoclass:: av.codec.context.ThreadType
 
     Which multithreading methods to use.
@@ -128,8 +134,38 @@ Enums
 
     .. enumtable:: av.codec.context.ThreadType
 
-.. autoclass:: av.codec.context.SkipType
 
-    .. enumtable:: av.codec.context.SkipType
+Hardware Acceleration
+---------------------
 
+.. currentmodule:: av.codec.hwaccel
+.. automodule:: av.codec.hwaccel
 
+.. autoclass:: HWDevice
+
+.. autoclass:: HWAccel
+
+.. autofunction:: hwdevices_available
+
+To decode on a hardware device, pass an :class:`HWAccel` to :func:`av.open`::
+
+    import av
+    from av.codec.hwaccel import HWAccel
+
+    hwaccel = HWAccel(device_type="videotoolbox")
+    with av.open("input.mp4", hwaccel=hwaccel) as container:
+        for frame in container.decode(video=0):
+            ...  # Frames are downloaded to system memory by default.
+
+To encode on a hardware device, pass one to :meth:`OutputContainer.add_stream
+<av.container.OutputContainer.add_stream>` with a hardware encoder. Software
+frames passed to ``encode`` are uploaded to the device automatically::
+
+    with av.open("output.mp4", "w") as container:
+        stream = container.add_stream(
+            "h264_videotoolbox", rate=30, hwaccel=HWAccel(device_type="videotoolbox")
+        )
+        ...
+
+See ``examples/basics/hw_decode.py`` for a complete example, including
+recommended device types per platform.

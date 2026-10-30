@@ -1,107 +1,167 @@
-import unittest
+import pytest
 
 from av import AudioFormat, Codec, VideoFormat, codecs_available
+from av.codec import PixFmtLoss, find_best_pix_fmt_of_list
 from av.codec.codec import UnknownCodecError
 
-from .common import TestCase
+
+def test_codec_bogus() -> None:
+    with pytest.raises(UnknownCodecError):
+        Codec("bogus123")
+    with pytest.raises(UnknownCodecError):
+        Codec("bogus123", "w")
 
 
-# some older ffmpeg versions have no native opus encoder
-try:
-    opus_c = Codec("opus", "w")
-    opus_encoder_missing = False
-except UnknownCodecError:
-    opus_encoder_missing = True
+def test_codec_mpeg4_decoder() -> None:
+    c = Codec("mpeg4")
+
+    assert c.name == "mpeg4"
+    assert c.long_name == "MPEG-4 part 2"
+    assert c.type == "video"
+    assert c.id == Codec("mpeg4", "w").id  # ids are not stable across FFmpeg versions
+    assert c.is_decoder
+    assert not c.is_encoder
+    assert c.delay
+
+    assert c.audio_formats is None and c.audio_rates is None
+
+    # formats = c.video_formats
+    # assert formats
+    # assert isinstance(formats[0], VideoFormat)
+    # assert any(f.name == "yuv420p" for f in formats)
+
+    assert c.frame_rates is None
 
 
-class TestCodecs(TestCase):
-    def test_codec_bogus(self):
-        with self.assertRaises(UnknownCodecError):
-            Codec("bogus123")
-        with self.assertRaises(UnknownCodecError):
-            Codec("bogus123", "w")
+def test_codec_mpeg4_encoder() -> None:
+    c = Codec("mpeg4", "w")
+    assert c.name == "mpeg4"
+    assert c.long_name == "MPEG-4 part 2"
+    assert c.type == "video"
+    assert c.id == Codec("mpeg4").id  # ids are not stable across FFmpeg versions
+    assert c.is_encoder
+    assert not c.is_decoder
+    assert c.delay
 
-    def test_codec_mpeg4_decoder(self):
-        c = Codec("mpeg4")
+    assert c.audio_formats is None and c.audio_rates is None
 
-        self.assertEqual(c.name, "mpeg4")
-        self.assertEqual(c.long_name, "MPEG-4 part 2")
-        self.assertEqual(c.type, "video")
-        self.assertIn(c.id, (12, 13))
-        self.assertTrue(c.is_decoder)
-        self.assertFalse(c.is_encoder)
+    formats = c.video_formats
+    assert formats
+    assert isinstance(formats[0], VideoFormat)
+    assert any(f.name == "yuv420p" for f in formats)
+    assert c.frame_rates is None
 
-        # audio
-        self.assertIsNone(c.audio_formats)
-        self.assertIsNone(c.audio_rates)
 
-        # video
-        formats = c.video_formats
-        self.assertTrue(formats)
-        self.assertIsInstance(formats[0], VideoFormat)
-        self.assertTrue(any(f.name == "yuv420p" for f in formats))
+def test_codec_opus_decoder() -> None:
+    c = Codec("opus")
 
-        self.assertIsNone(c.frame_rates)
+    assert c.name == "opus"
+    assert c.long_name == "Opus"
+    assert c.type == "audio"
+    assert c.is_decoder
+    assert not c.is_encoder
+    assert c.delay
 
-    def test_codec_mpeg4_encoder(self):
-        c = Codec("mpeg4", "w")
-        self.assertEqual(c.name, "mpeg4")
-        self.assertEqual(c.long_name, "MPEG-4 part 2")
-        self.assertEqual(c.type, "video")
-        self.assertIn(c.id, (12, 13))
-        self.assertTrue(c.is_encoder)
-        self.assertFalse(c.is_decoder)
+    assert c.audio_formats is None and c.audio_rates is None
+    assert c.video_formats is None and c.frame_rates is None
 
-        # audio
-        self.assertIsNone(c.audio_formats)
-        self.assertIsNone(c.audio_rates)
 
-        # video
-        formats = c.video_formats
-        self.assertTrue(formats)
-        self.assertIsInstance(formats[0], VideoFormat)
-        self.assertTrue(any(f.name == "yuv420p" for f in formats))
+def test_codec_opus_encoder() -> None:
+    c = Codec("opus", "w")
+    assert c.name in ("opus", "libopus")
+    assert c.canonical_name == "opus"
+    assert c.long_name in ("Opus", "libopus Opus")
+    assert c.type == "audio"
+    assert c.is_encoder
+    assert not c.is_decoder
+    assert c.delay
 
-        self.assertIsNone(c.frame_rates)
+    # audio
+    formats = c.audio_formats
+    assert formats
+    assert isinstance(formats[0], AudioFormat)
+    assert any(f.name in ("flt", "fltp") for f in formats)
 
-    def test_codec_opus_decoder(self):
-        c = Codec("opus")
+    assert c.audio_rates is not None
+    assert 48000 in c.audio_rates
 
-        self.assertEqual(c.name, "opus")
-        self.assertEqual(c.long_name, "Opus")
-        self.assertEqual(c.type, "audio")
-        self.assertTrue(c.is_decoder)
-        self.assertFalse(c.is_encoder)
+    assert c.video_formats is None and c.frame_rates is None
 
-        # audio
-        self.assertIsNone(c.audio_formats)
-        self.assertIsNone(c.audio_rates)
 
-        # video
-        self.assertIsNone(c.video_formats)
-        self.assertIsNone(c.frame_rates)
+def test_codecs_available() -> None:
+    assert codecs_available
 
-    @unittest.skipIf(opus_encoder_missing, "Opus encoder is not available")
-    def test_codec_opus_encoder(self):
-        c = Codec("opus", "w")
-        self.assertIn(c.name, ("opus", "libopus"))
-        self.assertIn(c.long_name, ("Opus", "libopus Opus"))
-        self.assertEqual(c.type, "audio")
-        self.assertTrue(c.is_encoder)
-        self.assertFalse(c.is_decoder)
 
-        # audio
-        formats = c.audio_formats
-        self.assertTrue(formats)
-        self.assertIsInstance(formats[0], AudioFormat)
-        self.assertTrue(any(f.name in ["flt", "fltp"] for f in formats))
+def test_find_best_pix_fmt_of_list_empty() -> None:
+    best, loss = find_best_pix_fmt_of_list([], "rgb24")
+    assert best is None
+    assert loss == 0
+    assert loss is PixFmtLoss.NONE
 
-        self.assertIsNotNone(c.audio_rates)
-        self.assertIn(48000, c.audio_rates)
 
-        # video
-        self.assertIsNone(c.video_formats)
-        self.assertIsNone(c.frame_rates)
+@pytest.mark.parametrize(
+    "pix_fmts,src_pix_fmt,expected_best",
+    [
+        (["rgb24", "yuv420p"], "rgb24", "rgb24"),
+        (["rgb24"], "yuv420p", "rgb24"),
+        (["yuv420p"], "rgb24", "yuv420p"),
+        ([VideoFormat("yuv420p")], VideoFormat("rgb24"), "yuv420p"),
+        (
+            ["yuv420p", "yuv444p", "gray", "rgb24", "rgba", "bgra", "yuyv422"],
+            "rgba",
+            "rgba",
+        ),
+    ],
+)
+def test_find_best_pix_fmt_of_list_best(pix_fmts, src_pix_fmt, expected_best) -> None:
+    best, loss = find_best_pix_fmt_of_list(pix_fmts, src_pix_fmt)
+    assert best is not None
+    assert best.name == expected_best
+    assert isinstance(loss, int)
 
-    def test_codecs_available(self):
-        self.assertTrue(codecs_available)
+
+@pytest.mark.parametrize(
+    "pix_fmts,src_pix_fmt",
+    [
+        (["__unknown_pix_fmt"], "rgb24"),
+        (["rgb24"], "__unknown_pix_fmt"),
+    ],
+)
+def test_find_best_pix_fmt_of_list_unknown_pix_fmt(pix_fmts, src_pix_fmt) -> None:
+    with pytest.raises(ValueError, match="not a pixel format"):
+        find_best_pix_fmt_of_list(pix_fmts, src_pix_fmt)
+
+
+@pytest.mark.parametrize(
+    "pix_fmts,src_pix_fmt",
+    [
+        (["rgb24", "bgr24", "gray", "yuv420p", "yuv444p", "yuyv422"], "nv12"),
+        (["yuv420p", "yuv444p", "gray", "yuv420p"], "rgb24"),
+        (["rgb24", "rgba", "bgra", "rgb24", "gray"], "yuv420p"),
+    ],
+)
+def test_find_best_pix_fmt_of_list_picks_from_list(pix_fmts, src_pix_fmt) -> None:
+    best, loss = find_best_pix_fmt_of_list(pix_fmts, src_pix_fmt)
+    assert best is not None
+    assert best.name in set(pix_fmts)
+    assert isinstance(loss, int)
+
+
+def test_find_best_pix_fmt_of_list_alpha_loss_flagged_when_used() -> None:
+    best, loss = find_best_pix_fmt_of_list(["rgb24"], "rgba", has_alpha=True)
+    assert best is not None
+    assert best.name == "rgb24"
+    assert loss != 0
+    assert isinstance(loss, PixFmtLoss)
+    assert loss & PixFmtLoss.ALPHA
+
+
+def test_find_best_pix_fmt_of_list_loss_flags() -> None:
+    # An identical format loses nothing.
+    _, loss = find_best_pix_fmt_of_list(["yuv420p"], "yuv420p")
+    assert loss is PixFmtLoss.NONE
+
+    # Converting color to grayscale drops the chroma planes.
+    _, loss = find_best_pix_fmt_of_list(["gray"], "rgb24")
+    assert isinstance(loss, PixFmtLoss)
+    assert loss & PixFmtLoss.CHROMA

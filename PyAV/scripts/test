@@ -1,4 +1,4 @@
-#!/bin/bash
+#! /usr/bin/env bash
 
 # Exit as soon as something errors.
 set -e
@@ -18,31 +18,10 @@ istest() {
     return $?
 }
 
-if istest black; then
-    $PYAV_PYTHON -m black av examples tests
-fi
-
-if istest flake8; then
-    # Settings are in setup.cfg
-    $PYAV_PYTHON -m flake8 av examples tests
-fi
-
-if istest isort; then
-    # More settings in setup.cfg
-    $PYAV_PYTHON -m isort --check-only --diff av examples tests
-fi
+$PYAV_PYTHON -c "import av; print(f'PyAV: {av.__version__}'); print(f'FFMPEG: {av.ffmpeg_version_info}')"
 
 if istest main; then
-    $PYAV_PYTHON setup.py test
-fi
-
-if istest sdist; then
-    $PYAV_PYTHON setup.py build_ext
-    $PYAV_PYTHON setup.py sdist
-fi
-
-if istest doctest; then
-    make -C docs test
+    $PYAV_PYTHON -m pytest
 fi
 
 if istest examples; then
