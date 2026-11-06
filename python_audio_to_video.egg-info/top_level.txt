@@ -1,0 +1,17 @@
+AudioStreamReader
+GenerateAll
+LoudMeter
+LyricsDisplayAI
+MultiTrackRender
+NoiseGateMeter
+PitchMeter1
+ProgressBar
+SpeakerMeter
+Spectrum3DAudacious
+Spectrum_2d
+StatusBarOverlay
+ThrustMeter
+TimelineRoll
+VU_Meter
+VibrationMeter
+WMPVisualizer

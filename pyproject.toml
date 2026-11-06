@@ -1,0 +1,67 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "python-audio-to-video"
+version = "0.1.0"
+description = "即装即用的Termux音视频可视化工具集(频谱、电平表、歌词、CTranslate2)"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "LIUZHOU" }]
+keywords = ["audio", "video", "visualizer", "termux", "ctranslate2"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: Android",
+    "Environment :: Termux",
+    "Topic :: Multimedia :: Video",
+    "Topic :: Multimedia :: Sound/Audio",
+]
+
+dependencies = [
+    "numpy>=2.0",
+    "pillow",
+    "tqdm",
+    "ctranslate2>=4.8.2",
+    "av",
+    "demucs",
+    "lameenc",
+    "llvmlite",
+    "soxr",
+]
+[project.optional-dependencies]
+ai = ["ctranslate2-termux>=4.8.2"]
+av = ["av"]
+demucs = ["demucs"]
+all = ["ctranslate2-termux>=4.8.2", "av", "demucs"]
+
+[project.scripts]
+audio2video = "GenerateAll:main"
+
+[project.urls]
+Homepage = "https://github.com/<你的用户名>/python-audio-to-video"
+
+[tool.setuptools]
+py-modules = [
+    "AudioStreamReader",
+    "GenerateAll",
+    "LoudMeter",
+    "LyricsDisplayAI",
+    "MultiTrackRender",
+    "NoiseGateMeter",
+    "PitchMeter1",
+    "ProgressBar",
+    "SpeakerMeter",
+    "Spectrum3DAudacious",
+    "Spectrum_2d",
+    "StatusBarOverlay",
+    "ThrustMeter",
+    "TimelineRoll",
+    "VU_Meter",
+    "VibrationMeter",
+    "WMPVisualizer",
+]
+
+[tool.setuptools.package-data]
+"*" = ["assests/*"]
