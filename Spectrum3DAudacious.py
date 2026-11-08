@@ -1,17 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Spectrum3DAudacious.py —— Audacious 风格 3D 频谱（第六版）
+Spectrum3DAudacious.py —— Audacious 风格 3D 频谱（第八版）
 
-修改:
-  - 加入俯视角度：相机从上方往下斜看频谱墙
-  - 摆动周期放慢（默认 15 秒一个来回）
-  - 保留角度渐变
-
-空间:
-  X = 频率
-  Y = 时间（往纵深）
-  Z = 响度（高度）
+新增:
+  - --hue-offset：红色起始角度（0.375=左上角红）
+  - --flip-freq：翻转频谱方向（低频放右边）
 """
 
 import argparse
@@ -31,9 +25,6 @@ BG = (4, 5, 10)
 TEXT_COL = (200, 210, 220)
 
 
-# ==========================================================================
-# 色环（红起，360°）
-# ==========================================================================
 def hue_to_rgb(h):
     h = h % 1.0
     i = int(h * 6)
@@ -52,9 +43,6 @@ def shade(col, k):
     return tuple(int(min(255, max(0, c * k))) for c in col)
 
 
-# ==========================================================================
-# 音频
-# ==========================================================================
 def _decode_ffmpeg(path):
     p = subprocess.run(
         [FFPROBE, "-v", "error", "-select_streams", "a:0",
@@ -81,9 +69,6 @@ def load_audio(path):
     return _decode_ffmpeg(path)
 
 
-# ==========================================================================
-# FFT
-# ==========================================================================
 def spectrum_bands(data, sr, fps, fft_size, bands,
                    fmin=40.0, fmax=14000.0):
     mono = data.mean(axis=1) if data.shape[1] > 1 else data[:, 0]
@@ -128,45 +113,25 @@ def spectrum_bands(data, sr, fps, fft_size, bands,
     return out
 
 
-# ==========================================================================
-# 投影（俯视 + 旋转）
-# ==========================================================================
 def project(x, y, z, W, H, yaw, cfg):
-    """
-    x: 频率轴 [-1, 1]
-    y: 时间轴 [0, 1]，0=最近，1=最远
-    z: 响度 [0, 1]
-
-    俯视效果:
-      相机从上方斜着往下看。俯视角 pitch 决定：
-        pitch = 0°  → 纯侧视（只能看到柱子的侧面）
-        pitch = 90° → 纯俯视（只能看到柱子的顶面）
-        pitch = 30° → 斜俯视（既看到侧面又看到纵深）
-    """
     wx = x * cfg["x_span"]
     wy = (y - 0.5) * cfg["depth"]
     wz = z
 
-    # 水平旋转（绕 Z 轴）
     yaw_total = yaw + math.radians(cfg["yaw_offset"])
     ca = math.cos(yaw_total)
     sa = math.sin(yaw_total)
     rx = wx * ca - wy * sa
-    ry = wx * sa + wy * ca   # 深度方向（时间轴）
-    rz = wz                  # 高度
+    ry = wx * sa + wy * ca
+    rz = wz
 
-    # 俯视：把 y 轴和 z 轴按 pitch 混合到屏幕的纵向
     pitch = math.radians(cfg["pitch"])
     cp = math.cos(pitch)
     sp = math.sin(pitch)
 
-    # 屏幕上的纵向 = 高度 * cos(pitch) + 纵深 * sin(pitch)
-    # 注意：纵深越大（越远），屏幕上越往上 → 加负号
     screen_y = -rz * cp - ry * sp
-    # 深度（用于透视和排序）
     depth = ry * cp - rz * sp
 
-    # 透视
     persp = 1.0 / (1.0 + depth * cfg["persp"])
 
     sx = W * 0.5 + rx * W * cfg["scale_x"] * persp
@@ -175,20 +140,14 @@ def project(x, y, z, W, H, yaw, cfg):
     return sx, sy, depth
 
 
-# ==========================================================================
-# 角度渐变
-# ==========================================================================
-def angular_color(x, y):
+def angular_color(x, y, hue_offset=0.5):
     dx = x
     dy = (y - 0.5) * 2.0
     theta = math.atan2(dy, dx)
-    hue = (theta / (2 * math.pi) + 0.5) % 1.0
+    hue = (theta / (2 * math.pi) + hue_offset) % 1.0
     return hue_to_rgb(hue)
 
 
-# ==========================================================================
-# 渲染
-# ==========================================================================
 def render(spec_db, cfg, out_path):
     W = cfg["width"] // 2 * 2
     H = cfg["height"] // 2 * 2
@@ -201,8 +160,13 @@ def render(spec_db, cfg, out_path):
 
     rows = cfg["rows"]
 
-    bar_xs = np.linspace(-1.0, 1.0, bands)
-    bar_w = (bar_xs[1] - bar_xs[0]) * 0.42 if bands > 1 else 0.05
+    if cfg.get("flip_freq", False):
+        bar_xs = np.linspace(1.0, -1.0, bands)
+    else:
+        bar_xs = np.linspace(-1.0, 1.0, bands)
+
+    bar_w = abs((bar_xs[1] - bar_xs[0]) * 0.42) if bands > 1 else 0.05
+
     t_step = 1.0 / max(rows - 1, 1)
     half_d = t_step * 0.5
 
@@ -269,7 +233,7 @@ def render(spec_db, cfg, out_path):
 
                     depth = (p_bl[2] + p_br[2] + p_fr[2] + p_fl[2]) * 0.25
 
-                    col = angular_color(x_c, t_pos)
+                    col = angular_color(x_c, t_pos, cfg["hue_offset"])
 
                     prims.append({
                         "depth": depth,
@@ -311,12 +275,9 @@ def render(spec_db, cfg, out_path):
     print("\r渲染完成 ✔", file=sys.stderr)
 
 
-# ==========================================================================
-# main
-# ==========================================================================
 def main():
     ap = argparse.ArgumentParser(
-        description="Audacious gl-spectrum 风格（第六版）")
+        description="Audacious gl-spectrum 风格（第八版）")
     ap.add_argument("input")
     ap.add_argument("-o", "--output", default=None)
     ap.add_argument("--fps", type=int, default=60)
@@ -331,19 +292,21 @@ def main():
     ap.add_argument("--db-min", type=float, default=-85.0)
     ap.add_argument("--db-max", type=float, default=-5.0)
 
-    # 摆动（放慢）
+    ap.add_argument("--hue-offset", type=float, default=0.5,
+                    help="色相起始偏移（0.375=左上角红，0.5=正上方红）")
+    ap.add_argument("--flip-freq", dest="flip_freq",
+                    action="store_true", help="翻转频谱（低频放右边）")
+
     ap.add_argument("--osc-period", type=float, default=15.0,
                     help="摆动周期（秒），越大越慢")
     ap.add_argument("--osc-angle", type=float, default=120.0,
                     help="摆动幅度（度）")
 
-    # 相机
     ap.add_argument("--pitch", type=float, default=35.0,
                     help="俯视角（度）。0=侧视，90=纯俯视")
     ap.add_argument("--yaw-offset", type=float, default=20.0,
                     help="初始偏航角（度）")
 
-    # 透视
     ap.add_argument("--persp", type=float, default=0.10)
     ap.add_argument("--x-span", type=float, default=1.0)
     ap.add_argument("--depth", type=float, default=1.6)
@@ -373,6 +336,7 @@ def main():
         input=a.input, fps=a.fps, width=a.width, height=a.height,
         bars=a.bars, rows=a.rows,
         db_min=a.db_min, db_max=a.db_max,
+        hue_offset=a.hue_offset, flip_freq=a.flip_freq,
         osc_period=a.osc_period, osc_angle=a.osc_angle,
         pitch=a.pitch, yaw_offset=a.yaw_offset,
         persp=a.persp, x_span=a.x_span, depth=a.depth,
