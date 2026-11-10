@@ -1,0 +1,9 @@
+{
+	"InstallScripts" : 
+	[
+		"/data/data/com.termux/files/home/Python/CTranslate2/build/cmake_install.cmake",
+		"/data/data/com.termux/files/home/Python/CTranslate2/build/third_party/spdlog/cmake_install.cmake",
+		"/data/data/com.termux/files/home/Python/CTranslate2/build/cli/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

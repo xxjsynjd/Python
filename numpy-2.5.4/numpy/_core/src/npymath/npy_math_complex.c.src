@@ -163,7 +163,9 @@ npy_carg@c@(@ctype@ z)
 #define SCALED_CEXP_LOWERL 11357.216553474703895L
 #define SCALED_CEXP_UPPERL 22756.021937783004509L
 
-#if 1
+#if !defined(HAVE_CSINH@C@) || \
+    !defined(HAVE_CCOSH@C@) || \
+    !defined(HAVE_CEXP@C@)
 
 static
 @ctype@
@@ -193,7 +195,7 @@ _npy_scaled_cexp@c@(@type@ x, @type@ y, npy_int expt)
 
 #endif
 
-#if 1
+#ifndef HAVE_CEXP@C@
 
 @ctype@
 npy_cexp@c@(@ctype@ z)
@@ -423,7 +425,7 @@ npy_csqrt@c@(@ctype@ z)
  */
 
 /* private function for use in npy_pow{f, ,l} */
-#if 0
+#ifdef HAVE_CPOW@C@
 static @ctype@
 sys_cpow@c@(@ctype@ x, @ctype@ y)
 {
@@ -519,7 +521,7 @@ npy_cpow@c@ (@ctype@ a, @ctype@ b)
         }
     }
 
-#if 0
+#ifdef HAVE_CPOW@C@
     return sys_cpow@c@(a, b);
 
 #else
@@ -535,7 +537,7 @@ npy_cpow@c@ (@ctype@ a, @ctype@ b)
 }
 
 
-#if 1
+#ifndef HAVE_CCOS@C@
 @ctype@
 npy_ccos@c@(@ctype@ z)
 {
@@ -544,7 +546,7 @@ npy_ccos@c@(@ctype@ z)
 }
 #endif
 
-#if 1
+#ifndef HAVE_CSIN@C@
 @ctype@
 npy_csin@c@(@ctype@ z)
 {
@@ -554,7 +556,7 @@ npy_csin@c@(@ctype@ z)
 }
 #endif
 
-#if 1
+#ifndef HAVE_CTAN@C@
 @ctype@
 npy_ctan@c@(@ctype@ z)
 {
@@ -564,7 +566,7 @@ npy_ctan@c@(@ctype@ z)
 }
 #endif
 
-#if 1
+#ifndef HAVE_CCOSH@C@
 /*
  * Taken from the msun library in FreeBSD, rev 226599.
  *
@@ -710,7 +712,7 @@ npy_ccosh@c@(@ctype@ z)
 #undef CCOSH_HUGE
 #endif
 
-#if 1
+#ifndef HAVE_CSINH@C@
 /*
  * Taken from the msun library in FreeBSD, rev 226599.
  *
@@ -857,7 +859,7 @@ npy_csinh@c@(@ctype@ z)
 #undef CSINH_HUGE
 #endif
 
-#if 1
+#ifndef HAVE_CTANH@C@
 /*
  * Taken from the msun library in FreeBSD, rev 226600.
  *
@@ -1751,7 +1753,7 @@ npy_catanh@c@(@ctype@ z)
  * #kind = cabs,carg#
  * #KIND = CABS,CARG#
  */
-#if 0
+#ifdef HAVE_@KIND@@C@
 @type@
 npy_@kind@@c@(@ctype@ z)
 {
@@ -1766,7 +1768,7 @@ npy_@kind@@c@(@ctype@ z)
  * #KIND = CEXP,CLOG,CSQRT,CCOS,CSIN,CTAN,CCOSH,CSINH,CTANH,
  *         CACOS,CASIN,CATAN,CACOSH,CASINH,CATANH#
  */
-#if 0
+#ifdef HAVE_@KIND@@C@
 @ctype@
 npy_@kind@@c@(@ctype@ z)
 {
