@@ -169,6 +169,15 @@ Spectrum3DAudacious.py 歌.mp3 -o out.mp4 \
 
 如果你看到这条通知没了，那么就是被杀掉了，Android在退出应用的时候会顺带清理该应用的全部通知。
 
+安装插件(TWMPXPEM，Termux Windows Media Player XP Extension Manager)：
+
+```bash
+cp -v */twmpxpem */wmpvisulizer1 $PREFIX/bin
+twmpxpem install [要安装的插件名字]
+```
+
+然后用新版的wmpvisulizer1重新跑一下可视化Windows Media Player视频渲染模块。
+
 ## 快速开始(懒人版)
 
 1.安装Termux:
