@@ -46,8 +46,10 @@
 pkg install python ffmpeg
 pip install numpy pillow soundfile
 dpkg -i *.deb # 或者：dpkg -i [要安装的包的文件名]
-find . -name "*.whl" -exec pip install {} --force-reinstall \;
+find . -name "*.whl" -exec pip install {} --force-reinstall --no-deps \;
 ```
+
+注意运行过后，如果提示 `ModuleNotFoundError` ，请根据提示中说明的模块名称，安装模块依赖，并提交PR或者Issue到本仓库。
 
 ```bash
 cp -v Python/*.py $PREFIX/bin
@@ -182,7 +184,6 @@ https://github.com/termux/termux-app/releases
 ```bash
 pkg update && pkg upgrade -y
 pkg install python ffmpeg mpv -y
-pip install numpy pillow soundfile -y
 ```
 
 3.克隆本项目:
