@@ -26,7 +26,7 @@
 | `TimelineRoll.py` | 滚动时间轴 | 波形+刻度线 |
 | `PitchMeter1.py` | 音符计 | YIN音高检测+滑音连音+BPM小节 |
 | `WMPVisualizer.py` | 随机场景可视化 | 瀑布/漩涡/粒子/圆环/竖条 |
-| `StatusBar.py` | 显示状态栏，用于显示播放信息 | 作者/播放路径/已播/未播/总时长 |
+| `StatusBarOverlay.py` | 显示状态栏，用于显示播放信息 | 作者/播放路径/已播/未播/总时长 |
 
 ### AI 歌词逐字对齐
 
