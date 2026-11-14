@@ -180,28 +180,28 @@ https://github.com/termux/termux-app/releases
 2.打开Termux,安装基础环境:
 
 ```bash
-   pkg update && pkg upgrade -y
-   pkg install python ffmpeg mpv -y
-   pip install numpy pillow soundfile -y
+pkg update && pkg upgrade -y
+pkg install python ffmpeg mpv -y
+pip install numpy pillow soundfile -y
 ```
 
 3.克隆本项目:
 
 ```bash
-   git clone https://github.com/xxjsynjd/Python
-   cd Python
+git clone https://github.com/xxjsynjd/Python
+cd Python
 ```
 
 4.安装hf_xet修复版(Termux+Python3.14必装):
 
 ```bash
-   pip install hf_xet-1.7.0-cp314-cp314-android_24_arm64_v8a.whl
+pip install hf_xet-1.7.0-cp314-cp314-android_24_arm64_v8a.whl
 ```
 
 5.试跑:
 
 ```bash
-   ./LoudMeter.py 你的歌.flac -o 输出.mp4
+./LoudMeter.py 你的歌.flac -o 输出.mp4
 ```
 
 ---
