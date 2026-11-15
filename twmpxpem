@@ -1,0 +1,446 @@
+#!/usr/bin/env python3
+# ==============================================================================
+# twmpxpem - 场景安装器 (完全自治版 - 带极客进度条)
+# ==============================================================================
+
+import os
+import sys
+import json
+import shutil
+import argparse
+import zipfile
+import io
+import subprocess
+import urllib.request
+import time
+from datetime import datetime
+
+try:
+    import tomllib
+except ImportError:
+    print("[!] 需要 Python 3.11+，或手动 pip install tomli 并修改 import")
+    sys.exit(1)
+
+# --- 环境路径定义 ---
+PREFIX = os.environ.get("PREFIX", "/data/data/com.termux/files/usr")
+BASE_DIR = os.path.join(PREFIX, "var", "lib", "twmpxpem")
+INFO_DIR = os.path.join(BASE_DIR, "info")
+STATUS_FILE = os.path.join(BASE_DIR, "status")
+SANDBOX_DIR = os.path.join(PREFIX, "lib", "twmpxpem", "site-packages", "root")
+CACHE_DIR = os.path.expanduser("~/.cache/twmpxpem")
+
+# --- 软件源路径 ---
+ETC_DIR = os.path.join(PREFIX, "etc", "twmpxpem")
+MAIN_SOURCES = os.path.join(ETC_DIR, "sources.list")
+SOURCES_D = os.path.join(ETC_DIR, "sources.list.d")
+
+# --- 专属魔改头 ---
+MAGIC_HEADER = b'TWMP'
+STANDARD_ZIP_HEADER = b'PK\x03\x04'
+
+# ==============================================================================
+# 🌟 核心 UI：极客进度条与滚动文字渲染器
+# ==============================================================================
+class TerminalProgressUI:
+    def __init__(self, total_files):
+        self.total = total_files
+        self.current = 0
+        # 获取终端宽度
+        self.term_width = shutil.get_terminal_size().columns
+        self.scroll_offset = 0
+
+        # 动态计算布局宽度 (留出边距)
+        self.text_width = max(15, int(self.term_width * 0.40))
+        self.bar_width = max(15, int(self.term_width * 0.35))
+        self.info_width = 12
+
+    def update(self, filename):
+        self.current += 1
+
+        # 1. 剩余数量
+        info_str = f"[{self.current}/{self.total}]"
+        info_str = f"{info_str:>{self.info_width}}"
+
+        # 2. 进度条
+        percent = self.current / self.total
+        filled_len = int(self.bar_width * percent)
+        bar = "█" * filled_len + "░" * (self.bar_width - filled_len)
+
+        # 3. 滚动文字 (从右往左)
+        display_name = os.path.basename(filename)
+
+        # 如果文件名太长，模拟滚动截断
+        if len(display_name) > self.text_width - 3:
+            scroll_str = display_name * 2 
+            start_idx = self.scroll_offset % len(display_name)
+            display_name = scroll_str[start_idx : start_idx + self.text_width - 3] + "..."
+            self.scroll_offset += 1
+        else:
+            display_name = f"{display_name:<{self.text_width}}"
+
+        # 全部完成时
+        if self.current >= self.total:
+            info_str = f"[{self.current}/{self.total}]"
+            info_str = f"{info_str:>{self.info_width}}"
+            bar = "█" * self.bar_width
+            display_name = "解压完毕!".ljust(self.text_width)
+            print(f"\r{display_name} | {bar} | {info_str}", flush=True)
+        else:
+            # 使用 \r 回到行首，原地覆盖刷新
+            print(f"\r{display_name} | {bar} | {info_str}", end="", flush=True)
+
+
+# ==============================================================================
+# 主管理器
+# ==============================================================================
+class TwmpxpemManager:
+    def __init__(self, verbosity=0, debug=False, bash_print=False):
+        self.verbosity = verbosity
+        self.debug = debug
+        self.bash_print = bash_print
+        self._ensure_dirs()
+        self.db = self._load_status()
+
+    def _ensure_dirs(self):
+        os.makedirs(INFO_DIR, exist_ok=True)
+        os.makedirs(SANDBOX_DIR, exist_ok=True)
+        os.makedirs(ETC_DIR, exist_ok=True)
+        os.makedirs(SOURCES_D, exist_ok=True)
+        os.makedirs(CACHE_DIR, exist_ok=True)
+        if not os.path.exists(STATUS_FILE):
+            with open(STATUS_FILE, "w") as f:
+                json.dump({}, f)
+        if not os.path.exists(MAIN_SOURCES):
+            with open(MAIN_SOURCES, "w") as f:
+                f.write("# 默认官方源\nwvwhl https://username.github.io/Termux-WMP-Plugin-Store termux-main main\n")
+
+    def _load_status(self):
+        with open(STATUS_FILE, "r") as f:
+            return json.load(f)
+
+    def _save_status(self):
+        with open(STATUS_FILE, "w") as f:
+            json.dump(self.db, f, indent=4)
+
+    def _log(self, level, message):
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        if level == "DEBUG" and self.verbosity < 3: return
+        print(f"[{timestamp}] [{level.upper()}] {message}")
+
+    def _parse_sources(self):
+        repos = []
+        def _parse_file(path):
+            if not os.path.exists(path): return
+            with open(path, "r") as f:
+                for line in f:
+                    line = line.strip()
+                    if not line or line.startswith("#"): continue
+                    parts = line.split()
+                    if len(parts) >= 3 and parts[0] == "wvwhl":
+                        repos.append({"url": parts[1], "dist": parts[2], "components": parts[3:]})
+        _parse_file(MAIN_SOURCES)
+        for f in os.listdir(SOURCES_D):
+            if f.endswith(".list"): _parse_file(os.path.join(SOURCES_D, f))
+        return repos
+
+    def _resolve_urls(self, package_name):
+        repos = self._parse_sources()
+        urls = []
+        for repo in repos:
+            base = repo["url"].rstrip("/")
+            urls.append(f"{base}/{repo['dist']}/visualizers/{package_name}.wvwhl")
+        return urls
+
+    def install(self, package_name, one_time_url=None, disable_cache=False, req_file=None):
+        if req_file:
+            self._install_from_requirements(req_file, disable_cache)
+            return
+
+        if disable_cache:
+            self._log("INFO", "强制清空下载缓存...")
+            shutil.rmtree(CACHE_DIR, ignore_errors=True)
+            os.makedirs(CACHE_DIR, exist_ok=True)
+
+        download_url = None
+        local_wvwhl = None
+
+        if one_time_url:
+            self._log("INFO", f"使用一次性地址: {one_time_url}")
+            download_url = one_time_url
+            local_wvwhl = os.path.join(CACHE_DIR, os.path.basename(one_time_url))
+        elif package_name.endswith(".wvwhl") and os.path.exists(package_name):
+            self._log("INFO", f"本地包安装: {package_name}")
+            local_wvwhl = package_name
+        else:
+            urls = self._resolve_urls(package_name)
+            if not urls:
+                self._log("ERROR", f"无法在软件源中找到 {package_name}")
+                return
+            download_url = urls[0]
+            local_wvwhl = os.path.join(CACHE_DIR, f"{package_name}.wvwhl")
+
+        if download_url:
+            self._log("INFO", f"正在抓取: {download_url}")
+            try:
+                urllib.request.urlretrieve(download_url, local_wvwhl)
+            except Exception as e:
+                self._log("ERROR", f"下载失败: {e}")
+                return
+
+        if not os.path.exists(local_wvwhl):
+            self._log("ERROR", "包文件不存在")
+            return
+
+        with open(local_wvwhl, 'rb') as f:
+            file_data = f.read()
+
+        if file_data.startswith(MAGIC_HEADER):
+            self._log("DEBUG", "检测到 TWMP 头，正在内存中还原 ZIP 结构...")
+            restored_zip = STANDARD_ZIP_HEADER + file_data[4:]
+        elif file_data.startswith(STANDARD_ZIP_HEADER):
+            restored_zip = file_data
+        else:
+            self._log("ERROR", "文件格式错误（非 TWMP 也非 ZIP）")
+            return
+
+        try:
+            with zipfile.ZipFile(io.BytesIO(restored_zip)) as zipf:
+                if "twmpxpem-project.toml" not in zipf.namelist():
+                    self._log("ERROR", "包内缺少 twmpxpem-project.toml")
+                    return
+                
+                with zipf.open("twmpxpem-project.toml") as tf:
+                    config = tomllib.loads(tf.read().decode('utf-8'))
+                
+                plugin_name = config["project"]["name"]
+                version = config["project"]["version"]
+                category = config["project"].get("category", "default")
+                
+                install_path = os.path.join(SANDBOX_DIR, plugin_name)
+                self._log("INFO", f"开始解压插件至沙盒...")
+
+                # 进度条
+                file_list = [f for f in zipf.namelist() if not f.endswith('/')]
+                ui = TerminalProgressUI(total_files=len(file_list))
+
+                for file in file_list:
+                    zipf.extract(file, install_path)
+                    ui.update(file)
+                    time.sleep(0.01) 
+
+                # 赋权
+                py_script = os.path.join(install_path, "wmpvisualizer.dll")
+                if os.path.exists(py_script):
+                    os.chmod(py_script, 0o755)
+                    self._log("INFO", f"[chmod] 权限已修改: wmpvisualizer.dll -> 755")
+                
+                # 记录文件清单
+                files_written = []
+                for root, _, files in os.walk(install_path):
+                    for file in files:
+                        files_written.append(os.path.join(root, file))
+                with open(os.path.join(INFO_DIR, f"{plugin_name}.list"), "w") as f:
+                    f.write("\n".join(files_written))
+                
+                shutil.copy(os.path.join(install_path, "twmpxpem-project.toml"),
+                            os.path.join(INFO_DIR, f"{plugin_name}.toml"))
+                
+                self.db[plugin_name] = {
+                    "status": "install ok installed",
+                    "version": version,
+                    "category": category,
+                    "install_path": install_path
+                }
+                self._save_status()
+                
+                print() 
+                self._log("DONE", f"🎉 安装成功: {plugin_name} (v{version})")
+                self._check_dependencies(plugin_name)
+
+        except Exception as e:
+            print() 
+            self._log("ERROR", f"安装失败: {e}")
+
+    def _install_from_requirements(self, req_file, disable_cache):
+        if not os.path.exists(req_file):
+            self._log("ERROR", f"需求文件不存在: {req_file}")
+            return
+        with open(req_file, "r") as f:
+            pkgs = [line.strip() for line in f if line.strip() and not line.startswith("#")]
+        self._log("INFO", f"从 {req_file} 读取到 {len(pkgs)} 个包")
+        for i, pkg in enumerate(pkgs, 1):
+            self._log("INFO", f"[{i}/{len(pkgs)}] 安装: {pkg}")
+            self.install(pkg, disable_cache=disable_cache)
+
+    def _check_dependencies(self, plugin_name):
+        toml_path = os.path.join(INFO_DIR, f"{plugin_name}.toml")
+        if not os.path.exists(toml_path): return
+        try:
+            with open(toml_path, "rb") as f:
+                config = tomllib.load(f)
+        except Exception: return
+
+        deps = config.get("project", {}).get("dependencies", [])
+        if isinstance(deps, str): deps = [d.strip() for d in deps.split(",") if d.strip()]
+        
+        for dep in deps:
+            dep_name = dep.split("==")[0].strip()
+            if dep_name not in self.db:
+                self._log("WARN", f"缺少依赖: {dep_name}，正在自动安装...")
+                self.install(dep_name)
+
+    def list_installed(self):
+        if not self.db:
+            print("本地暂无已安装场景。")
+            return
+        print(f"{'Name':<25} {'Version':<12} {'Category':<20} {'Status'}")
+        print("-" * 80)
+        for name, info in self.db.items():
+            print(f"{name:<25} {info.get('version','unknown'):<12} {info.get('category','default'):<20} {info.get('status')}")
+
+    def info(self, plugin_name):
+        if plugin_name not in self.db:
+            self._log("ERROR", f"找不到插件: {plugin_name}")
+            return
+        info = self.db[plugin_name]
+        print(f"\n[+] 插件详情: {plugin_name}")
+        print("=" * 60)
+        print(f" 版本: {info.get('version')}")
+        print(f" 分类: {info.get('category')}")
+        print(f" 状态: {info.get('status')}")
+        print(f" 安装路径: {info.get('install_path')}")
+        
+        list_file = os.path.join(INFO_DIR, f"{plugin_name}.list")
+        if os.path.exists(list_file):
+            print("\n 文件清单:")
+            with open(list_file, "r") as f:
+                for line in f:
+                    print(f"   - {line.strip()}")
+        print("=" * 60)
+
+    def remove(self, plugin_name):
+        if plugin_name not in self.db:
+            self._log("ERROR", f"找不到插件: {plugin_name}")
+            return
+        self._log("INFO", f"正在卸载: {plugin_name}")
+        
+        list_file = os.path.join(INFO_DIR, f"{plugin_name}.list")
+        if os.path.exists(list_file):
+            with open(list_file, "r") as f:
+                for path in f.read().splitlines():
+                    if os.path.exists(path): os.remove(path)
+        
+        install_path = self.db[plugin_name].get("install_path")
+        if install_path and os.path.exists(install_path):
+            shutil.rmtree(install_path, ignore_errors=True)
+        
+        for ext in [".list", ".toml"]:
+            p = os.path.join(INFO_DIR, f"{plugin_name}{ext}")
+            if os.path.exists(p): os.remove(p)
+            
+        del self.db[plugin_name]
+        self._save_status()
+        self._log("DONE", f"✅ {plugin_name} 已卸载")
+
+    def configure_all(self, rebuild=False):
+        self._log("INFO", "正在扫描本地状态机...")
+        broken = [name for name, info in self.db.items() if info.get("status") != "install ok installed"]
+        if not broken and not rebuild:
+            self._log("DONE", "✅ 所有包状态正常")
+            return
+        targets = broken if not rebuild else list(self.db.keys())
+        for pkg in targets:
+            self._log("INFO", f"正在修复: {pkg}")
+            self.db[pkg]["status"] = "install ok installed"
+        self._save_status()
+        self._log("DONE", "✅ 修复完毕")
+
+    def fix_broken(self):
+        self._log("INFO", "正在检查依赖树...")
+        for name in list(self.db.keys()): 
+            self._check_dependencies(name)
+        self._log("DONE", "✅ 检查完毕")
+
+    def wheel(self, source_dir):
+        if not os.path.isdir(source_dir):
+            self._log("ERROR", f"路径无效: {source_dir}")
+            return
+        toml_path = os.path.join(source_dir, "twmpxpem-project.toml")
+        if not os.path.exists(toml_path):
+            self._log("ERROR", "缺少 twmpxpem-project.toml")
+            return
+        
+        with open(toml_path, "rb") as f:
+            config = tomllib.load(f)
+        name = config["project"]["name"]
+        version = config["project"]["version"]
+        
+        output = f"{name}-{version}.wvwhl"
+        self._log("INFO", f"正在打包至: {output}")
+        
+        with zipfile.ZipFile(output, 'w', zipfile.ZIP_DEFLATED) as zf:
+            for root, _, files in os.walk(source_dir):
+                for file in files:
+                    file_path = os.path.join(root, file)
+                    arcname = os.path.relpath(file_path, source_dir)
+                    zf.write(file_path, arcname)
+        
+        with open(output, 'rb') as f:
+            data = f.read()
+        if data.startswith(STANDARD_ZIP_HEADER):
+            with open(output, 'wb') as f:
+                f.write(MAGIC_HEADER + data[4:])
+        self._log("DONE", f"🎉 打包完成: {output}")
+
+def main():
+    parser = argparse.ArgumentParser(description="twmpxpem - 场景安装器 (完全自治版)")
+    parser.add_argument("-v", "--verbose", action="count", default=0)
+    subparsers = parser.add_subparsers(dest="command", required=True)
+
+    p_install = subparsers.add_parser("install", help="安装")
+    p_install.add_argument("package", nargs="?", help="包名或本地 .wvwhl 路径")
+    p_install.add_argument("--set-one-time-url", help="临时下载地址")
+    p_install.add_argument("--disable-cache-directory", action="store_true")
+    p_install.add_argument("--install-requirement-file", help="批量安装清单")
+
+    subparsers.add_parser("list", help="列出已安装")
+    subparsers.add_parser("list-installed", help="列出已安装 (别名)")
+
+    p_info = subparsers.add_parser("info", help="查看详情")
+    p_info.add_argument("package")
+
+    p_remove = subparsers.add_parser("remove", help="卸载")
+    p_remove.add_argument("package")
+
+    p_conf = subparsers.add_parser("configure", help="修复状态")
+    p_conf.add_argument("-a", "--all", action="store_true")
+    p_conf.add_argument("-ra", "--rebuild-all", action="store_true")
+
+    subparsers.add_parser("fix-broken", help="修复依赖")
+
+    p_wheel = subparsers.add_parser("wheel", help="打包插件")
+    p_wheel.add_argument("source_dir")
+
+    args = parser.parse_args()
+    manager = TwmpxpemManager(verbosity=args.verbose)
+
+    if args.command == "install":
+        manager.install(args.package, 
+                        one_time_url=args.set_one_time_url,
+                        disable_cache=args.disable_cache_directory,
+                        req_file=args.install_requirement_file)
+    elif args.command in ("list", "list-installed"):
+        manager.list_installed()
+    elif args.command == "info":
+        manager.info(args.package)
+    elif args.command == "remove":
+        manager.remove(args.package)
+    elif args.command == "configure":
+        manager.configure_all(rebuild=args.rebuild_all)
+    elif args.command == "fix-broken":
+        manager.fix_broken()
+    elif args.command == "wheel":
+        manager.wheel(args.source_dir)
+
+if __name__ == "__main__":
+    main()
