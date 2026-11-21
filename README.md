@@ -15,7 +15,7 @@
 |---|---|---|
 | `Spectrum3DAudacious.py` | 3D频谱墙 | Audacious gl-spectrum风格 |
 | `Spectrum_2d.py` | 2D频谱竖条 | 经典FFT频谱 |
-| `WMPVisualizer.py` | 瀑布图 | Windows Media Player XP风格 |
+| `WMPVisualizer.py` | 瀑布图，也叫随机场景可视化 | Windows Media Player XP风格 |
 | `VU_Meter.py` | 电平表 | 带回落+峰值保持 |
 | `LoudMeter.py` | 响度计 | BS.1770 LUFS |
 | `ThrustMeter.py` | 推力计 | 低频冲击感 |
@@ -25,7 +25,7 @@
 | `ProgressBar.py` | 播放进度条 | 纯横条 |
 | `TimelineRoll.py` | 滚动时间轴 | 波形+刻度线 |
 | `PitchMeter1.py` | 音符计 | YIN音高检测+滑音连音+BPM小节 |
-| `WMPVisualizer.py` | 随机场景可视化 | 瀑布/漩涡/粒子/圆环/竖条 |
+| `PhaseMeter.py` | 立体声相位表 | 利萨茹矢量示波器，立体声相位与宽度分析 |
 | `StatusBarOverlay.py` | 显示状态栏，用于显示播放信息 | 作者/播放路径/已播/未播/总时长 |
 | `TitleLineBay.py` | 显示标题栏，用于显示播放信息以及当前使用的工具的版本号 | 播放路径/歌曲名/歌手/专辑/专辑图片文件名/播放器名称与版本号/已播/未播/总时长 |
 
@@ -168,6 +168,15 @@ Spectrum3DAudacious.py 歌.mp3 -o out.mp4 \
 ```
 
 如果你看到这条通知没了，那么就是被杀掉了，Android在退出应用的时候会顺带清理该应用的全部通知。
+
+安装插件(TWMPXPEM，Termux Windows Media Player XP Extension Manager)：
+
+```bash
+cp -v */twmpxpem */wmpvisulizer1 $PREFIX/bin
+twmpxpem install [要安装的插件名字]
+```
+
+然后用新版的wmpvisulizer1重新跑一下可视化Windows Media Player视频渲染模块。
 
 ## 快速开始(懒人版)
 
