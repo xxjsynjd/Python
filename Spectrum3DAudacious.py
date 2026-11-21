@@ -6,6 +6,7 @@ Spectrum3DAudacious.py —— Audacious 风格 3D 频谱（第八版）
 新增:
   - --hue-offset：红色起始角度（0.375=左上角红）
   - --flip-freq：翻转频谱方向（低频放右边）
+  - --hue-reverse：色环反向（反转色相环方向，不翻转频率轴）
 """
 
 import argparse
@@ -140,11 +141,14 @@ def project(x, y, z, W, H, yaw, cfg):
     return sx, sy, depth
 
 
-def angular_color(x, y, hue_offset=0.5):
+def angular_color(x, y, hue_offset=0.5, hue_reverse=False):
     dx = x
     dy = (y - 0.5) * 2.0
     theta = math.atan2(dy, dx)
-    hue = (theta / (2 * math.pi) + hue_offset) % 1.0
+    t = theta / (2 * math.pi)
+    if hue_reverse:
+        t = -t
+    hue = (t + hue_offset) % 1.0
     return hue_to_rgb(hue)
 
 
@@ -233,7 +237,8 @@ def render(spec_db, cfg, out_path):
 
                     depth = (p_bl[2] + p_br[2] + p_fr[2] + p_fl[2]) * 0.25
 
-                    col = angular_color(x_c, t_pos, cfg["hue_offset"])
+                    col = angular_color(x_c, t_pos, cfg["hue_offset"],
+                                         cfg.get("hue_reverse", False))
 
                     prims.append({
                         "depth": depth,
@@ -296,6 +301,9 @@ def main():
                     help="色相起始偏移（0.375=左上角红，0.5=正上方红）")
     ap.add_argument("--flip-freq", dest="flip_freq",
                     action="store_true", help="翻转频谱（低频放右边）")
+    ap.add_argument("--hue-reverse", dest="hue_reverse",
+                    action="store_true",
+                    help="色环反向（反转色相环方向，不翻转频率轴）")
 
     ap.add_argument("--osc-period", type=float, default=15.0,
                     help="摆动周期（秒），越大越慢")
@@ -337,6 +345,7 @@ def main():
         bars=a.bars, rows=a.rows,
         db_min=a.db_min, db_max=a.db_max,
         hue_offset=a.hue_offset, flip_freq=a.flip_freq,
+        hue_reverse=a.hue_reverse,
         osc_period=a.osc_period, osc_angle=a.osc_angle,
         pitch=a.pitch, yaw_offset=a.yaw_offset,
         persp=a.persp, x_span=a.x_span, depth=a.depth,

@@ -1,0 +1,186 @@
+#!/usr/bin/env python3
+# ==============================================================================
+# twmpxpem - 场景安装器 (核心引擎迷你版)
+# 支持: install, list, remove, info
+# ==============================================================================
+
+import os
+import sys
+import json
+import shutil
+import argparse
+import zipfile
+import io
+import tomllib # Python 3.11+ 自带，如果你的 Python 比较老，可以用 pip install toml
+from datetime import datetime
+
+# 模拟 Termux 的 PREFIX 环境变量
+PREFIX = os.environ.get("PREFIX", "/data/data/com.termux/files/usr")
+BASE_DIR = os.path.join(PREFIX, "var", "lib", "twmpxpem")
+INFO_DIR = os.path.join(BASE_DIR, "info")
+STATUS_FILE = os.path.join(BASE_DIR, "status")
+SANDBOX_DIR = os.path.join(PREFIX, "lib", "twmpxpem", "site-packages", "root")
+
+# 咱们之前定义的专属文件头 (TWMP)
+MAGIC_HEADER = b'TWMP'
+STANDARD_ZIP_HEADER = b'PK\x03\x04'
+
+class TwmpxpemManager:
+    def __init__(self):
+        self._ensure_dirs()
+        self.db = self._load_status()
+
+    def _ensure_dirs(self):
+        os.makedirs(INFO_DIR, exist_ok=True)
+        os.makedirs(SANDBOX_DIR, exist_ok=True)
+        if not os.path.exists(STATUS_FILE):
+            with open(STATUS_FILE, "w") as f:
+                json.dump({}, f)
+
+    def _load_status(self):
+        with open(STATUS_FILE, "r") as f:
+            return json.load(f)
+
+    def _save_status(self):
+        with open(STATUS_FILE, "w") as f:
+            json.dump(self.db, f, indent=4)
+
+    def _log(self, level, message):
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        print(f"[{timestamp}] [{level.upper()}] {message}")
+
+    def install(self, wvwhl_path):
+        self._log("INFO", f"正在解析包: {os.path.basename(wvwhl_path)}")
+        
+        if not os.path.exists(wvwhl_path):
+            self._log("ERROR", f"找不到文件: {wvwhl_path}")
+            return
+
+        with open(wvwhl_path, 'rb') as f:
+            file_data = f.read()
+
+        # 内存脱壳
+        if file_data.startswith(MAGIC_HEADER):
+            self._log("DEBUG", "检测到 TWMP 专属文件头，正在内存中还原 ZIP 结构...")
+            restored_zip_data = STANDARD_ZIP_HEADER + file_data[4:]
+        elif file_data.startswith(STANDARD_ZIP_HEADER):
+            self._log("WARN", "未检测到 TWMP 文件头，尝试直接解压...")
+            restored_zip_data = file_data
+        else:
+            self._log("ERROR", "文件格式错误！既不是 TWMP 也不是标准 ZIP。")
+            return
+
+        try:
+            with zipfile.ZipFile(io.BytesIO(restored_zip_data)) as zipf:
+                # 读取 control.tar.gz 下的配置 (这里简化为直接读取包根目录的 toml)
+                if "twmpxpem-project.toml" not in zipf.namelist():
+                    self._log("ERROR", "包内缺少 twmpxpem-project.toml 配置文件！")
+                    return
+                
+                with zipf.open("twmpxpem-project.toml") as tf:
+                    config = tomllib.loads(tf.read().decode('utf-8'))
+                
+                plugin_name = config["project"]["name"]
+                version = config["project"]["version"]
+                
+                # 解压到沙盒
+                install_path = os.path.join(SANDBOX_DIR, plugin_name)
+                self._log("INFO", f"正在解压至沙盒: {install_path}")
+                zipf.extractall(install_path)
+                
+                # 修改权限
+                py_script = os.path.join(install_path, "wmpvisualizer.dll") # 用咱们之前说的伪装后缀
+                if os.path.exists(py_script):
+                    os.chmod(py_script, 0o755)
+                    self._log("INFO", f"[chmod] {py_script} -> 755 (rwxr-xr-x)")
+                
+                # 记录文件清单
+                files_written = []
+                for root, _, files in os.walk(install_path):
+                    for file in files:
+                        files_written.append(os.path.join(root, file))
+                        
+                with open(os.path.join(INFO_DIR, f"{plugin_name}.list"), "w") as f:
+                    f.write("\n".join(files_written))
+                
+                # 更新状态
+                self.db[plugin_name] = {
+                    "status": "install ok installed",
+                    "version": version,
+                    "install_path": install_path
+                }
+                self._save_status()
+                self._log("DONE", f"🎉 安装成功！已注册滤镜 '{plugin_name}'。")
+
+        except Exception as e:
+            self._log("ERROR", f"安装失败: {e}")
+
+    def list_installed(self):
+        if not self.db:
+            print("本地暂无已安装的场景/滤镜。")
+            return
+        print(f"{'Name':<20} {'Version':<15} {'Status'}")
+        print("-" * 55)
+        for name, info in self.db.items():
+            print(f"{name:<20} {info.get('version', 'unknown'):<15} {info.get('status')}")
+
+    def remove(self, plugin_name):
+        if plugin_name not in self.db:
+            self._log("ERROR", f"找不到插件: {plugin_name}")
+            return
+        
+        self._log("INFO", f"正在卸载: {plugin_name}")
+        
+        # 根据 .list 清理文件
+        list_file = os.path.join(INFO_DIR, f"{plugin_name}.list")
+        if os.path.exists(list_file):
+            with open(list_file, "r") as f:
+                for file_path in f.read().splitlines():
+                    if os.path.exists(file_path):
+                        os.remove(file_path)
+        
+        # 删除沙盒空目录
+        install_path = self.db[plugin_name].get("install_path")
+        if install_path and os.path.exists(install_path):
+            shutil.rmtree(install_path, ignore_errors=True)
+            
+        # 清理 info 和 status
+        for ext in [".list", ".toml"]:
+            p = os.path.join(INFO_DIR, f"{plugin_name}{ext}")
+            if os.path.exists(p):
+                os.remove(p)
+                
+        del self.db[plugin_name]
+        self._save_status()
+        self._log("DONE", f"✅ {plugin_name} 已彻底卸载。")
+
+# ==============================================================================
+# CLI 入口
+# ==============================================================================
+def main():
+    parser = argparse.ArgumentParser(description="twmpxpem - 场景安装器")
+    subparsers = parser.add_subparsers(dest="command", required=True)
+
+    # install 子命令
+    parser_install = subparsers.add_parser("install", help="安装 .wvwhl 包")
+    parser_install.add_argument("package", help="包文件路径")
+    
+    # list 子命令
+    parser_list = subparsers.add_parser("list", help="查看已安装的场景")
+    
+    # remove 子命令
+    parser_remove = subparsers.add_parser("remove", help="卸载场景")
+    parser_remove.add_argument("package", help="场景名称")
+
+    args = parser.parse_args()
+    manager = TwmpxpemManager()
+
+    if args.command == "install":
+        manager.install(args.package)
+    elif args.command == "list":
+        manager.list_installed()
+    elif args.command == "remove":
+        manager.remove(args.package)
+
+if __name__ == "__main__":
+    main()
