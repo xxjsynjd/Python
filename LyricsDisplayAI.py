@@ -358,26 +358,81 @@ def _text_bbox(font, text):
     return font.getbbox(text)
 
 
+def _char_w(font, ch):
+    bbox = font.getbbox(ch)
+    return bbox[2] - bbox[0]
+
+
+def _wrap_idx_h(font, text, max_w):
+    """横排按宽度贪心折行，返回每行对应的原字符索引列表。
+    英文/数字单词整体不拆，优先在空格处断行；单词自身超宽才逐字硬拆。"""
+    n = len(text)
+    if not max_w or max_w <= 0:
+        return [list(range(n))]
+    spans = [m.span() for m in re.finditer(
+        r"[A-Za-z0-9]+(?:[.\-'][A-Za-z0-9]+)*|\s|.", text)]
+    lines_idx, cur_idx, cur_w = [], [], 0
+    for a, b in spans:
+        idx = list(range(a, b))
+        tw = sum(_char_w(font, text[k]) for k in idx)
+        tok = text[a:b]
+        is_word = bool(tok) and not tok.isspace() and re.match(r"[A-Za-z0-9]", tok[0])
+        if cur_idx and cur_w + tw > max_w:
+            lines_idx.append(cur_idx)
+            cur_idx, cur_w = [], 0
+        if is_word and tw > max_w:
+            # 单词比可用宽度还宽：逐字硬拆，保证不横向溢出
+            for k in idx:
+                cw = _char_w(font, text[k])
+                if cur_idx and cur_w + cw > max_w:
+                    lines_idx.append(cur_idx)
+                    cur_idx, cur_w = [k], cw
+                else:
+                    cur_idx.append(k)
+                    cur_w += cw
+        else:
+            cur_idx += idx
+            cur_w += tw
+    if cur_idx:
+        lines_idx.append(cur_idx)
+    return [sl for sl in lines_idx if sl]
+
+
+def wrap_text_h(font, text, max_w):
+    """横排按最大宽度贪心折行，返回行文本列表；max_w 为空/<=0 时不折行。"""
+    if not text:
+        return []
+    if not max_w or max_w <= 0:
+        return [text]
+    return [text[sl[0]:sl[-1] + 1].rstrip()
+            for sl in _wrap_idx_h(font, text, max_w)]
+
+
 def _draw_text_static(canvas, x, y, text, font, col, shadow_col):
     draw = ImageDraw.Draw(canvas, "RGBA")
     draw.text((x + 2, y + 2), text, font=font, fill=shadow_col)
     draw.text((x, y), text, font=font, fill=col)
 
 
-def draw_line_h(canvas, cx, y, text, font, col, shadow_col, align):
-    """横排一行（静态）"""
+def draw_line_h(canvas, cx, y, text, font, col, shadow_col, align, max_w=None):
+    """横排静态句；超出 max_w 时自动折成多行，垂直居中堆叠。"""
     draw = ImageDraw.Draw(canvas, "RGBA")
-    bbox = draw.textbbox((0, 0), text, font=font)
-    tw = bbox[2] - bbox[0]
-    th = bbox[3] - bbox[1]
-    if align == "center":
-        x = cx - tw / 2 - bbox[0]
-    elif align == "left":
-        x = cx - bbox[0]
-    else:
-        x = cx - tw - bbox[0]
-    yy = y - th / 2 - bbox[1]
-    _draw_text_static(canvas, x, yy, text, font, col, shadow_col)
+    lines = wrap_text_h(font, text, max_w)
+    lh = int(font.size * 1.35)
+    total_h = lh * len(lines)
+    for j, line in enumerate(lines):
+        bbox = draw.textbbox((0, 0), line, font=font)
+        tw = bbox[2] - bbox[0]
+        th = bbox[3] - bbox[1]
+        if align == "center":
+            x = cx - tw / 2 - bbox[0]
+        elif align == "left":
+            x = cx - bbox[0]
+        else:
+            x = cx - tw - bbox[0]
+        line_y = y - total_h / 2 + j * lh
+        yy = line_y + lh / 2 - th / 2 - bbox[1]
+        _draw_text_static(canvas, x, yy, line, font, col, shadow_col)
 
 
 def draw_line_v(canvas, cx, cy, text, font, col, shadow_col, align):
@@ -409,28 +464,34 @@ def draw_current_h(canvas, cx, y_center, text, font,
                    char_times, cur_sec,
                    base_col, hl_col, shadow_col,
                    bounce_scale=1.35, bounce_dur=0.18,
-                   align="center"):
-    """横排当前句：逐字弹跳"""
+                   align="center", max_w=None):
+    """横排当前句：逐字弹跳；超出 max_w 时自动折成多行。"""
     n = len(text)
     if n == 0:
         return
-    widths = []
-    for ch in text:
-        bbox = font.getbbox(ch)
-        widths.append(bbox[2] - bbox[0])
-    total_w = sum(widths)
-    if align == "center":
-        x = cx - total_w / 2
-    elif align == "left":
-        x = cx
+    widths = [_char_w(font, ch) for ch in text]
+
+    # 按宽度贪心分行，记录每行的原字符索引（英文单词整体不拆）
+    if max_w and max_w > 0:
+        lines_idx = _wrap_idx_h(font, text, max_w)
     else:
-        x = cx - total_w
+        lines_idx = [list(range(n))]
+
+    row_w = [sum(widths[k] for k in idxs) for idxs in lines_idx]
+    char_row, char_prefix = {}, {}
+    for j, idxs in enumerate(lines_idx):
+        run = 0
+        for k in idxs:
+            char_row[k] = j
+            char_prefix[k] = run
+            run += widths[k]
 
     base_bbox = font.getbbox("测Ag")
     line_h = base_bbox[3] - base_bbox[1]
+    lh = int(line_h * 1.3)
     pad = int(line_h * 0.9)
-    layer_w = int(total_w) + pad * 2
-    layer_h = int(line_h * 2.5) + pad * 2
+    layer_w = int(max(row_w)) + pad * 2
+    layer_h = int(lh * len(lines_idx)) + pad * 2
     layer = Image.new("RGBA", (layer_w, layer_h), (0, 0, 0, 0))
 
     for k in range(n):
@@ -442,8 +503,16 @@ def draw_current_h(canvas, cx, y_center, text, font,
         bbox = font.getbbox(ch)
         cw = bbox[2] - bbox[0]
         ch_h = bbox[3] - bbox[1]
-        char_cx = x + sum(widths[:k]) + cw / 2
-        char_cy = layer_h / 2
+
+        j = char_row[k]
+        if align == "center":
+            row_x = (layer_w - row_w[j]) / 2
+        elif align == "left":
+            row_x = pad
+        else:
+            row_x = layer_w - pad - row_w[j]
+        char_cx_layer = row_x + char_prefix[k] + cw / 2
+        char_cy_layer = pad + lh * (j + 0.5)
 
         if is_punct(ch):
             sx = sy = 1.0
@@ -469,10 +538,8 @@ def draw_current_h(canvas, cx, y_center, text, font,
             cimg = cimg.resize((max(1, int(cw_i * sx)),
                                 max(1, int(ch_i * sy))),
                                Image.BILINEAR)
-        # 图层坐标系里字符中心
-        char_cx_layer = char_cx - x + pad
         paste_x = char_cx_layer - cimg.width / 2
-        paste_y = char_cy - cimg.height / 2 + dy
+        paste_y = char_cy_layer - cimg.height / 2 + dy
         layer.alpha_composite(cimg, (int(paste_x), int(paste_y)))
 
     if align == "center":
@@ -480,7 +547,7 @@ def draw_current_h(canvas, cx, y_center, text, font,
     elif align == "left":
         layer_x = cx - pad
     else:
-        layer_x = cx - total_w - pad
+        layer_x = cx - layer_w + pad
     canvas.alpha_composite(layer, (int(layer_x),
                                    int(y_center - layer_h / 2)))
 
@@ -550,7 +617,7 @@ def draw_lyrics(canvas, cx, cy, lyrics, char_times_map, cur_sec,
                 bounce_scale=1.35, bounce_dur=0.18,
                 scroll_threshold=0.85, scroll_ease="smoothstep",
                 align="center", layout="stack", arrange="h",
-                stagger=60):
+                stagger=60, max_w=None):
     if not lyrics:
         return
     times = [t for t, _ in lyrics]
@@ -599,6 +666,16 @@ def draw_lyrics(canvas, cx, cy, lyrics, char_times_map, cur_sec,
             return 0
         return stagger if (i % 2 == 0) else -stagger
 
+    # ---- 当前句折多行时的纵向避让：把上下紧邻句各推开溢出量的一半 ----
+    h_ov = 0.0
+    if arrange in ("h", "h-stagger") and 0 <= idx < n and max_w:
+        rows_cur = len(wrap_text_h(font_cur, lyrics[idx][1], max_w))
+        if rows_cur > 1:
+            lh_cur = font_cur.size * 1.3
+            pad_cur = font_cur.size * 0.9
+            h_cur = lh_cur * rows_cur + pad_cur * 2
+            h_ov = max(0.0, (h_cur - line_h) / 2.0)
+
     for slot in range(visible_lines):
         offset = slot - (visible_lines // 2)
         i = idx + offset
@@ -606,6 +683,11 @@ def draw_lyrics(canvas, cx, cy, lyrics, char_times_map, cur_sec,
             continue
 
         y = y_start + slot * line_h + scroll_offset + stagger_dy(i)
+        if arrange in ("h", "h-stagger"):
+            if i < idx:
+                y -= int(h_ov)
+            elif i > idx:
+                y += int(h_ov)
         x = cx + stagger_dx(i)
         text = lyrics[i][1]
 
@@ -616,21 +698,21 @@ def draw_lyrics(canvas, cx, cy, lyrics, char_times_map, cur_sec,
                 draw_current_h(canvas, x, y, text, font_cur,
                                char_times_map[i], cur_sec,
                                COL_NOW_BASE, COL_NOW_HL, COL_SHADOW,
-                               bounce_scale, bounce_dur, align)
+                               bounce_scale, bounce_dur, align, max_w)
             else:
                 col = COL_PAST if i < idx else COL_FUTURE
                 draw_line_h(canvas, x, y, text, font_other,
-                            col, COL_SHADOW, align)
+                            col, COL_SHADOW, align, max_w)
         elif arrange == "h-stagger":
             if is_current and i in char_times_map:
                 draw_current_h(canvas, x, y, text, font_cur,
                                char_times_map[i], cur_sec,
                                COL_NOW_BASE, COL_NOW_HL, COL_SHADOW,
-                               bounce_scale, bounce_dur, align)
+                               bounce_scale, bounce_dur, align, max_w)
             else:
                 col = COL_PAST if i < idx else COL_FUTURE
                 draw_line_h(canvas, x, y, text, font_other,
-                            col, COL_SHADOW, align)
+                            col, COL_SHADOW, align, max_w)
         elif arrange == "v":
             if is_current and i in char_times_map:
                 draw_current_v(canvas, x, y, text, font_cur,
@@ -657,6 +739,10 @@ def render(lyrics, char_times_map, total_sec, cfg, out_path):
     W = cfg["width"] // 2 * 2
     H = cfg["height"] // 2 * 2
     fps = cfg["fps"]
+    ratio = cfg.get("width_ratio", 0.8)
+    # 可用宽度占视频宽度的比例，限制在 70%~100%，不按很小的固定值折行
+    ratio = min(1.0, max(0.7, float(ratio)))
+    max_w = int(W * ratio)
     n_frames = max(1, int(math.ceil(total_sec * fps)))
     font_cur = load_font(cfg["font"], cfg["font_size_cur"])
     font_other = load_font(cfg["font"], cfg["font_size_other"])
@@ -692,7 +778,8 @@ def render(lyrics, char_times_map, total_sec, cfg, out_path):
                         align=cfg["align"],
                         layout=cfg["layout"],
                         arrange=cfg["arrange"],
-                        stagger=cfg["stagger"])
+                        stagger=cfg["stagger"],
+                        max_w=max_w)
             proc.stdin.write(canvas.convert("RGB").tobytes("raw", "RGB"))
             if i % report == 0:
                 print(f"\r渲染中… {i * 100 // n_frames:3d}%",
@@ -744,6 +831,9 @@ def main():
                     help="排列方式：h=横排；v=竖排；h-stagger=横排错开；v-stagger=竖排错开")
     ap.add_argument("--stagger", type=int, default=60,
                     help="错开模式下的像素偏移量")
+    ap.add_argument("--width-ratio", type=float, default=0.8,
+                    help="横排可用宽度占视频宽度的比例（0.7~1.0），默认 0.8；"
+                         "超出该宽度的句子自动折行")
     a = ap.parse_args()
 
     if not FFMPEG:
@@ -813,6 +903,7 @@ def main():
         layout=a.layout,
         arrange=a.arrange,
         stagger=a.stagger,
+        width_ratio=a.width_ratio,
     )
 
     print(f"[4/4] 渲染 {int(total_sec * a.fps)} 帧 → {out_path}",
