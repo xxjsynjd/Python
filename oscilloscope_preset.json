@@ -1,0 +1,17 @@
+{
+  "color": "#00ffb4",
+  "bg_color": "#080a0e",
+  "line_width": 2,
+  "window": 30.0,
+  "points": 400,
+  "scale": 1.0,
+  "show_peaks": true,
+  "peak_lines": true,
+  "peak_hold": true,
+  "peak_ramp": 0.3,
+  "grid": true,
+  "trail": true,
+  "decay": 0.85,
+  "trail_hold": 0.6,
+  "blur": 1.2
+}

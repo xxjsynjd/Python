@@ -36,6 +36,7 @@ MODES = {
     "vibration":  ("VibrationMeter.py", "_vib.mp4", []),
     "noisegate":  ("NoiseGateMeter.py", "_gate.mp4", []),
     "phase":      ("PhaseMeter.py", "_phase.mp4", []),
+    "scope":      ("Oscilloscope.py", "_scope.mp4", []),
     "timeline":   ("TimelineRoll.py", "_timeline.mp4", []),
     "pitch":      ("PitchMeter1.py", "_pitch.mp4", ["--auto-vocals"]),
     "lyrics":     ("LyricsDisplayAI.py", "_lyrics.mp4", [
