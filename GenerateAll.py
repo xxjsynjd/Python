@@ -38,17 +38,15 @@ MODES = {
     "phase":      ("PhaseMeter.py", "_phase.mp4", []),
     "scope":      ("Oscilloscope.py", "_scope.mp4", []),
     "timeline":   ("TimelineRoll.py", "_timeline.mp4", []),
-    "pitch":      ("PitchMeter1.py", "_pitch.mp4", ["--auto-vocals"]),
+    "pitch":      ("PitchMeter.py", "_pitch.mp4", ["--auto-vocals"]),
     "lyrics":     ("LyricsDisplayAI.py", "_lyrics.mp4", [
         "--auto-vocals", "--model", "base", "--lang", "zh",
     ]),
     "progress":   ("ProgressBar.py", "_progress.mp4", []),
     "speaker":    ("SpeakerMeter.py", "_speaker.mp4", []),
-    "status":     ("StatusBar.py", "_status.mp4", []),
+    "status":     ("StatusBarOverlay.py", "_status.mp4", []),
     "TitleLineBar":("TitleLineBar.py", "_title.mp4", []),
     "wmp":        ("WMPVisualizer.py", "_wmp.mp4", []),
-    "waterfall":  ("WaterfallWMP.py", "_waterfall.mp4", []),
-    "waterfall3d":("Waterfall3D.py", "_wf3d.mp4", []),
     "vu":         ("VU_Meter.py", "_meter.mp4", []),
 }
 

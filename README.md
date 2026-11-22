@@ -24,7 +24,7 @@
 | `SpeakerMeter.py` | 低音+高音喇叭 | 分频驱动双喇叭 |
 | `ProgressBar.py` | 播放进度条 | 纯横条 |
 | `TimelineRoll.py` | 滚动时间轴 | 波形+刻度线 |
-| `PitchMeter1.py` | 音符计 | YIN音高检测+滑音连音+BPM小节 |
+| `PitchMeter.py` | 音符计 | YIN音高检测+滑音连音+BPM小节 |
 | `PhaseMeter.py` | 立体声相位表 | 利萨茹矢量示波器，立体声相位与宽度分析 |
 | `Oscilloscope.py` | 时域示波器 | 采样点轮廓折线；十六进制配色 / JSON 预设 / 峰谷值显示与线段（线性滑动·保持回落时长可调）/ 余晖拖尾边淡出边高斯模糊 |
 | `StatusBarOverlay.py` | 显示状态栏，用于显示播放信息 | 作者/播放路径/已播/未播/总时长 |
@@ -84,7 +84,7 @@ pip install --force-reinstall xet-core/hf_xet/target/wheels/hf_xet-1.7.0-cp314-c
 Spectrum3DAudacious.py 歌.mp3 -o out.mp4
 
 # 音符计（带 AI 人声分离）
-PitchMeter1.py 歌.mp3 -o out.mp4 --auto-vocals
+PitchMeter.py 歌.mp3 -o out.mp4 --auto-vocals
 
 # 歌词逐字弹跳
 LyricsDisplayAI.py 歌.mp3 -o out.mp4 --auto-vocals --model base --lang zh
@@ -188,11 +188,11 @@ Spectrum3DAudacious.py 歌.mp3 -o out.mp4 \
 安装插件(TWMPXPEM，Termux Windows Media Player XP Extension Manager)：
 
 ```bash
-cp -v */twmpxpem */wmpvisulizer1 $PREFIX/bin
+cp -v ./twmpxpem ./wmpvisualizer1 $PREFIX/bin
 twmpxpem install [要安装的插件名字]
 ```
 
-然后用新版的wmpvisulizer1重新跑一下可视化Windows Media Player视频渲染模块。
+然后用新版的 wmpvisualizer1 重新跑一下可视化 Windows Media Player 视频渲染模块。
 
 ## 快速开始(懒人版)
 
