@@ -13,7 +13,7 @@
 
 | 脚本 | 功能 | 风格 |
 |---|---|---|
-| `Spectrum3DAudacious.py` | 3D频谱墙 | Audacious gl-spectrum风格 |
+| `Spectrum3DAudacious.py` | 3D频谱墙 | Audacious gl-spectrum风格；五种 PS 渐变（角度/线性/径向/对称/菱形）+ 底盘网格开关 |
 | `Spectrum_2d.py` | 2D频谱竖条 | 经典FFT频谱 |
 | `WMPVisualizer.py` | 瀑布图，也叫随机场景可视化 | Windows Media Player XP风格 |
 | `VU_Meter.py` | 电平表 | 带回落+峰值保持 |
@@ -26,7 +26,7 @@
 | `TimelineRoll.py` | 滚动时间轴 | 波形+刻度线 |
 | `PitchMeter1.py` | 音符计 | YIN音高检测+滑音连音+BPM小节 |
 | `PhaseMeter.py` | 立体声相位表 | 利萨茹矢量示波器，立体声相位与宽度分析 |
-| `Oscilloscope.py` | 时域示波器 | 采样点轮廓折线；十六进制配色 / JSON 预设 / 峰谷值显示与线段（线性滑动·保持回落）/ 余晖拖尾边淡出边高斯模糊 |
+| `Oscilloscope.py` | 时域示波器 | 采样点轮廓折线；十六进制配色 / JSON 预设 / 峰谷值显示与线段（线性滑动·保持回落时长可调）/ 余晖拖尾边淡出边高斯模糊 |
 | `StatusBarOverlay.py` | 显示状态栏，用于显示播放信息 | 作者/播放路径/已播/未播/总时长 |
 | `TitleLineBay.py` | 显示标题栏，用于显示播放信息以及当前使用的工具的版本号 | 播放路径/歌曲名/歌手/专辑/专辑图片文件名/播放器名称与版本号/已播/未播/总时长 |
 
@@ -130,9 +130,13 @@ Spectrum3DAudacious.py 歌.mp3 -o out.mp4 \
   --osc-angle 40 \
   --hue-offset 0.375 \
   --flip-freq \
+  --gradient angular \
+  --grid \
   --pitch 35 \
   --width 720 --height 1280 --fps 30
 ```
+
+渐变类型 `--gradient`：`angular` 角度扫掠(默认) / `linear` 线性 / `radial` 径向 / `reflected` 对称 / `diamond` 菱形；`--grid` 显示底盘网格线（默认关闭，`--no-grid` 关闭）。
 
 ---
 

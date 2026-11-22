@@ -8,6 +8,7 @@
   "show_peaks": false,
   "peak_lines": false,
   "peak_hold": false,
+  "peak_hold_sec": 1.2,
   "peak_ramp": 0.0,
   "grid": false,
   "trail": false,

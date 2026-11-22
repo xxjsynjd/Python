@@ -7,6 +7,9 @@ Spectrum3DAudacious.py —— Audacious 风格 3D 频谱（第八版）
   - --hue-offset：红色起始角度（0.375=左上角红）
   - --flip-freq：翻转频谱方向（低频放右边）
   - --hue-reverse：色环反向（反转色相环方向，不翻转频率轴）
+  - --gradient：渐变类型 angular 角度(默认) / linear 线性 / radial 径向 /
+    reflected 对称 / diamond 菱形
+  - --grid / --no-grid：底盘网格线显示开关（默认关闭）
 """
 
 import argparse
@@ -24,6 +27,7 @@ FFPROBE = shutil.which("ffprobe")
 
 BG = (4, 5, 10)
 TEXT_COL = (200, 210, 220)
+GRID_COL = (26, 30, 40)
 
 
 def hue_to_rgb(h):
@@ -141,11 +145,33 @@ def project(x, y, z, W, H, yaw, cfg):
     return sx, sy, depth
 
 
-def angular_color(x, y, hue_offset=0.5, hue_reverse=False):
-    dx = x
-    dy = (y - 0.5) * 2.0
-    theta = math.atan2(dy, dx)
-    t = theta / (2 * math.pi)
+def _grad_t(gtype, x, yn):
+    """按 PS 渐变类型把平面坐标映射到渐变进度 t∈[0,1]。
+
+    x ∈ [-1,1]（频段方向），yn ∈ [-1,1]（纵深方向，已居中归一）。
+    """
+    if gtype == "linear":
+        # 线性渐变：沿频段方向从左到右
+        return (x + 1.0) * 0.5
+    if gtype == "radial":
+        # 径向渐变：由中心向外圆扩散
+        r = math.sqrt(x * x + yn * yn) / math.sqrt(2.0)
+        return min(1.0, max(0.0, r))
+    if gtype == "reflected":
+        # 对称渐变：以中线为轴向两侧镜像
+        return min(1.0, max(0.0, abs(x)))
+    if gtype == "diamond":
+        # 菱形渐变：由中心沿曼哈顿距离向外菱形扩散
+        d = (abs(x) + abs(yn)) * 0.5
+        return min(1.0, max(0.0, d))
+    # angular（角度渐变，默认）：绕中心顺时针扫掠
+    theta = math.atan2(yn, x)
+    return theta / (2 * math.pi)
+
+
+def gradient_color(gtype, x, y, hue_offset=0.5, hue_reverse=False):
+    yn = (y - 0.5) * 2.0
+    t = _grad_t(gtype, x, yn)
     if hue_reverse:
         t = -t
     hue = (t + hue_offset) % 1.0
@@ -201,6 +227,19 @@ def render(spec_db, cfg, out_path):
             canvas = Image.new("RGB", (W, H), BG)
             draw = ImageDraw.Draw(canvas, "RGBA")
 
+            # —— 底盘网格线（地面 z=0，随视角一同投影）——
+            if cfg.get("grid", False):
+                gx = np.linspace(-1.0, 1.0, 11)
+                gy = np.linspace(0.0, 1.0, 9)
+                for gxi in gx:
+                    p0 = project(gxi, 0.0, 0.0, W, H, yaw, cfg)
+                    p1 = project(gxi, 1.0, 0.0, W, H, yaw, cfg)
+                    draw.line([p0[:2], p1[:2]], fill=GRID_COL, width=1)
+                for gyi in gy:
+                    p0 = project(-1.0, gyi, 0.0, W, H, yaw, cfg)
+                    p1 = project(1.0, gyi, 0.0, W, H, yaw, cfg)
+                    draw.line([p0[:2], p1[:2]], fill=GRID_COL, width=1)
+
             prims = []
 
             start = max(0, i - rows + 1)
@@ -237,7 +276,8 @@ def render(spec_db, cfg, out_path):
 
                     depth = (p_bl[2] + p_br[2] + p_fr[2] + p_fl[2]) * 0.25
 
-                    col = angular_color(x_c, t_pos, cfg["hue_offset"],
+                    col = gradient_color(cfg.get("gradient", "angular"),
+                                         x_c, t_pos, cfg["hue_offset"],
                                          cfg.get("hue_reverse", False))
 
                     prims.append({
@@ -305,6 +345,17 @@ def main():
                     action="store_true",
                     help="色环反向（反转色相环方向，不翻转频率轴）")
 
+    ap.add_argument("--gradient", default="angular",
+                    choices=["angular", "linear", "radial", "reflected", "diamond"],
+                    help="PS 渐变类型：angular=角度扫掠(默认)，linear=线性，"
+                         "radial=径向，reflected=对称，diamond=菱形")
+
+    ap.add_argument("--grid", dest="grid", action="store_true",
+                    help="显示底盘网格线")
+    ap.add_argument("--no-grid", dest="grid", action="store_false",
+                    help="关闭底盘网格线")
+    ap.set_defaults(grid=False)
+
     ap.add_argument("--osc-period", type=float, default=15.0,
                     help="摆动周期（秒），越大越慢")
     ap.add_argument("--osc-angle", type=float, default=120.0,
@@ -345,7 +396,7 @@ def main():
         bars=a.bars, rows=a.rows,
         db_min=a.db_min, db_max=a.db_max,
         hue_offset=a.hue_offset, flip_freq=a.flip_freq,
-        hue_reverse=a.hue_reverse,
+        hue_reverse=a.hue_reverse, gradient=a.gradient, grid=a.grid,
         osc_period=a.osc_period, osc_angle=a.osc_angle,
         pitch=a.pitch, yaw_offset=a.yaw_offset,
         persp=a.persp, x_span=a.x_span, depth=a.depth,

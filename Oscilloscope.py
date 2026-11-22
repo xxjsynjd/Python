@@ -8,16 +8,16 @@ Oscilloscope.py —— 时域波形示波器（采样点轮廓折线，非离散
   - 颜色支持十六进制输入（#RRGGBB / 0xRRGGBB，兼容十进制数值）；所有显示开关默认关闭，未指定的数值参数使用内置默认值
   - 支持导入 JSON 预设文件（命令行显式参数优先于预设）
   - 可开启峰谷值显示：峰值 / 谷值数值 + 峰、谷标记点（峰圈贴峰值线上方，谷圈贴谷值线下方）
-  - 可开启峰谷值线段：峰值 / 谷值水平参考线（可选峰值保持回落、线性滑动平滑）
+  - 可开启峰谷值线段：峰值 / 谷值水平参考线（可选保持回落，保持时长可调；线性滑动平滑）
   - 可开启时间模糊淡出模式（Audacious 示波器余晖拖尾）：残影边淡出边高斯模糊扩散，
     可调拖尾保持时间（或衰减系数）与模糊半径
 
 用法示例:
     python3 Oscilloscope.py 歌曲.mp3 -o scope.mp4
-    python3 Oscilloscope.py 歌曲.mp3 --color 65280 --show-peaks --peak-lines
+    python3 Oscilloscope.py 歌曲.mp3 --color #00ffb4 --show-peaks --peak-lines
     python3 Oscilloscope.py 歌曲.mp3 --preset scope_preset.json
     python3 Oscilloscope.py 歌曲.mp3 --trail --trail-hold 0.6 --blur 1.6
-    python3 Oscilloscope.py 歌曲.mp3 --show-peaks --peak-lines --peak-ramp 0.4
+    python3 Oscilloscope.py 歌曲.mp3 --show-peaks --peak-lines --peak-hold --peak-hold-sec 1.2 --peak-ramp 0.4
     python3 Oscilloscope.py 歌曲.mp3 --window 25 --points 480 --line-width 2
 
 依赖:
@@ -51,7 +51,7 @@ DIM_COL = (95, 100, 112)
 # 预设文件允许读取的键（其余忽略，防止预设覆盖危险项）
 PRESET_KEYS = {
     "color", "bg_color", "line_width", "window", "points", "scale",
-    "show_peaks", "peak_lines", "peak_hold", "grid", "font",
+    "show_peaks", "peak_lines", "peak_hold", "peak_hold_sec", "grid", "font",
     "trail", "decay", "peak_ramp", "trail_hold", "blur",
 }
 
@@ -407,13 +407,13 @@ def main():
     ap.add_argument("--bg-color", default=None,
                     help="背景色，十六进制（#RRGGBB / 0xRRGGBB，如 #080a0e），兼容十进制数值")
     ap.add_argument("--line-width", type=int, default=None,
-                    help="波形轮廓线宽（像素）")
+                    help="波形轮廓线宽（像素），默认 2")
     ap.add_argument("--window", type=float, default=None,
-                    help="时域分析窗口（毫秒），越小越灵敏")
+                    help="时域分析窗口（毫秒），越小越灵敏，默认 30.0")
     ap.add_argument("--points", type=int, default=None,
-                    help="每帧折线采样点数（轮廓线分辨率）")
+                    help="每帧折线采样点数（轮廓线分辨率），默认 400")
     ap.add_argument("--scale", type=float, default=None,
-                    help="波形振幅缩放比例")
+                    help="波形振幅缩放比例，默认 1.0")
     ap.add_argument("--font", default=None, help="可选字体文件路径")
 
     ap.add_argument("--show-peaks", dest="show_peaks", action="store_true",
@@ -434,8 +434,11 @@ def main():
                     help="峰谷线段使用瞬时值，不保持")
     ap.set_defaults(peak_hold=None)
 
+    ap.add_argument("--peak-hold-sec", type=float, default=None,
+                    help="峰谷值保持时长（秒，配合 --peak-hold）；峰值线 / 谷值线从保持极值逐渐向当前电平靠拢回落的时间，越大回落越慢")
+
     ap.add_argument("--peak-ramp", type=float, default=None,
-                    help="峰谷值线性滑动时间（秒，0=关闭）；峰谷读数在该时长内线性趋近目标值，避免跳变")
+                    help="峰谷值线性滑动时间（秒，0=关闭，默认 0）；峰谷读数在该时长内线性趋近目标值，避免跳变")
 
     ap.add_argument("--grid", dest="grid", action="store_true",
                     help="开启背景网格")
@@ -450,11 +453,11 @@ def main():
     ap.set_defaults(trail=None)
 
     ap.add_argument("--decay", type=float, default=None,
-                    help="余晖衰减系数 0.5~0.98（越大拖尾越长；未给 --trail-hold 时生效）")
+                    help="余晖衰减系数 0.5~0.98（越大拖尾越长，默认 0.85；未给 --trail-hold 时生效）")
     ap.add_argument("--trail-hold", type=float, default=None,
-                    help="拖尾淡入淡出保持时间（秒，0=关闭，改用 --decay）；余晖在该时长内逐渐淡出并模糊")
+                    help="拖尾淡入淡出保持时间（秒，0=关闭改用 --decay，默认 0）；余晖在该时长内逐渐淡出并模糊")
     ap.add_argument("--blur", type=float, default=None,
-                    help="余晖高斯模糊半径（像素），越大残影越扩散（配合 --trail）")
+                    help="余晖高斯模糊半径（像素，默认 1.2），越大残影越扩散（配合 --trail）")
 
     args = ap.parse_args()
 
@@ -478,6 +481,7 @@ def main():
     show_peaks = bool(pick("show_peaks", args.show_peaks, False))
     peak_lines = bool(pick("peak_lines", args.peak_lines, False))
     peak_hold = bool(pick("peak_hold", args.peak_hold, False))
+    peak_hold_sec = float(pick("peak_hold_sec", args.peak_hold_sec, 1.2))
     peak_ramp = float(pick("peak_ramp", args.peak_ramp, 0.0))
     grid = bool(pick("grid", args.grid, False))
     trail = bool(pick("trail", args.trail, False))
@@ -499,6 +503,8 @@ def main():
         raise SystemExit("--decay 必须在 0.5~0.98 之间")
     if peak_ramp < 0:
         raise SystemExit("--peak-ramp 不能小于 0")
+    if peak_hold_sec <= 0:
+        raise SystemExit("--peak-hold-sec 必须大于 0")
     if trail_hold < 0:
         raise SystemExit("--trail-hold 不能小于 0")
     if blur < 0:
@@ -522,13 +528,15 @@ def main():
         peaks, troughs = apply_ramp(peaks, troughs, args.fps, ramp_sec=peak_ramp)
 
     if peak_hold:
-        peaks, troughs = apply_hold(peaks, troughs, args.fps, hold_sec=1.2)
+        peaks, troughs = apply_hold(peaks, troughs, args.fps,
+                                    hold_sec=peak_hold_sec)
 
     cfg = dict(
         input=args.input, fps=args.fps, width=args.width, height=args.height,
         color=color, bg_color=bg_color, line_width=line_width,
         scale=scale, show_peaks=show_peaks, peak_lines=peak_lines,
-        peak_hold=peak_hold, peak_ramp=peak_ramp, grid=grid, font=font_path,
+        peak_hold=peak_hold, peak_hold_sec=peak_hold_sec,
+        peak_ramp=peak_ramp, grid=grid, font=font_path,
         trail=trail, decay=decay, trail_hold=trail_hold, blur=blur,
     )
 
