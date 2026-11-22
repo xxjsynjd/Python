@@ -21,7 +21,7 @@ import subprocess
 import sys
 
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont
 
 FFMPEG = shutil.which("ffmpeg")
 FFPROBE = shutil.which("ffprobe")
@@ -40,6 +40,29 @@ COLOR_STOPS = [
     (0.0, (255, 70, 45)),
     (6.0, (255, 45, 45)),
 ]
+
+
+def load_mono_font(size):
+    """跨平台加载等宽字体（Android Termux / Linux / Windows / macOS），
+    找不到等宽字体时退回 PIL 默认字体。"""
+    candidates = (
+        "/system/fonts/DroidSansMono.ttf",
+        "/data/data/com.termux/files/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",
+        "/usr/share/fonts/truetype/liberation/LiberationMono-Regular.ttf",
+        "/usr/share/fonts/truetype/noto/NotoSansMono-Regular.ttf",
+        "/usr/share/fonts/truetype/ubuntu/UbuntuMono-R.ttf",
+        "C:/Windows/Fonts/consola.ttf",
+        "C:/Windows/Fonts/cour.ttf",
+        "/System/Library/Fonts/Menlo.ttc",
+    )
+    for p in candidates:
+        if os.path.isfile(p):
+            try:
+                return ImageFont.truetype(p, size)
+            except Exception:
+                continue
+    return ImageFont.load_default()
 
 
 # --------------------------------------------------------------------------
@@ -174,10 +197,12 @@ def build_bar_texture(bar_h, bar_w, db_min, db_max, seg_h):
     return bright, dim
 
 
-def render_video(norm, peak_norm, cfg, out_path):
+def render_video(norm, peak_norm, peak_db, cfg, out_path):
     W, H = cfg["width"], cfg["height"]
     n_ch = norm.shape[1]
     fps = cfg["fps"]
+    show_legend = cfg.get("legend", True)
+    legend_font = load_mono_font(max(12, int(H * 0.026))) if show_legend else None
 
     margin_x = max(28, int(W * 0.075))
     margin_top = max(40, int(H * 0.06))
@@ -219,9 +244,11 @@ def render_video(norm, peak_norm, cfg, out_path):
     try:
         for i in range(total):
             canvas = Image.new("RGB", (W, H), BG_COLOR)
+            draw = ImageDraw.Draw(canvas)
 
             for c in range(n_ch):
                 x = margin_x + c * (bar_w + gap)
+                cx = x + bar_w * 0.5
 
                 # 底座（暗条）
                 canvas.paste(dim, (x, bar_top))
@@ -234,12 +261,25 @@ def render_video(norm, peak_norm, cfg, out_path):
                     canvas.paste(region, (x, bar_top + bar_h - fill))
 
                 # 峰值保持线
+                pv = float(peak_norm[i, c])
                 if cfg["peak_hold"]:
-                    pv = float(peak_norm[i, c])
                     if pv > 0.001:
                         py = bar_top + bar_h - int(round(pv * bar_h))
                         py = max(bar_top, min(bar_top + bar_h - 3, py))
                         canvas.paste(PEAK_COLOR, (x, py, x + bar_w, py + 3))
+
+                # 峰值 dB 数字图例（对齐 Audacious vumeter Display legend）
+                if show_legend and pv > 0.001:
+                    txt = f"{float(peak_db[i, c]):+.1f}"
+                    py = bar_top + bar_h - int(round(pv * bar_h))
+                    py = max(bar_top, min(bar_top + bar_h - 3, py))
+                    tb = draw.textbbox((0, 0), txt, font=legend_font)
+                    tw, th = tb[2] - tb[0], tb[3] - tb[1]
+                    ty = py - th - 4
+                    if ty < bar_top:
+                        ty = py + 5
+                    draw.text((cx - tw * 0.5, ty), txt,
+                              fill=PEAK_COLOR, font=legend_font)
 
             proc.stdin.write(canvas.tobytes("raw", "RGB"))
 
@@ -294,6 +334,12 @@ def main():
     ap.add_argument("--peak-release", type=float, default=1.2,
                     help="峰值指示线回落 --release-db 分贝所需时间（秒）")
 
+    ap.add_argument("--legend", dest="legend", action="store_true",
+                    help="显示峰值 dB 数字图例（默认开启，对齐 Audacious VU Meter）")
+    ap.add_argument("--no-legend", dest="no_legend", action="store_true",
+                    help="关闭峰值 dB 数字图例")
+    ap.set_defaults(legend=True, no_legend=False)
+
     args = ap.parse_args()
 
     if not FFMPEG:
@@ -339,11 +385,12 @@ def main():
         "db_max": args.db_max,
         "seg": args.seg,
         "peak_hold": args.peak_hold,
+        "legend": args.legend and not args.no_legend,
     }
 
     print(f"[3/4] 渲染 {n_frames} 帧 @ {args.fps}fps → {args.width}x{args.height}",
           file=sys.stderr)
-    rc = render_video(norm, peak_norm, cfg, out_path)
+    rc = render_video(norm, peak_norm, peak_db, cfg, out_path)
 
     if rc != 0:
         raise SystemExit(f"ffmpeg 编码失败（退出码 {rc}）")

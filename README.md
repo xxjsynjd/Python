@@ -16,7 +16,7 @@
 | `Spectrum3DAudacious.py` | 3D频谱墙 | Audacious gl-spectrum风格；五种 PS 渐变（角度/线性/径向/对称/菱形）+ 底盘网格开关 + 纵深透明度渐变蒙版 |
 | `Spectrum_2d.py` | 2D频谱竖条 | 经典FFT频谱 |
 | `WMPVisualizer.py` | 瀑布图，也叫随机场景可视化 | Windows Media Player XP风格 |
-| `VU_Meter.py` | 电平表 | 带回落+峰值保持 |
+| `VU_Meter.py` | 电平表 | 带回落+峰值保持+峰值dB数字图例（`--legend`/`--no-legend`） |
 | `LoudMeter.py` | 响度计 | BS.1770 LUFS |
 | `ThrustMeter.py` | 推力计 | 低频冲击感 |
 | `VibrationMeter.py` | 震力计 | 低频震动波纹 |
