@@ -5,7 +5,7 @@ Oscilloscope.py —— 时域波形示波器（采样点轮廓折线，非离散
 
 特性:
   - 每帧取一个时域窗口，采样点用折线连成连续轮廓线
-  - 颜色支持十进制数值输入（也兼容 0x / # 十六进制写法）
+  - 颜色支持十六进制输入（#RRGGBB / 0xRRGGBB，兼容十进制数值）；所有显示开关默认关闭，未指定的数值参数使用内置默认值
   - 支持导入 JSON 预设文件（命令行显式参数优先于预设）
   - 可开启峰谷值显示：峰值 / 谷值数值 + 峰、谷标记点（峰圈贴峰值线上方，谷圈贴谷值线下方）
   - 可开启峰谷值线段：峰值 / 谷值水平参考线（可选峰值保持回落、线性滑动平滑）
@@ -60,7 +60,7 @@ PRESET_KEYS = {
 # 颜色 / 字体
 # --------------------------------------------------------------------------
 def parse_color(value, default):
-    """把十进制整数（或 0x / # 十六进制字符串）解析成 (r, g, b)。"""
+    """把十六进制（#RRGGBB / 0xRRGGBB）或十进制颜色值解析成 (r, g, b)。"""
     if value is None:
         return default
     if isinstance(value, str):
@@ -403,9 +403,9 @@ def main():
     ap.add_argument("--preset", default=None,
                     help="导入 JSON 预设文件；命令行显式参数优先于预设")
     ap.add_argument("--color", default=None,
-                    help="波形轮廓线颜色，十进制数值（如 65280），兼容 0x / # 十六进制")
+                    help="波形轮廓线颜色，十六进制（#RRGGBB / 0xRRGGBB，如 #00ffb4），兼容十进制数值")
     ap.add_argument("--bg-color", default=None,
-                    help="背景色，十进制数值（如 13），兼容 0x / # 十六进制")
+                    help="背景色，十六进制（#RRGGBB / 0xRRGGBB，如 #080a0e），兼容十进制数值")
     ap.add_argument("--line-width", type=int, default=None,
                     help="波形轮廓线宽（像素）")
     ap.add_argument("--window", type=float, default=None,
@@ -479,7 +479,7 @@ def main():
     peak_lines = bool(pick("peak_lines", args.peak_lines, False))
     peak_hold = bool(pick("peak_hold", args.peak_hold, False))
     peak_ramp = float(pick("peak_ramp", args.peak_ramp, 0.0))
-    grid = bool(pick("grid", args.grid, True))
+    grid = bool(pick("grid", args.grid, False))
     trail = bool(pick("trail", args.trail, False))
     decay = float(pick("decay", args.decay, 0.85))
     trail_hold = float(pick("trail_hold", args.trail_hold, 0.0))
