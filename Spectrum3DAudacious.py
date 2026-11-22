@@ -9,7 +9,8 @@ Spectrum3DAudacious.py —— Audacious 风格 3D 频谱（第八版）
   - --hue-reverse：色环反向（反转色相环方向，不翻转频率轴）
   - --gradient：渐变类型 angular 角度(默认) / linear 线性 / radial 径向 /
     reflected 对称 / diamond 菱形
-  - --grid：显示底盘网格线（默认关闭，不加即关闭）
+  - --grid：显示底盘网格线（默认关闭）；格数跟随 --bars/--rows，
+    线色跟随当前渐变类型/色相/翻转设置
   - 纵深透明度渐变蒙版：-p Point 点序号 -a Alpha 透明度(0~1) -l Location
     纵深位置(0~1) -c Center 相邻点插值中点(0~1)；可成组重复，按位置排序线性插值；
     --preset-type 可套用内置预设 white-to-black（近端白实→远端黑透），手动控制点优先
@@ -30,7 +31,6 @@ FFPROBE = shutil.which("ffprobe")
 
 BG = (4, 5, 10)
 TEXT_COL = (200, 210, 220)
-GRID_COL = (26, 30, 40)
 
 
 def hue_to_rgb(h):
@@ -294,17 +294,39 @@ def render(spec_db, cfg, out_path):
             draw = ImageDraw.Draw(canvas, "RGBA")
 
             # —— 底盘网格线（地面 z=0，随视角一同投影）——
+            # 格子数跟随频谱墙：横向 bands 列、纵深 rows 排，每格对齐一根柱条底面；
+            # 线色跟随当前渐变类型/色相偏移/色环反向/频段翻转，压暗作地面参考。
             if cfg.get("grid", False):
-                gx = np.linspace(-1.0, 1.0, 11)
-                gy = np.linspace(0.0, 1.0, 9)
+                gtype = cfg.get("gradient", "angular")
+                hue_off = cfg["hue_offset"]
+                hrev = cfg.get("hue_reverse", False)
+                flip = cfg.get("flip_freq", False)
+                gx = np.linspace(-1.0, 1.0, bands + 1)
+                gy = np.linspace(0.0, 1.0, rows + 1)
+
+                def grid_col(x, y):
+                    xc = -x if flip else x
+                    c = gradient_color(gtype, xc, y, hue_off, hrev)
+                    return shade(c, 0.32)
+
+                # 纵线：固定频段位置，沿纵深逐排分段着色
                 for gxi in gx:
-                    p0 = project(gxi, 0.0, 0.0, W, H, yaw, cfg)
-                    p1 = project(gxi, 1.0, 0.0, W, H, yaw, cfg)
-                    draw.line([p0[:2], p1[:2]], fill=GRID_COL, width=1)
+                    for j in range(rows):
+                        y0, y1 = gy[j], gy[j + 1]
+                        p0 = project(gxi, y0, 0.0, W, H, yaw, cfg)
+                        p1 = project(gxi, y1, 0.0, W, H, yaw, cfg)
+                        draw.line([p0[:2], p1[:2]],
+                                  fill=grid_col(gxi, (y0 + y1) * 0.5),
+                                  width=1)
+                # 横线：固定纵深位置，沿频段逐列分段着色
                 for gyi in gy:
-                    p0 = project(-1.0, gyi, 0.0, W, H, yaw, cfg)
-                    p1 = project(1.0, gyi, 0.0, W, H, yaw, cfg)
-                    draw.line([p0[:2], p1[:2]], fill=GRID_COL, width=1)
+                    for b in range(bands):
+                        x0, x1 = gx[b], gx[b + 1]
+                        p0 = project(x0, gyi, 0.0, W, H, yaw, cfg)
+                        p1 = project(x1, gyi, 0.0, W, H, yaw, cfg)
+                        draw.line([p0[:2], p1[:2]],
+                                  fill=grid_col((x0 + x1) * 0.5, gyi),
+                                  width=1)
 
             prims = []
 
@@ -421,7 +443,7 @@ def main():
                          "radial=径向，reflected=对称，diamond=菱形")
 
     ap.add_argument("--grid", dest="grid", action="store_true",
-                    help="显示底盘网格线")
+                    help="显示底盘网格线（格数跟随 --bars/--rows，线色跟随当前渐变）")
     ap.set_defaults(grid=False)
 
     ap.add_argument("-p", "--mask-point", dest="mask_p", type=int,

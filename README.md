@@ -136,7 +136,7 @@ Spectrum3DAudacious.py 歌.mp3 -o out.mp4 \
   --width 720 --height 1280 --fps 30
 ```
 
-渐变类型 `--gradient`：`angular` 角度扫掠(默认) / `linear` 线性 / `radial` 径向 / `reflected` 对称 / `diamond` 菱形；`--grid` 显示底盘网格线（默认关闭，不加即关闭）。
+渐变类型 `--gradient`：`angular` 角度扫掠(默认) / `linear` 线性 / `radial` 径向 / `reflected` 对称 / `diamond` 菱形；`--grid` 显示底盘网格线（默认关闭），格数跟随 `--bars`/`--rows`，线色跟随当前渐变类型/色相/翻转设置。
 
 纵深透明度渐变蒙版（沿近→远方向，对标 PS 渐变编辑器上方不透明度色标），控制点成组重复：
 
