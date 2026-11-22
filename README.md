@@ -34,7 +34,7 @@
 
 | 脚本 | 功能 |
 |---|---|
-| `LyricsDisplayAI.py` | 读取LRC，用Whisper逐字对齐，唱到哪弹哪 |
+| `LyricsDisplayAI.py` | 读取LRC，用Whisper逐字对齐，唱到哪弹哪；无歌词时画面等宽红字报错 `fatal: Unable to read ID3 tag: No Lyrics` |
 | `GenerateAll.py` | 一首歌，一键跑全套 |
 
 ---

@@ -8,6 +8,8 @@ LyricsDisplayAI.py —— 歌词显示（AI 对齐 + 上滑 + 对齐/排版/排�
   2. --auto-vocals 用 Demucs 分离人声（带缓存，秒读）
   3. Whisper 对人声轨逐字对齐
   4. 唱到哪弹哪 + 上滑过渡 + 水平对齐 + 排版模式 + 排列方向
+  5. 读取不到歌词时不退出：画面以跨平台等宽字体红字显示
+     “fatal: Unable to read ID3 tag: No Lyrics”
 """
 
 import argparse
@@ -30,6 +32,10 @@ COL_NOW_BASE = (225, 228, 235, 245)
 COL_NOW_HL = (255, 80, 80, 255)
 COL_FUTURE = (170, 178, 190, 225)
 COL_SHADOW = (0, 0, 0, 190)
+
+# 无歌词时画面红字报错文本（等宽字体渲染）
+FATAL_TEXT = "fatal: Unable to read ID3 tag: No Lyrics"
+COL_FATAL = (255, 56, 56, 255)
 
 
 def _decode_ffmpeg(path):
@@ -170,7 +176,9 @@ def load_lyrics(audio_path, lrc_path=None):
         print(f"  歌词来源: ID3 ({len(lines)} 行)", file=sys.stderr)
         return lines
 
-    raise SystemExit("找不到歌词：既没有指定 .lrc，也没有同名 .lrc，也没有 ID3 歌词")
+    print("  未读取到歌词（无指定 .lrc / 同名 .lrc / ID3 歌词）",
+          file=sys.stderr)
+    return []
 
 
 def find_or_create_vocals(audio_path, cache_dir=".vocals_cache"):
@@ -333,6 +341,35 @@ def load_font(path, size):
             except Exception:
                 continue
     return ImageFont.load_default()
+
+
+def load_mono_font(size):
+    """跨平台加载等宽字体（Android Termux / Linux / Windows / macOS）。
+
+    找不到等宽字体时回退到通用字体，再退回 PIL 默认字体。
+    """
+    candidates = (
+        # Android / Termux
+        "/system/fonts/DroidSansMono.ttf",
+        "/data/data/com.termux/files/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",
+        # Linux
+        "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",
+        "/usr/share/fonts/truetype/liberation/LiberationMono-Regular.ttf",
+        "/usr/share/fonts/truetype/noto/NotoSansMono-Regular.ttf",
+        "/usr/share/fonts/truetype/ubuntu/UbuntuMono-R.ttf",
+        # Windows
+        "C:/Windows/Fonts/consola.ttf",
+        "C:/Windows/Fonts/cour.ttf",
+        # macOS
+        "/System/Library/Fonts/Menlo.ttc",
+    )
+    for p in candidates:
+        if os.path.isfile(p):
+            try:
+                return ImageFont.truetype(p, size)
+            except Exception:
+                continue
+    return load_font(None, size)
 
 
 def is_punct(ch):
@@ -747,6 +784,20 @@ def render(lyrics, char_times_map, total_sec, cfg, out_path):
     font_cur = load_font(cfg["font"], cfg["font_size_cur"])
     font_other = load_font(cfg["font"], cfg["font_size_other"])
 
+    # 无歌词报错模式：等宽红字，字号自适应到整行不超出可用宽度
+    fatal = bool(cfg.get("fatal_error", False))
+    mono_font = None
+    if fatal:
+        avail_w = int(W * 0.9)
+        mono_size = max(16, int(H * 0.045))
+        mono_font = load_mono_font(mono_size)
+        while mono_size > 12:
+            bb = mono_font.getbbox(FATAL_TEXT)
+            if bb[2] - bb[0] <= avail_w:
+                break
+            mono_size -= 2
+            mono_font = load_mono_font(mono_size)
+
     cmd = [
         FFMPEG, "-y", "-loglevel", "error",
         "-f", "rawvideo", "-vcodec", "rawvideo",
@@ -766,20 +817,28 @@ def render(lyrics, char_times_map, total_sec, cfg, out_path):
             base = Image.new("RGB", (W, H), BG)
             canvas = base.convert("RGBA")
             cur_sec = i / float(fps)
-            draw_lyrics(canvas, W // 2, int(H * cfg["y_ratio"]),
-                        lyrics, char_times_map, cur_sec,
-                        font_cur, font_other,
-                        visible_lines=cfg["visible_lines"],
-                        line_gap=cfg["line_gap"],
-                        bounce_scale=cfg["bounce_scale"],
-                        bounce_dur=cfg["bounce_dur"],
-                        scroll_threshold=cfg["scroll_threshold"],
-                        scroll_ease=cfg["scroll_ease"],
-                        align=cfg["align"],
-                        layout=cfg["layout"],
-                        arrange=cfg["arrange"],
-                        stagger=cfg["stagger"],
-                        max_w=max_w)
+            if fatal:
+                d = ImageDraw.Draw(canvas)
+                bb = mono_font.getbbox(FATAL_TEXT)
+                tw, th = bb[2] - bb[0], bb[3] - bb[1]
+                tx = (W - tw) // 2 - bb[0]
+                ty = (H - th) // 2 - bb[1]
+                d.text((tx, ty), FATAL_TEXT, font=mono_font, fill=COL_FATAL)
+            else:
+                draw_lyrics(canvas, W // 2, int(H * cfg["y_ratio"]),
+                            lyrics, char_times_map, cur_sec,
+                            font_cur, font_other,
+                            visible_lines=cfg["visible_lines"],
+                            line_gap=cfg["line_gap"],
+                            bounce_scale=cfg["bounce_scale"],
+                            bounce_dur=cfg["bounce_dur"],
+                            scroll_threshold=cfg["scroll_threshold"],
+                            scroll_ease=cfg["scroll_ease"],
+                            align=cfg["align"],
+                            layout=cfg["layout"],
+                            arrange=cfg["arrange"],
+                            stagger=cfg["stagger"],
+                            max_w=max_w)
             proc.stdin.write(canvas.convert("RGB").tobytes("raw", "RGB"))
             if i % report == 0:
                 print(f"\r渲染中… {i * 100 // n_frames:3d}%",
@@ -851,41 +910,48 @@ def main():
 
     print("[2/4] 读取歌词", file=sys.stderr)
     lyrics = load_lyrics(a.input, a.lrc)
-    for t, txt in lyrics[:3]:
-        print(f"      [{t:6.2f}s] {txt}", file=sys.stderr)
-
-    align_path = a.input
-    if a.vocals and os.path.isfile(a.vocals):
-        align_path = a.vocals
-        print(f"      人声轨: {a.vocals}", file=sys.stderr)
-    elif a.auto_vocals:
-        vp = find_or_create_vocals(a.input, a.cache_dir)
-        if vp:
-            align_path = vp
-            print(f"      使用人声: {vp}", file=sys.stderr)
-        else:
-            print("      分离失败，退回原曲", file=sys.stderr)
-
-    print("[3/4] AI 逐字对齐", file=sys.stderr)
-    char_times = align_words_with_whisper(align_path, lyrics,
-                                          a.model, a.lang)
+    no_lyrics = len(lyrics) == 0
+    if no_lyrics:
+        print("      未读取到歌词：画面将以等宽红字报错提示", file=sys.stderr)
+    else:
+        for t, txt in lyrics[:3]:
+            print(f"      [{t:6.2f}s] {txt}", file=sys.stderr)
 
     char_times_map = {}
-    if char_times:
-        pos = 0
-        for i, (t, txt) in enumerate(lyrics):
-            n = len(txt)
-            char_times_map[i] = char_times[pos:pos + n]
-            pos += n
-        print(f"      对齐 {len(char_times)} 个字", file=sys.stderr)
+    if not no_lyrics:
+        align_path = a.input
+        if a.vocals and os.path.isfile(a.vocals):
+            align_path = a.vocals
+            print(f"      人声轨: {a.vocals}", file=sys.stderr)
+        elif a.auto_vocals:
+            vp = find_or_create_vocals(a.input, a.cache_dir)
+            if vp:
+                align_path = vp
+                print(f"      使用人声: {vp}", file=sys.stderr)
+            else:
+                print("      分离失败，退回原曲", file=sys.stderr)
+
+        print("[3/4] AI 逐字对齐", file=sys.stderr)
+        char_times = align_words_with_whisper(align_path, lyrics,
+                                              a.model, a.lang)
+
+        if char_times:
+            pos = 0
+            for i, (t, txt) in enumerate(lyrics):
+                n = len(txt)
+                char_times_map[i] = char_times[pos:pos + n]
+                pos += n
+            print(f"      对齐 {len(char_times)} 个字", file=sys.stderr)
+        else:
+            for i, (t, txt) in enumerate(lyrics):
+                t_end = lyrics[i + 1][0] if i + 1 < len(lyrics) else t + 4.0
+                n = len(txt)
+                step = (t_end - t) / max(n, 1)
+                char_times_map[i] = [(txt[k], t + k * step, t + (k + 1) * step)
+                                     for k in range(n)]
+            print("      使用均匀分配（无 AI 时间戳）", file=sys.stderr)
     else:
-        for i, (t, txt) in enumerate(lyrics):
-            t_end = lyrics[i + 1][0] if i + 1 < len(lyrics) else t + 4.0
-            n = len(txt)
-            step = (t_end - t) / max(n, 1)
-            char_times_map[i] = [(txt[k], t + k * step, t + (k + 1) * step)
-                                 for k in range(n)]
-        print("      使用均匀分配（无 AI 时间戳）", file=sys.stderr)
+        print("[3/4] 跳过 AI 对齐（无歌词）", file=sys.stderr)
 
     cfg = dict(
         input=a.input, fps=a.fps, width=a.width, height=a.height,
@@ -904,6 +970,7 @@ def main():
         arrange=a.arrange,
         stagger=a.stagger,
         width_ratio=a.width_ratio,
+        fatal_error=no_lyrics,
     )
 
     print(f"[4/4] 渲染 {int(total_sec * a.fps)} 帧 → {out_path}",
