@@ -10,6 +10,8 @@ Spectrum3DAudacious.py —— Audacious 风格 3D 频谱（第八版）
   - --gradient：渐变类型 angular 角度(默认) / linear 线性 / radial 径向 /
     reflected 对称 / diamond 菱形
   - --grid：显示底盘网格线（默认关闭，不加即关闭）
+  - 纵深透明度渐变蒙版：-p 点序号 -a 透明度(0~1) -l 纵深位置(0~1)
+    -c 相邻点插值中点(0~1)；可成组重复，按位置排序线性插值；不加则全不透明
 """
 
 import argparse
@@ -178,6 +180,62 @@ def gradient_color(gtype, x, y, hue_offset=0.5, hue_reverse=False):
     return hue_to_rgb(hue)
 
 
+def build_mask(points):
+    """组装纵深透明度蒙版控制点并按位置排序。
+
+    points: 列表，每项 (idx, alpha, loc, center)。
+    返回 [(loc, alpha, center), ...]，按 loc 升序；空列表表示不启用蒙版。
+    """
+    pts = []
+    for _idx, alpha, loc, center in points:
+        loc = min(1.0, max(0.0, loc))
+        alpha = min(1.0, max(0.0, alpha))
+        center = min(1.0, max(0.0, center))
+        pts.append((loc, alpha, center))
+    pts.sort(key=lambda x: x[0])
+    return pts
+
+
+def mask_alpha(t, pts):
+    """按纵深位置 t∈[0,1] 采样蒙版透明度。
+
+    相邻控制点之间以左点 center 作为插值中点（PS 色标中点语义），
+    两段分别线性插值；pts 为空时返回 1.0（全不透明）。
+    """
+    if not pts:
+        return 1.0
+    t = min(1.0, max(0.0, t))
+    if t <= pts[0][0]:
+        return pts[0][1]
+    if t >= pts[-1][0]:
+        return pts[-1][1]
+    for i in range(len(pts) - 1):
+        l1, a1, c1 = pts[i]
+        l2, a2, _ = pts[i + 1]
+        if l1 <= t <= l2:
+            span = l2 - l1
+            if span <= 1e-9:
+                return a2
+            mid = l1 + c1 * span
+            if t <= mid:
+                k = 0.5 * (t - l1) / (mid - l1) if mid > l1 else 1.0
+            else:
+                k = 0.5 + 0.5 * (t - mid) / (l2 - mid) if l2 > mid else 1.0
+            k = min(1.0, max(0.0, k))
+            return a1 + (a2 - a1) * k
+    return pts[-1][1]
+
+
+def blend(fg, alpha, bg=BG):
+    """前景色按 alpha 与背景色混合，返回 RGB 元组。"""
+    if alpha >= 1.0:
+        return fg
+    if alpha <= 0.0:
+        return bg
+    return tuple(int(bg[k] * (1.0 - alpha) + fg[k] * alpha)
+                 for k in range(3))
+
+
 def render(spec_db, cfg, out_path):
     W = cfg["width"] // 2 * 2
     H = cfg["height"] // 2 * 2
@@ -282,6 +340,7 @@ def render(spec_db, cfg, out_path):
 
                     prims.append({
                         "depth": depth,
+                        "t": t_pos,
                         "bottom": [p_bl[:2], p_br[:2], p_fr[:2], p_fl[:2]],
                         "top": [top_bl[:2], top_br[:2],
                                 top_fr[:2], top_fl[:2]],
@@ -290,18 +349,21 @@ def render(spec_db, cfg, out_path):
 
             prims.sort(key=lambda p: -p["depth"])
 
+            mask_pts = cfg.get("mask", [])
+
             for p in prims:
                 bot = p["bottom"]
                 top = p["top"]
                 col = p["col"]
+                alpha = mask_alpha(p["t"], mask_pts)
 
                 side_shades = [0.55, 0.78, 0.65, 0.5]
                 for k in range(4):
                     k2 = (k + 1) % 4
                     face = [bot[k], bot[k2], top[k2], top[k]]
-                    draw.polygon(face, fill=shade(col, side_shades[k]))
+                    draw.polygon(face, fill=blend(shade(col, side_shades[k]), alpha))
 
-                draw.polygon(top, fill=shade(col, 1.18))
+                draw.polygon(top, fill=blend(shade(col, 1.18), alpha))
 
             draw.text((24, 22), "AUDACIOUS 3D SPECTRUM",
                       fill=TEXT_COL)
@@ -323,19 +385,19 @@ def render(spec_db, cfg, out_path):
 def main():
     ap = argparse.ArgumentParser(
         description="Audacious gl-spectrum 风格（第八版）")
-    ap.add_argument("input")
-    ap.add_argument("-o", "--output", default=None)
-    ap.add_argument("--fps", type=int, default=60)
-    ap.add_argument("--width", type=int, default=1280)
-    ap.add_argument("--height", type=int, default=720)
+    ap.add_argument("input", help="输入音频文件（mp3 / wav / flac / m4a …）")
+    ap.add_argument("-o", "--output", default=None, help="输出视频文件（默认按音频名加 _audacious.mp4）")
+    ap.add_argument("--fps", type=int, default=60, help="视频帧率")
+    ap.add_argument("--width", type=int, default=1280, help="画面宽度（px）")
+    ap.add_argument("--height", type=int, default=720, help="画面高度（px）")
 
-    ap.add_argument("--bars", type=int, default=28)
-    ap.add_argument("--rows", type=int, default=36)
-    ap.add_argument("--fft-size", type=int, default=4096)
-    ap.add_argument("--fmin", type=float, default=40.0)
-    ap.add_argument("--fmax", type=float, default=14000.0)
-    ap.add_argument("--db-min", type=float, default=-85.0)
-    ap.add_argument("--db-max", type=float, default=-5.0)
+    ap.add_argument("--bars", type=int, default=28, help="横向频段柱条数量")
+    ap.add_argument("--rows", type=int, default=36, help="纵深拖尾排数（前后层数）")
+    ap.add_argument("--fft-size", type=int, default=4096, help="FFT 窗大小（点数，自动取 2 的幂）")
+    ap.add_argument("--fmin", type=float, default=40.0, help="分析最低频率（Hz）")
+    ap.add_argument("--fmax", type=float, default=14000.0, help="分析最高频率（Hz）")
+    ap.add_argument("--db-min", type=float, default=-85.0, help="频谱归一化下限电平（dB）")
+    ap.add_argument("--db-max", type=float, default=-5.0, help="频谱归一化上限电平（dB）")
 
     ap.add_argument("--hue-offset", type=float, default=0.5,
                     help="色相起始偏移（0.375=左上角红，0.5=正上方红）")
@@ -354,6 +416,20 @@ def main():
                     help="显示底盘网格线")
     ap.set_defaults(grid=False)
 
+    ap.add_argument("-p", "--mask-point", dest="mask_p", type=int,
+                    action="append", default=[],
+                    help="蒙版控制点序号；与 -a/-l/-c 成组重复使用，"
+                         "如 -p 1 -a 1.0 -l 0.0 -c 0.5 -p 2 -a 0.15 -l 1.0 -c 0.5")
+    ap.add_argument("-a", "--mask-alpha", dest="mask_a", type=float,
+                    action="append", default=[],
+                    help="该控制点透明度 0~1（0=全透明，1=不透明）")
+    ap.add_argument("-l", "--mask-loc", dest="mask_l", type=float,
+                    action="append", default=[],
+                    help="该控制点纵深位置 0~1（0=最近排，1=最远排）")
+    ap.add_argument("-c", "--mask-center", dest="mask_c", type=float,
+                    action="append", default=[],
+                    help="相邻两控制点之间插值中点 0~1（PS 色标中点，默认 0.5）")
+
     ap.add_argument("--osc-period", type=float, default=15.0,
                     help="摆动周期（秒），越大越慢")
     ap.add_argument("--osc-angle", type=float, default=120.0,
@@ -364,17 +440,25 @@ def main():
     ap.add_argument("--yaw-offset", type=float, default=20.0,
                     help="初始偏航角（度）")
 
-    ap.add_argument("--persp", type=float, default=0.10)
-    ap.add_argument("--x-span", type=float, default=1.0)
-    ap.add_argument("--depth", type=float, default=1.6)
-    ap.add_argument("--scale-x", type=float, default=0.42)
-    ap.add_argument("--scale-y", type=float, default=0.32)
-    ap.add_argument("--y-offset", type=float, default=0.68)
+    ap.add_argument("--persp", type=float, default=0.10, help="透视强度（越大近大远小越明显）")
+    ap.add_argument("--x-span", type=float, default=1.0, help="横向展开跨度系数")
+    ap.add_argument("--depth", type=float, default=1.6, help="纵深深度系数")
+    ap.add_argument("--scale-x", type=float, default=0.42, help="横向屏幕缩放系数")
+    ap.add_argument("--scale-y", type=float, default=0.32, help="纵向屏幕缩放系数")
+    ap.add_argument("--y-offset", type=float, default=0.68, help="画面纵向偏移（0~1，越低越靠下）")
 
     a = ap.parse_args()
 
     if not FFMPEG:
         raise SystemExit("未找到 ffmpeg")
+
+    mp, ma, ml, mc = a.mask_p, a.mask_a, a.mask_l, a.mask_c
+    n = len(mp)
+    if not (len(ma) == n and len(ml) == n):
+        raise SystemExit("蒙版参数需按 -p/-a/-l 成组配齐（-c 可省略，默认 0.5）")
+    if n and len(mc) < n:
+        mc = mc + [0.5] * (n - len(mc))
+    mask_pts = build_mask(list(zip(mp, ma, ml, mc[:n])))
     out_path = a.output
     if out_path is None:
         base = os.path.splitext(os.path.basename(a.input))[0]
@@ -395,6 +479,7 @@ def main():
         db_min=a.db_min, db_max=a.db_max,
         hue_offset=a.hue_offset, flip_freq=a.flip_freq,
         hue_reverse=a.hue_reverse, gradient=a.gradient, grid=a.grid,
+        mask=mask_pts,
         osc_period=a.osc_period, osc_angle=a.osc_angle,
         pitch=a.pitch, yaw_offset=a.yaw_offset,
         persp=a.persp, x_span=a.x_span, depth=a.depth,

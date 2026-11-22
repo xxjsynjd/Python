@@ -247,9 +247,9 @@ def main():
     ap.add_argument("input", help="输入音频文件")
     ap.add_argument("-o", "--output", default=None, help="输出视频文件")
 
-    ap.add_argument("--fps", type=int, default=60)
-    ap.add_argument("--width", type=int, default=1280)
-    ap.add_argument("--height", type=int, default=720)
+    ap.add_argument("--fps", type=int, default=60, help="视频帧率")
+    ap.add_argument("--width", type=int, default=1280, help="画面宽度（px）")
+    ap.add_argument("--height", type=int, default=720, help="画面高度（px）")
     ap.add_argument("--radius", type=int, default=220,
                     help="表盘半径（像素）")
 

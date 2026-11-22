@@ -395,10 +395,10 @@ def main():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     ap.add_argument("input", help="输入音频文件（mp3 / wav / flac / m4a …）")
-    ap.add_argument("-o", "--output", default=None)
-    ap.add_argument("--fps", type=int, default=30)
-    ap.add_argument("--width", type=int, default=720)
-    ap.add_argument("--height", type=int, default=1280)
+    ap.add_argument("-o", "--output", default=None, help="输出视频文件（默认按音频名加 _scope.mp4）")
+    ap.add_argument("--fps", type=int, default=30, help="视频帧率")
+    ap.add_argument("--width", type=int, default=720, help="画面宽度（px）")
+    ap.add_argument("--height", type=int, default=1280, help="画面高度（px）")
 
     ap.add_argument("--preset", default=None,
                     help="导入 JSON 预设文件；命令行显式参数优先于预设")

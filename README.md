@@ -13,7 +13,7 @@
 
 | 脚本 | 功能 | 风格 |
 |---|---|---|
-| `Spectrum3DAudacious.py` | 3D频谱墙 | Audacious gl-spectrum风格；五种 PS 渐变（角度/线性/径向/对称/菱形）+ 底盘网格开关 |
+| `Spectrum3DAudacious.py` | 3D频谱墙 | Audacious gl-spectrum风格；五种 PS 渐变（角度/线性/径向/对称/菱形）+ 底盘网格开关 + 纵深透明度渐变蒙版 |
 | `Spectrum_2d.py` | 2D频谱竖条 | 经典FFT频谱 |
 | `WMPVisualizer.py` | 瀑布图，也叫随机场景可视化 | Windows Media Player XP风格 |
 | `VU_Meter.py` | 电平表 | 带回落+峰值保持 |
@@ -137,6 +137,8 @@ Spectrum3DAudacious.py 歌.mp3 -o out.mp4 \
 ```
 
 渐变类型 `--gradient`：`angular` 角度扫掠(默认) / `linear` 线性 / `radial` 径向 / `reflected` 对称 / `diamond` 菱形；`--grid` 显示底盘网格线（默认关闭，不加即关闭）。
+
+纵深透明度渐变蒙版（沿近→远方向），控制点成组重复：`-p` 点序号、`-a` 透明度(0~1)、`-l` 纵深位置(0~1，0=最近)、`-c` 相邻点插值中点(0~1，默认 0.5)；不加则全不透明。示例：`-p 1 -a 1.0 -l 0.0 -c 0.5 -p 2 -a 0.15 -l 1.0 -c 0.5`（近端实、远端渐隐）。
 
 ---
 

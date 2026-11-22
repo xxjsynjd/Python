@@ -854,31 +854,32 @@ def render(lyrics, char_times_map, total_sec, cfg, out_path):
 
 def main():
     ap = argparse.ArgumentParser(description="歌词显示（AI 对齐 + 全排版）")
-    ap.add_argument("input")
-    ap.add_argument("-o", "--output", default=None)
-    ap.add_argument("--fps", type=int, default=30)
-    ap.add_argument("--width", type=int, default=720)
-    ap.add_argument("--height", type=int, default=1280)
+    ap.add_argument("input", help="输入音频文件（mp3 / wav / flac / m4a …）")
+    ap.add_argument("-o", "--output", default=None, help="输出视频文件")
+    ap.add_argument("--fps", type=int, default=30, help="视频帧率")
+    ap.add_argument("--width", type=int, default=720, help="画面宽度（px）")
+    ap.add_argument("--height", type=int, default=1280, help="画面高度（px）")
     ap.add_argument("--model", default="base",
                     help="whisper 模型: tiny / base / small / medium")
     ap.add_argument("--lang", default="zh", help="语言代码")
     ap.add_argument("--auto-vocals", dest="auto_vocals",
                     action="store_true", help="Demucs 分离人声后再对齐")
-    ap.add_argument("--cache-dir", default=".vocals_cache")
-    ap.add_argument("--vocals", default=None)
+    ap.add_argument("--cache-dir", default=".vocals_cache", help="人声分离中间结果缓存目录")
+    ap.add_argument("--vocals", default=None, help="直接指定已分离好的人声音频文件（跳过分离）")
     ap.add_argument("--lrc", default=None,
                     help="手动指定 .lrc 文件路径")
-    ap.add_argument("--font", default=None)
-    ap.add_argument("--font-size-cur", type=int, default=52)
-    ap.add_argument("--font-size-other", type=int, default=36)
-    ap.add_argument("--visible-lines", type=int, default=5)
-    ap.add_argument("--line-gap", type=float, default=1.7)
-    ap.add_argument("--y-ratio", type=float, default=0.5)
-    ap.add_argument("--bounce-scale", type=float, default=1.35)
-    ap.add_argument("--bounce-dur", type=float, default=0.18)
-    ap.add_argument("--scroll-threshold", type=float, default=0.85)
+    ap.add_argument("--font", default=None, help="中文字体路径")
+    ap.add_argument("--font-size-cur", type=int, default=52, help="当前高亮行字号（px）")
+    ap.add_argument("--font-size-other", type=int, default=36, help="其它行字号（px）")
+    ap.add_argument("--visible-lines", type=int, default=5, help="屏幕同时显示的歌词行数")
+    ap.add_argument("--line-gap", type=float, default=1.7, help="行间距倍数（相对行高）")
+    ap.add_argument("--y-ratio", type=float, default=0.5, help="歌词整体纵向位置 0~1")
+    ap.add_argument("--bounce-scale", type=float, default=1.35, help="当前行弹跳放大倍数")
+    ap.add_argument("--bounce-dur", type=float, default=0.18, help="弹跳动画时长（秒）")
+    ap.add_argument("--scroll-threshold", type=float, default=0.85, help="触发滚动的进度阈值 0~1")
     ap.add_argument("--scroll-ease", default="smoothstep",
-                    choices=["linear", "smoothstep", "smootherstep", "easeout"])
+                    choices=["linear", "smoothstep", "smootherstep", "easeout"],
+                    help="滚动缓动曲线")
     ap.add_argument("--align", default="center",
                     choices=["left", "center", "right"],
                     help="水平对齐（或竖排时的顶/中/底对齐）")

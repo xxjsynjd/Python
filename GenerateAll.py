@@ -102,9 +102,9 @@ def main():
     ap.add_argument("--modes", default="all",
                     help="要跑的模式，逗号分隔，或 all。可选: " +
                          ",".join(MODES.keys()))
-    ap.add_argument("--width", type=int, default=720)
-    ap.add_argument("--height", type=int, default=1280)
-    ap.add_argument("--fps", type=int, default=30)
+    ap.add_argument("--width", type=int, default=720, help="各模式画面宽度（px）")
+    ap.add_argument("--height", type=int, default=1280, help="各模式画面高度（px）")
+    ap.add_argument("--fps", type=int, default=30, help="各模式视频帧率")
     ap.add_argument("--skip-existing", action="store_true",
                     help="已存在的跳过")
     ap.add_argument("--no-auto-vocals", action="store_true",

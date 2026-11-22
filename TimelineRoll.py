@@ -460,26 +460,26 @@ def render(wave_env, points_per_sec, total_sec, cfg, out_path):
 def main():
     ap = argparse.ArgumentParser(
         description="滚动时间轴 + 波形（剪映风格，全套）")
-    ap.add_argument("input")
-    ap.add_argument("-o", "--output", default=None)
+    ap.add_argument("input", help="输入音频文件（mp3 / wav / flac / m4a …）")
+    ap.add_argument("-o", "--output", default=None, help="输出视频文件")
 
-    ap.add_argument("--fps", type=int, default=60)
-    ap.add_argument("--width", type=int, default=1280)
-    ap.add_argument("--height", type=int, default=720)
+    ap.add_argument("--fps", type=int, default=60, help="视频帧率")
+    ap.add_argument("--width", type=int, default=1280, help="画面宽度（px）")
+    ap.add_argument("--height", type=int, default=720, help="画面高度（px）")
 
     ap.add_argument("--window", type=float, default=10.0,
                     help="时间轴一屏显示多少秒")
     ap.add_argument("--height-px", type=int, default=160,
                     help="时间轴区域高度（像素）")
-    ap.add_argument("--width-ratio", type=float, default=0.92)
-    ap.add_argument("--bottom-margin", type=int, default=40)
-    ap.add_argument("--wave-ratio", type=float, default=0.62)
+    ap.add_argument("--width-ratio", type=float, default=0.92, help="时间轴宽度占画面比例")
+    ap.add_argument("--bottom-margin", type=int, default=40, help="底部边距（px）")
+    ap.add_argument("--wave-ratio", type=float, default=0.62, help="波形高度占时间轴区域比例")
     ap.add_argument("--wave-res", type=float, default=300.0,
                     help="波形包络点/秒")
 
     ap.add_argument("--auto-vocals", dest="auto_vocals",
                     action="store_true", help="Demucs 分离人声")
-    ap.add_argument("--cache-dir", default=".vocals_cache")
+    ap.add_argument("--cache-dir", default=".vocals_cache", help="人声分离中间结果缓存目录")
     ap.add_argument("--vocals", default=None,
                     help="手动指定人声轨")
 
@@ -487,9 +487,9 @@ def main():
                     help="叠加 BPM 小节线 + 拍号")
     ap.add_argument("--bpm", type=float, default=0.0,
                     help="手动 BPM，0=自动")
-    ap.add_argument("--beats-per-bar", type=int, default=4)
-    ap.add_argument("--beat-unit", type=int, default=4)
-    ap.add_argument("--beat-offset", type=float, default=0.0)
+    ap.add_argument("--beats-per-bar", type=int, default=4, help="每小节拍数")
+    ap.add_argument("--beat-unit", type=int, default=4, help="节拍分母（几分音符为一拍）")
+    ap.add_argument("--beat-offset", type=float, default=0.0, help="节拍起始偏移（拍）")
 
     a = ap.parse_args()
 
