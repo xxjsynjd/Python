@@ -17,7 +17,7 @@ except ImportError:
     import pygame
 
 class InfoTechTroubleshootingPlayerTitleBar:
-    PLAYER_VERSION = "v1.0.2"
+    PLAYER_VERSION = "v1.1.0"
     APP_NAME = "XinXiJiShuYiNanJieDa Media Player"
 
     def _format_time(self, seconds):
