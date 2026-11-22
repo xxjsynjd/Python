@@ -10,8 +10,9 @@ Spectrum3DAudacious.py —— Audacious 风格 3D 频谱（第八版）
   - --gradient：渐变类型 angular 角度(默认) / linear 线性 / radial 径向 /
     reflected 对称 / diamond 菱形
   - --grid：显示底盘网格线（默认关闭，不加即关闭）
-  - 纵深透明度渐变蒙版：-p 点序号 -a 透明度(0~1) -l 纵深位置(0~1)
-    -c 相邻点插值中点(0~1)；可成组重复，按位置排序线性插值；不加则全不透明
+  - 纵深透明度渐变蒙版：-p Point 点序号 -a Alpha 透明度(0~1) -l Location
+    纵深位置(0~1) -c Center 相邻点插值中点(0~1)；可成组重复，按位置排序线性插值；
+    --preset-type 可套用内置预设 white-to-black（近端白实→远端黑透），手动控制点优先
 """
 
 import argparse
@@ -194,6 +195,13 @@ def build_mask(points):
         pts.append((loc, alpha, center))
     pts.sort(key=lambda x: x[0])
     return pts
+
+
+# 内置透明度蒙版预设：每项为 (点序号, 透明度, 纵深位置, 插值中点)
+# 白=不透明(1.0)，黑=全透明(0.0)；方向由预设名约定。
+MASK_PRESETS = {
+    "white-to-black": [(1, 1.0, 0.0, 0.5), (2, 0.0, 1.0, 0.5)],
+}
 
 
 def mask_alpha(t, pts):
@@ -418,17 +426,22 @@ def main():
 
     ap.add_argument("-p", "--mask-point", dest="mask_p", type=int,
                     action="append", default=[],
-                    help="蒙版控制点序号；与 -a/-l/-c 成组重复使用，"
+                    help="Point 蒙版控制点序号（对标 PS 渐变编辑器上方不透明度色标）；"
+                         "与 -a/-l/-c 成组重复使用，"
                          "如 -p 1 -a 1.0 -l 0.0 -c 0.5 -p 2 -a 0.15 -l 1.0 -c 0.5")
     ap.add_argument("-a", "--mask-alpha", dest="mask_a", type=float,
                     action="append", default=[],
-                    help="该控制点透明度 0~1（0=全透明，1=不透明）")
+                    help="Alpha 该控制点透明度 0~1（0=全透明/黑，1=不透明/白）")
     ap.add_argument("-l", "--mask-loc", dest="mask_l", type=float,
                     action="append", default=[],
-                    help="该控制点纵深位置 0~1（0=最近排，1=最远排）")
+                    help="Location 控制点纵深位置 0~1（0=最近排，1=最远排）")
     ap.add_argument("-c", "--mask-center", dest="mask_c", type=float,
                     action="append", default=[],
-                    help="相邻两控制点之间插值中点 0~1（PS 色标中点，默认 0.5）")
+                    help="Center 相邻两控制点之间插值中点 0~1（PS 色标间菱形中点，默认 0.5）")
+    ap.add_argument("--preset-type", dest="preset_type", default="none",
+                    choices=["none", "white-to-black"],
+                    help="内置透明度蒙版预设：white-to-black=近端白(不透明)→远端黑(全透明)；"
+                         "none=不套用(默认)。手动 -p/-a/-l/-c 优先于预设")
 
     ap.add_argument("--osc-period", type=float, default=15.0,
                     help="摆动周期（秒），越大越慢")
@@ -458,7 +471,13 @@ def main():
         raise SystemExit("蒙版参数需按 -p/-a/-l 成组配齐（-c 可省略，默认 0.5）")
     if n and len(mc) < n:
         mc = mc + [0.5] * (n - len(mc))
-    mask_pts = build_mask(list(zip(mp, ma, ml, mc[:n])))
+    manual_pts = build_mask(list(zip(mp, ma, ml, mc[:n])))
+    if manual_pts:
+        mask_pts = manual_pts
+    elif a.preset_type != "none":
+        mask_pts = build_mask(MASK_PRESETS[a.preset_type])
+    else:
+        mask_pts = []
     out_path = a.output
     if out_path is None:
         base = os.path.splitext(os.path.basename(a.input))[0]
