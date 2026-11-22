@@ -194,6 +194,8 @@ twmpxpem install [要安装的插件名字]
 
 然后用新版的 wmpvisualizer1 重新跑一下可视化 Windows Media Player 视频渲染模块。
 
+此框架代码内置 Audio Access and Rendering Framework。
+
 ## 快速开始(懒人版)
 
 1.安装Termux:
