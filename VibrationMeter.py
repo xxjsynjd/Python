@@ -262,8 +262,6 @@ def main():
     ap.add_argument("--peak-hold", type=float, default=1.5,
                     help="峰值保持时间（秒）")
 
-    ap.add_argument("--no-peak-hold", dest="peak_hold",
-                    action="store_false", help="关闭峰值保持")
     ap.set_defaults(peak_hold=True)
 
     a = ap.parse_args()

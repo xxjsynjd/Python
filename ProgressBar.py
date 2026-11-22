@@ -292,16 +292,12 @@ def main():
 
     ap.add_argument("--show-time", dest="show_time",
                     action="store_true", help="显示时间文字（默认开）")
-    ap.add_argument("--no-time", dest="show_time",
-                    action="store_false")
     ap.set_defaults(show_time=True)
 
     ap.add_argument("--show-countdown", dest="show_countdown",
                     action="store_true", help="显示剩余时间倒计时")
     ap.set_defaults(show_countdown=False)
 
-    ap.add_argument("--no-knob", dest="knob",
-                    action="store_false", help="不显示拖拽圆点")
     ap.set_defaults(knob=True)
 
     a = ap.parse_args()

@@ -7,7 +7,6 @@ audiometer.py —— 音频 → 竖条式电平表视频（含原声）
     python audiometer.py song.mp3 -o meter.mp4
     python audiometer.py song.flac -o meter.mp4 --release 0.5 --release-db 20
     python audiometer.py song.wav  -o meter.mp4 --fps 60 --width 720 --height 1280
-    python audiometer.py song.mp3  -o meter.mp4 --db-min -60 --no-peak-hold
 
 依赖:
     pip install numpy pillow soundfile
@@ -290,8 +289,6 @@ def main():
 
     ap.add_argument("--peak-hold", dest="peak_hold", action="store_true",
                     help="开启峰值保持指示线（默认开启）")
-    ap.add_argument("--no-peak-hold", dest="peak_hold", action="store_false",
-                    help="关闭峰值保持指示线")
     ap.set_defaults(peak_hold=True)
 
     ap.add_argument("--peak-release", type=float, default=1.2,

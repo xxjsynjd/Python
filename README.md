@@ -136,7 +136,7 @@ Spectrum3DAudacious.py 歌.mp3 -o out.mp4 \
   --width 720 --height 1280 --fps 30
 ```
 
-渐变类型 `--gradient`：`angular` 角度扫掠(默认) / `linear` 线性 / `radial` 径向 / `reflected` 对称 / `diamond` 菱形；`--grid` 显示底盘网格线（默认关闭，`--no-grid` 关闭）。
+渐变类型 `--gradient`：`angular` 角度扫掠(默认) / `linear` 线性 / `radial` 径向 / `reflected` 对称 / `diamond` 菱形；`--grid` 显示底盘网格线（默认关闭，不加即关闭）。
 
 ---
 

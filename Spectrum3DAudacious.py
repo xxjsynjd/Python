@@ -9,7 +9,7 @@ Spectrum3DAudacious.py —— Audacious 风格 3D 频谱（第八版）
   - --hue-reverse：色环反向（反转色相环方向，不翻转频率轴）
   - --gradient：渐变类型 angular 角度(默认) / linear 线性 / radial 径向 /
     reflected 对称 / diamond 菱形
-  - --grid / --no-grid：底盘网格线显示开关（默认关闭）
+  - --grid：显示底盘网格线（默认关闭，不加即关闭）
 """
 
 import argparse
@@ -352,8 +352,6 @@ def main():
 
     ap.add_argument("--grid", dest="grid", action="store_true",
                     help="显示底盘网格线")
-    ap.add_argument("--no-grid", dest="grid", action="store_false",
-                    help="关闭底盘网格线")
     ap.set_defaults(grid=False)
 
     ap.add_argument("--osc-period", type=float, default=15.0,

@@ -268,8 +268,6 @@ def main():
     ap.add_argument("--seg", type=int, default=4,
                     help="分段刻痕像素，0 表示不分段")
 
-    ap.add_argument("--no-peak-hold", dest="peak_hold",
-                    action="store_false", help="关闭峰值保持")
     ap.set_defaults(peak_hold=True)
 
     a = ap.parse_args()

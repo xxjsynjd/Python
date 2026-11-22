@@ -418,20 +418,14 @@ def main():
 
     ap.add_argument("--show-peaks", dest="show_peaks", action="store_true",
                     help="开启峰谷值显示（数值 + 峰/谷标记点）")
-    ap.add_argument("--no-show-peaks", dest="show_peaks", action="store_false",
-                    help="关闭峰谷值显示")
     ap.set_defaults(show_peaks=None)
 
     ap.add_argument("--peak-lines", dest="peak_lines", action="store_true",
                     help="开启峰谷值水平线段")
-    ap.add_argument("--no-peak-lines", dest="peak_lines", action="store_false",
-                    help="关闭峰谷值水平线段")
     ap.set_defaults(peak_lines=None)
 
     ap.add_argument("--peak-hold", dest="peak_hold", action="store_true",
                     help="峰谷线段保持并缓慢回落（配合 --peak-lines）")
-    ap.add_argument("--no-peak-hold", dest="peak_hold", action="store_false",
-                    help="峰谷线段使用瞬时值，不保持")
     ap.set_defaults(peak_hold=None)
 
     ap.add_argument("--peak-hold-sec", type=float, default=None,
@@ -442,14 +436,10 @@ def main():
 
     ap.add_argument("--grid", dest="grid", action="store_true",
                     help="开启背景网格")
-    ap.add_argument("--no-grid", dest="grid", action="store_false",
-                    help="关闭背景网格")
     ap.set_defaults(grid=None)
 
     ap.add_argument("--trail", dest="trail", action="store_true",
                     help="开启时间模糊淡出模式（Audacious 示波器余晖拖尾）")
-    ap.add_argument("--no-trail", dest="trail", action="store_false",
-                    help="关闭余晖拖尾，每帧只显示当前轮廓")
     ap.set_defaults(trail=None)
 
     ap.add_argument("--decay", type=float, default=None,
