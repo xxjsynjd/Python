@@ -14,10 +14,11 @@ Spectrum3DAudacious.py —— Audacious 风格 3D 频谱（第八版）
   - 纵深透明度渐变蒙版：-p Point 点序号 -a Alpha 透明度(0~1) -l Location
     纵深位置(0~1) -c Center 相邻点插值中点(0~1)；可成组重复，按位置排序线性插值；
     --preset-type 可套用内置预设 white-to-black（近端白实→远端黑透），手动控制点优先
-  - 贴图：--image 指定图像，--image-x/-y/-z 指定 3D 空间位置，--image-scale
-    缩放，--image-alpha 透明度；贴图为正平面，跟随视角投影定位
-  - 静态三轴旋转：--rot-x/--rot-y/--rot-z 绕 X/Y/Z 轴旋转角（度），叠加在
-    动态摆动与俯仰之上，默认 0 不改变原画面
+  - 贴图对象（选中式，可多张）：--image-add <id>=<路径> 注册对象，--select <id>
+    选中后，--image-x/y/z 位置、--image-scale 缩放、--image-alpha 透明度、
+    --obj-rot-x/y/z 对象级旋转角作用于该对象；兼容旧 --image <路径>
+  - 场景静态三轴旋转：--rot-x/--rot-y/--rot-z 绕 X/Y/Z 轴旋转角（度），
+    作用于整个场景，叠加在动态摆动与俯仰之上，默认 0 不改变原画面
 """
 
 import argparse
@@ -125,28 +126,31 @@ def spectrum_bands(data, sr, fps, fft_size, bands,
     return out
 
 
-def project(x, y, z, W, H, yaw, cfg):
+def project(x, y, z, W, H, yaw, cfg, obj_rot=None):
     wx = x * cfg["x_span"]
     wy = (y - 0.5) * cfg["depth"]
     wz = z
 
-    # —— 静态三轴旋转（欧拉 X→Y→Z，默认 0 不改变原画面）——
+    # 静态三轴旋转（欧拉 X→Y→Z）；obj_rot 为单个图像对象的旋转覆盖，否则用全局场景角
+    if obj_rot is None:
+        obj_rot = (cfg.get("rot_x", 0.0), cfg.get("rot_y", 0.0),
+                   cfg.get("rot_z", 0.0))
     # 绕 X 轴（俯仰）
-    ax = math.radians(cfg.get("rot_x", 0.0))
+    ax = math.radians(obj_rot[0])
     if ax:
         cx, sx = math.cos(ax), math.sin(ax)
         ry = wy * cx - wz * sx
         rz = wy * sx + wz * cx
         wy, wz = ry, rz
     # 绕 Y 轴（偏航）
-    ay = math.radians(cfg.get("rot_y", 0.0))
+    ay = math.radians(obj_rot[1])
     if ay:
         cy, sy = math.cos(ay), math.sin(ay)
         rx = wx * cy + wz * sy
         rz = -wx * sy + wz * cy
         wx, wz = rx, rz
     # 绕 Z 轴（翻滚）
-    az = math.radians(cfg.get("rot_z", 0.0))
+    az = math.radians(obj_rot[2])
     if az:
         cz, sz = math.cos(az), math.sin(az)
         rx = wx * cz - wy * sz
@@ -271,6 +275,87 @@ def blend(fg, alpha, bg=BG):
                  for k in range(3))
 
 
+# 图像对象属性令牌 → 对象字段（选中式：作用于当前 --select 的对象）
+_OBJ_PROP = {
+    "--image-x": "x", "--image-y": "y", "--image-z": "z",
+    "--image-scale": "scale", "--image-alpha": "alpha",
+    "--obj-rot-x": "rot_x", "--obj-rot-y": "rot_y", "--obj-rot-z": "rot_z",
+}
+
+
+def _load_image(path):
+    """加载贴图为 RGBA，失败/缺失返回 None 并告警。"""
+    if not path:
+        return None
+    if not os.path.isfile(path):
+        print(f"  警告: 贴图文件不存在 {path}，忽略该对象", file=sys.stderr)
+        return None
+    try:
+        return Image.open(path).convert("RGBA")
+    except Exception as e:
+        print(f"  警告: 贴图加载失败 {path}: {e}，忽略该对象", file=sys.stderr)
+        return None
+
+
+def _new_object(oid, path):
+    return {
+        "id": oid, "image": _load_image(path),
+        "x": 0.0, "y": 0.5, "z": 0.0,
+        "scale": 0.5, "alpha": 1.0,
+        "rot_x": 0.0, "rot_y": 0.0, "rot_z": 0.0,
+    }
+
+
+def parse_image_objects(argv):
+    """按命令行顺序解析图像对象（方案 A 选中式）。
+
+    - `--image-add id=路径` 注册对象；`--select id` 选中后续属性作用对象；
+    - 属性 `--image-x/y/z/scale/alpha`、`--obj-rot-x/y/z` 归入当前选中对象；
+    - 兼容旧 `--image 路径`（等价注册默认对象 image）。
+    返回 (objects 列表, 剩余待 argparse 解析的 argv)。
+    """
+    objs, order, current = {}, [], None
+    rest = []
+    i = 0
+    while i < len(argv):
+        tok = argv[i]
+        if tok == "--image-add":
+            val = argv[i + 1]
+            i += 2
+            if "=" not in val:
+                raise SystemExit("--image-add 格式: <id>=<图片路径>")
+            oid, path = val.split("=", 1)
+            if oid not in objs:
+                objs[oid] = _new_object(oid, path)
+                order.append(oid)
+            else:
+                objs[oid]["image"] = _load_image(path)
+            current = oid
+        elif tok == "--select":
+            current = argv[i + 1]
+            i += 2
+            if current not in objs:
+                raise SystemExit(f"--select 未注册的图像对象: {current}")
+        elif tok in _OBJ_PROP:
+            if current is None:
+                raise SystemExit(f"{tok} 需先用 --image-add 或 --select 指定对象")
+            objs[current][_OBJ_PROP[tok]] = float(argv[i + 1])
+            i += 2
+        elif tok == "--image":
+            path = argv[i + 1]
+            i += 2
+            if "image" not in objs:
+                objs["image"] = _new_object("image", path)
+                order.append("image")
+            else:
+                objs["image"]["image"] = _load_image(path)
+            current = "image"
+        else:
+            rest.append(tok)
+            i += 1
+    return [objs[k] for k in order], rest
+
+
 def render(spec_db, cfg, out_path):
     W = cfg["width"] // 2 * 2
     H = cfg["height"] // 2 * 2
@@ -320,20 +405,27 @@ def render(spec_db, cfg, out_path):
             canvas = Image.new("RGB", (W, H), BG)
             draw = ImageDraw.Draw(canvas, "RGBA")
 
-            # —— 贴图（按 3D 坐标定位，正平面跟随视角投影，置于背景层）——
-            img = cfg.get("image")
-            if img is not None:
-                ix, iy, iz = cfg["image_x"], cfg["image_y"], cfg["image_z"]
-                sx, sy, depth = project(ix, iy, iz, W, H, yaw, cfg)
+            # —— 贴图对象列表（各自 3D 坐标定位，正平面跟随视角投影，背景层）——
+            for obj in cfg.get("objects", []):
+                img = obj.get("image")
+                if img is None:
+                    continue
+                sx, sy, depth = project(
+                    obj["x"], obj["y"], obj["z"], W, H, yaw, cfg,
+                    obj_rot=(obj["rot_x"], obj["rot_y"], obj["rot_z"]))
                 persp = 1.0 / (1.0 + depth * cfg["persp"])
-                iw = max(1, int(W * cfg["image_scale"] * persp))
+                iw = max(1, int(W * obj["scale"] * persp))
                 ih = max(1, int(iw * img.height / img.width))
                 im = img.resize((iw, ih), Image.LANCZOS)
-                if cfg["image_alpha"] < 1.0:
+                if obj["rot_z"]:
+                    im = im.rotate(-obj["rot_z"], expand=True,
+                                   resample=Image.BICUBIC)
+                if obj["alpha"] < 1.0:
                     im = im.convert("RGBA")
                     im.putalpha(im.getchannel("A").point(
-                        lambda v: int(v * cfg["image_alpha"])))
-                canvas.paste(im, (int(sx - iw / 2), int(sy - ih / 2)),
+                        lambda v: int(v * obj["alpha"])))
+                canvas.paste(im, (int(sx - im.width / 2),
+                                   int(sy - im.height / 2)),
                              im if im.mode == "RGBA" else None)
 
             # —— 底盘网格线（地面 z=0，随视角一同投影）——
@@ -525,29 +617,23 @@ def main():
     ap.add_argument("--scale-y", type=float, default=0.32, help="纵向屏幕缩放系数")
     ap.add_argument("--y-offset", type=float, default=0.68, help="画面纵向偏移（0~1，越低越靠下）")
 
-    # —— 贴图（按 3D 坐标插入一张图像）——
-    ap.add_argument("--image", default=None,
-                    help="插入贴图图像路径（png/jpg…），不指定则不贴图")
-    ap.add_argument("--image-x", type=float, default=0.0,
-                    help="贴图在 3D 空间 X 轴位置（-1~1，0=居中）")
-    ap.add_argument("--image-y", type=float, default=0.5,
-                    help="贴图在 3D 空间纵深 Y 位置（0~1，0=最近，1=最远）")
-    ap.add_argument("--image-z", type=float, default=0.0,
-                    help="贴图在 3D 空间高度 Z 位置（0=底面，越大越抬升）")
-    ap.add_argument("--image-scale", type=float, default=0.5,
-                    help="贴图缩放系数（相对画面宽度，1.0=撑满宽）")
-    ap.add_argument("--image-alpha", type=float, default=1.0,
-                    help="贴图透明度 0~1（1=不透明）")
+    # —— 图像对象（选中式，由 parse_image_objects 在 parse_args 前顺序解析）——
+    #   --image-add <id>=<路径>  注册对象；--select <id> 选中后续属性作用对象；
+    #   --image-x/y/z 位置、--image-scale 缩放、--image-alpha 透明度；
+    #   --obj-rot-x/y/z 对象级旋转角（度）；兼容旧 --image <路径>。
+    #   这些令牌不在此注册，避免 argparse 按无顺序覆盖。
 
-    # —— 静态三轴 3D 旋转（叠加在动态摆动/俯仰之上，默认 0 不改变原画面）——
+    # —— 场景静态三轴 3D 旋转（叠加在动态摆动/俯仰之上，默认 0 不改变原画面）——
     ap.add_argument("--rot-x", type=float, default=0.0,
-                    help="绕 X 轴静态旋转角（度，俯仰）")
+                    help="场景绕 X 轴静态旋转角（度，俯仰）")
     ap.add_argument("--rot-y", type=float, default=0.0,
-                    help="绕 Y 轴静态旋转角（度，偏航）")
+                    help="场景绕 Y 轴静态旋转角（度，偏航）")
     ap.add_argument("--rot-z", type=float, default=0.0,
-                    help="绕 Z 轴静态翻滚角（度）")
+                    help="场景绕 Z 轴静态翻滚角（度）")
 
-    a = ap.parse_args()
+    # 先按顺序抽出图像对象，剩余参数交给 argparse
+    objects, rest_argv = parse_image_objects(sys.argv[1:])
+    a = ap.parse_args(rest_argv)
 
     if not FFMPEG:
         raise SystemExit("未找到 ffmpeg")
@@ -570,17 +656,6 @@ def main():
         base = os.path.splitext(os.path.basename(a.input))[0]
         out_path = base + "_audacious.mp4"
 
-    img_obj = None
-    if a.image:
-        if not os.path.isfile(a.image):
-            print(f"  警告: 贴图文件不存在 {a.image}，忽略贴图", file=sys.stderr)
-        else:
-            try:
-                img_obj = Image.open(a.image).convert("RGBA")
-            except Exception as e:
-                print(f"  警告: 贴图加载失败 {a.image}: {e}，忽略贴图",
-                      file=sys.stderr)
-
     print("[1/3] 读取音频", file=sys.stderr)
     data, sr = load_audio(a.input)
     print(f"      {sr} Hz, {data.shape[1]}ch, {len(data)/sr:.2f}s",
@@ -602,9 +677,7 @@ def main():
         persp=a.persp, x_span=a.x_span, depth=a.depth,
         scale_x=a.scale_x, scale_y=a.scale_y,
         y_offset=a.y_offset,
-        image=img_obj,
-        image_x=a.image_x, image_y=a.image_y, image_z=a.image_z,
-        image_scale=a.image_scale, image_alpha=a.image_alpha,
+        objects=objects,
         rot_x=a.rot_x, rot_y=a.rot_y, rot_z=a.rot_z,
     )
 
