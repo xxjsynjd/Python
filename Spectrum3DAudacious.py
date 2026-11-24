@@ -16,7 +16,9 @@ Spectrum3DAudacious.py —— Audacious 风格 3D 频谱（第八版）
     --preset-type 可套用内置预设 white-to-black（近端白实→远端黑透），手动控制点优先
   - 贴图对象（选中式，可多张）：--image-add <id>=<路径> 注册对象，--select <id>
     选中后，--image-x/y/z 位置、--image-scale 缩放、--image-alpha 透明度、
-    --obj-rot-x/y/z 对象级旋转角作用于该对象；兼容旧 --image <路径>
+    --image-thickness 图像厚度（沿纵深挤出比例 0~0.5）、--image-solid 开启该对象
+    3D 具象化实体模式（侧面明暗 + 棱边轮廓），--obj-rot-x/y/z 对象级旋转角
+    作用于该对象；兼容旧 --image <路径>
   - 场景静态三轴旋转：--rot-x/--rot-y/--rot-z 绕 X/Y/Z 轴旋转角（度），
     作用于整个场景，叠加在动态摆动与俯仰之上，默认 0 不改变原画面
 """
@@ -275,10 +277,18 @@ def blend(fg, alpha, bg=BG):
                  for k in range(3))
 
 
+def _avg_rgb(im):
+    """取贴图缩略平均色，作为实体侧面/棱边的基色。"""
+    small = im.convert("RGB").resize((8, 8), Image.BILINEAR)
+    arr = np.asarray(small).reshape(-1, 3).mean(axis=0)
+    return tuple(int(min(255, max(0, v))) for v in arr)
+
+
 # 图像对象属性令牌 → 对象字段（选中式：作用于当前 --select 的对象）
 _OBJ_PROP = {
     "--image-x": "x", "--image-y": "y", "--image-z": "z",
     "--image-scale": "scale", "--image-alpha": "alpha",
+    "--image-thickness": "thickness",
     "--obj-rot-x": "rot_x", "--obj-rot-y": "rot_y", "--obj-rot-z": "rot_z",
 }
 
@@ -302,6 +312,7 @@ def _new_object(oid, path):
         "id": oid, "image": _load_image(path),
         "x": 0.0, "y": 0.5, "z": 0.0,
         "scale": 0.5, "alpha": 1.0,
+        "thickness": 0.12, "solid": False,
         "rot_x": 0.0, "rot_y": 0.0, "rot_z": 0.0,
     }
 
@@ -339,8 +350,17 @@ def parse_image_objects(argv):
         elif tok in _OBJ_PROP:
             if current is None:
                 raise SystemExit(f"{tok} 需先用 --image-add 或 --select 指定对象")
-            objs[current][_OBJ_PROP[tok]] = float(argv[i + 1])
+            field = _OBJ_PROP[tok]
+            val = float(argv[i + 1])
+            if field == "thickness":
+                val = min(0.5, max(0.0, val))
+            objs[current][field] = val
             i += 2
+        elif tok == "--image-solid":
+            if current is None:
+                raise SystemExit("--image-solid 需先用 --image-add 或 --select 指定对象")
+            objs[current]["solid"] = True
+            i += 1
         elif tok == "--image":
             path = argv[i + 1]
             i += 2
@@ -424,8 +444,38 @@ def render(spec_db, cfg, out_path):
                     im = im.convert("RGBA")
                     im.putalpha(im.getchannel("A").point(
                         lambda v: int(v * obj["alpha"])))
-                canvas.paste(im, (int(sx - im.width / 2),
-                                   int(sy - im.height / 2)),
+                fw, fh = im.width, im.height
+                front = [(sx - fw / 2, sy - fh / 2),
+                         (sx + fw / 2, sy - fh / 2),
+                         (sx + fw / 2, sy + fh / 2),
+                         (sx - fw / 2, sy + fh / 2)]
+
+                # —— 3D 具象化：沿纵深挤出厚度，绘制侧面明暗、背面与棱边 ——
+                solid = obj.get("solid", False)
+                thick = obj.get("thickness", 0.0)
+                if solid and thick > 0:
+                    bx, by, bdepth = project(
+                        obj["x"], obj["y"] + thick, obj["z"], W, H, yaw, cfg,
+                        obj_rot=(obj["rot_x"], obj["rot_y"], obj["rot_z"]))
+                    bpersp = 1.0 / (1.0 + bdepth * cfg["persp"])
+                    bw = max(1, int(W * obj["scale"] * bpersp))
+                    bh = max(1, int(bw * img.height / img.width))
+                    back = [(bx - bw / 2, by - bh / 2),
+                            (bx + bw / 2, by - bh / 2),
+                            (bx + bw / 2, by + bh / 2),
+                            (bx - bw / 2, by + bh / 2)]
+                    avg = _avg_rgb(im)
+                    al = obj["alpha"]
+                    side_shades = [0.5, 0.66, 0.58, 0.45]
+                    for k in range(4):
+                        k2 = (k + 1) % 4
+                        draw.polygon([front[k], front[k2], back[k2], back[k]],
+                                     fill=blend(shade(avg, side_shades[k]), al))
+                    draw.polygon(back, fill=blend(shade(avg, 0.32), al))
+                    draw.line(front + [front[0]],
+                              fill=blend(shade(avg, 1.12), al), width=1)
+
+                canvas.paste(im, (int(sx - fw / 2), int(sy - fh / 2)),
                              im if im.mode == "RGBA" else None)
 
             # —— 底盘网格线（地面 z=0，随视角一同投影）——
@@ -619,7 +669,8 @@ def main():
 
     # —— 图像对象（选中式，由 parse_image_objects 在 parse_args 前顺序解析）——
     #   --image-add <id>=<路径>  注册对象；--select <id> 选中后续属性作用对象；
-    #   --image-x/y/z 位置、--image-scale 缩放、--image-alpha 透明度；
+    #   --image-x/y/z 位置、--image-scale 缩放、--image-alpha 透明度、
+    #   --image-thickness 厚度(0~0.5)、--image-solid 实体 3D 具象化开关；
     #   --obj-rot-x/y/z 对象级旋转角（度）；兼容旧 --image <路径>。
     #   这些令牌不在此注册，避免 argparse 按无顺序覆盖。
 
