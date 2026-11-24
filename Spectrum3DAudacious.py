@@ -24,6 +24,10 @@ Spectrum3DAudacious.py —— Audacious 风格 3D 频谱（第八版）
     center/left/right、--text-x/y/z 位置、--text-rot-x/y/z 角度、
     --text-thickness 立体厚度(0~0.5)；--text-clip 被前方柱条遮挡裁剪(默认开)，
     --text-float 文本浮在最前不被遮挡
+  - 对象关键帧动画（可多对象独立轨道）：-ko <id> 切换轨道；-kp <n> 新建关键帧点；
+    -kt <秒> 当前帧时间(可小数)；-ktp linear/bezier 段间类型；-kcb x1,y1,x2,y2
+    bezier 的 cubic-bezier 四元组(缺省默认缓出)；-k-x/y/z/scale/alpha/thickness/
+    size/rot-x/rot-y/rot-z <值> 当前帧属性；相邻段可混用线性与贝塞尔
   - 场景静态三轴旋转：--rot-x/--rot-y/--rot-z 绕 X/Y/Z 轴旋转角（度），
     作用于整个场景，叠加在动态摆动与俯仰之上，默认 0 不改变原画面
 """
@@ -439,6 +443,73 @@ def _paint_object(canvas, draw, obj, im, sx, sy, persp,
                  im if im.mode == "RGBA" else None)
 
 
+def _bezier_pt(t, p1, p2):
+    """三次贝塞尔端点固定 (0,0)→(1,1)，返回 t 处的 (x, y)。"""
+    mt = 1.0 - t
+    x = 3 * mt * mt * t * p1[0] + 3 * mt * t * t * p2[0] + t * t * t
+    y = 3 * mt * mt * t * p1[1] + 3 * mt * t * t * p2[1] + t * t * t
+    return x, y
+
+
+def _cubic_bezier(u, bez):
+    """按 cubic-bezier (x1,y1,x2,y2) 把线性进度 u 映射为缓动进度 y。"""
+    x1, y1, x2, y2 = bez
+    if u <= 0.0:
+        return 0.0
+    if u >= 1.0:
+        return 1.0
+    lo, hi = 0.0, 1.0
+    for _ in range(20):
+        mid = (lo + hi) / 2.0
+        x, _ = _bezier_pt(mid, (x1, y1), (x2, y2))
+        if x < u:
+            lo = mid
+        else:
+            hi = mid
+    _, y = _bezier_pt((lo + hi) / 2.0, (x1, y1), (x2, y2))
+    return min(1.0, max(0.0, y))
+
+
+def _apply_kf(obj, kf):
+    for field, val in kf["props"].items():
+        obj[field] = val
+
+
+def _sample_keyframes(obj, t):
+    """按当前时间 t(秒) 采样关键帧，把插值结果写回对象生效字段。
+
+    每帧先从静态基线 _base 重置，再按关键帧覆盖/插值，避免逐帧累积漂移。
+    段间过渡曲线由后一关键帧的 type 决定；早于首帧取首帧，晚于末帧取末帧。
+    """
+    kfs = obj.get("keyframes") or []
+    if not kfs:
+        return
+    base = obj.get("_base") or {}
+    for f in _KF_PROP.values():
+        if f in base:
+            obj[f] = base[f]
+
+    kfs = sorted(kfs, key=lambda k: k["time"])
+    if t <= kfs[0]["time"]:
+        _apply_kf(obj, kfs[0])
+        return
+    if t >= kfs[-1]["time"]:
+        _apply_kf(obj, kfs[-1])
+        return
+
+    for a, b in zip(kfs, kfs[1:]):
+        if a["time"] <= t <= b["time"]:
+            span = b["time"] - a["time"]
+            u = 0.0 if span <= 1e-9 else (t - a["time"]) / span
+            if b["type"] == "bezier" and b.get("bezier"):
+                u = _cubic_bezier(u, b["bezier"])
+            for field in set(a["props"]) | set(b["props"]):
+                va = a["props"].get(field, base.get(field, 0.0))
+                vb = b["props"].get(field, base.get(field, 0.0))
+                obj[field] = va + (vb - va) * u
+            return
+
+
 # 图像对象属性令牌 → 对象字段（选中式：作用于当前 --select 的对象）
 _OBJ_PROP = {
     "--image-x": "x", "--image-y": "y", "--image-z": "z",
@@ -456,6 +527,17 @@ _TEXT_PROP = {
 }
 
 _TEXT_ALIGNS = ("center", "left", "right")
+
+# 关键帧可动画属性：令牌后缀 → 对象字段
+_KF_PROP = {
+    "x": "x", "y": "y", "z": "z",
+    "scale": "scale", "alpha": "alpha", "thickness": "thickness",
+    "size": "size",
+    "rot-x": "rot_x", "rot-y": "rot_y", "rot-z": "rot_z",
+}
+
+# cubic-bezier 默认缓出曲线（bezier 帧未给四元组时使用）
+DEFAULT_BEZIER = (0.25, 0.1, 0.25, 1.0)
 
 
 def _load_image(path):
@@ -479,6 +561,7 @@ def _new_object(oid, path):
         "scale": 0.5, "alpha": 1.0,
         "thickness": 0.12, "solid": False,
         "rot_x": 0.0, "rot_y": 0.0, "rot_z": 0.0,
+        "keyframes": [],
     }
 
 
@@ -489,6 +572,7 @@ def _new_text_object(oid, text):
         "x": 0.0, "y": 0.5, "z": 0.0, "alpha": 1.0,
         "thickness": 0.0, "clip": True,
         "rot_x": 0.0, "rot_y": 0.0, "rot_z": 0.0,
+        "keyframes": [],
     }
 
 
@@ -500,10 +584,16 @@ def parse_image_objects(argv):
     - 图像属性 `--image-x/y/z/scale/alpha/thickness`、`--image-solid`、
       `--obj-rot-x/y/z`；文本属性 `--text-x/y/z/size/width/align/font/thickness`、
       `--text-rot-x/y/z`、`--text-clip`/`--text-float`；
+    - 关键帧动画：`-ko id` 切换当前动画轨道对象；`-kp n` 在该轨道新建关键帧点；
+      `-kt 秒` 当前帧时间（可小数）；`-ktp linear|bezier` 当前帧段间类型；
+      `-kcb x1,y1,x2,y2` bezier 帧的 cubic-bezier 四元组（缺省回退默认缓出）；
+      `-k-x/y/z/scale/alpha/thickness/size/rot-x/rot-y/rot-z 值` 当前帧属性值。
+      允许多条独立 `-ko` 轨道，相邻段可混用线性段与贝塞尔段；
     - 兼容旧 `--image 路径`（等价注册默认对象 image）。
     返回 (objects 列表, 剩余待 argparse 解析的 argv)。
     """
     objs, order, current = {}, [], None
+    current_kf = None
     rest = []
     i = 0
     while i < len(argv):
@@ -584,6 +674,50 @@ def parse_image_objects(argv):
                 raise SystemExit("--text-float 需先用 --text-add 或 --select 指定对象")
             objs[current]["clip"] = False
             i += 1
+        elif tok in ("-ko", "--keyframe-object"):
+            current = argv[i + 1]
+            i += 2
+            if current not in objs:
+                raise SystemExit(f"-ko 未注册的对象: {current}")
+            current_kf = None
+        elif tok in ("-kp", "--keyframe-point"):
+            if current is None:
+                raise SystemExit("-kp 需先用 -ko 指定关键帧对象")
+            kf = {"point": int(argv[i + 1]), "time": None,
+                  "type": "linear", "bezier": None, "props": {}}
+            objs[current]["keyframes"].append(kf)
+            current_kf = kf
+            i += 2
+        elif tok in ("-kt", "--keyframe-time"):
+            if current_kf is None:
+                raise SystemExit("-kt 需先用 -kp 新建关键帧点")
+            current_kf["time"] = float(argv[i + 1])
+            i += 2
+        elif tok in ("-ktp", "--keyframe-type"):
+            if current_kf is None:
+                raise SystemExit("-ktp 需先用 -kp 新建关键帧点")
+            tp = argv[i + 1].lower()
+            if tp not in ("linear", "bezier"):
+                raise SystemExit("-ktp 可选: linear / bezier")
+            current_kf["type"] = tp
+            i += 2
+        elif tok in ("-kcb", "--keyframe-bezier"):
+            if current_kf is None:
+                raise SystemExit("-kcb 需先用 -kp 新建关键帧点")
+            parts = [float(x) for x in argv[i + 1].replace("，", ",").split(",")]
+            if len(parts) != 4:
+                raise SystemExit("-kcb 格式: x1,y1,x2,y2（cubic-bezier 四元组）")
+            current_kf["bezier"] = tuple(parts)
+            current_kf["type"] = "bezier"
+            i += 2
+        elif tok.startswith("-k-") or tok.startswith("--k-"):
+            if current_kf is None:
+                raise SystemExit(f"{tok} 需先用 -ko/-kp 指定关键帧点")
+            prop = tok.split("-", 2)[-1]
+            if prop not in _KF_PROP:
+                raise SystemExit(f"{tok} 不可动画属性，可选: {', '.join(_KF_PROP)}")
+            current_kf["props"][_KF_PROP[prop]] = float(argv[i + 1])
+            i += 2
         elif tok == "--image":
             path = argv[i + 1]
             i += 2
@@ -596,6 +730,8 @@ def parse_image_objects(argv):
         else:
             rest.append(tok)
             i += 1
+    for o in objs.values():
+        o["_base"] = {f: o[f] for f in _KF_PROP.values() if f in o}
     return [objs[k] for k in order], rest
 
 
@@ -644,6 +780,10 @@ def render(spec_db, cfg, out_path):
             t = i / float(fps)
             phase = (t / osc_period) * 2 * math.pi
             yaw = math.sin(phase) * osc_amp
+
+            # 按当前时间采样各对象关键帧动画，覆盖静态属性
+            for obj in cfg.get("objects", []):
+                _sample_keyframes(obj, t)
 
             canvas = Image.new("RGB", (W, H), BG)
             draw = ImageDraw.Draw(canvas, "RGBA")
@@ -864,6 +1004,8 @@ def main():
     #   文本：--text-add <id>=<文本> 注册；--text-font、--text-size、--text-width、
     #   --text-align、--text-x/y/z、--text-rot-x/y/z、--text-thickness、
     #   --text-clip / --text-float；--select 选中后续属性作用对象。
+    #   关键帧：-ko <id> 轨道、-kp <n> 帧点、-kt 秒、-ktp linear/bezier、
+    #   -kcb x1,y1,x2,y2、-k-x/y/z/scale/alpha/thickness/size/rot-x/y/z。
     #   这些令牌不在此注册，避免 argparse 按无顺序覆盖。
 
     # —— 场景静态三轴 3D 旋转（叠加在动态摆动/俯仰之上，默认 0 不改变原画面）——
