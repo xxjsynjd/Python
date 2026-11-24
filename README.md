@@ -12,7 +12,7 @@
 
 | 脚本 | 功能 | 风格 |
 |---|---|---|
-| `Spectrum3DAudacious.py` | 3D频谱墙 | Audacious gl-spectrum风格；五种 PS 渐变（角度/线性/径向/对称/菱形）+ 底盘网格开关 + 纵深透明度渐变蒙版 |
+| `Spectrum3DAudacious.py` | 3D频谱墙 | Audacious gl-spectrum风格；五种 PS 渐变（角度/线性/径向/对称/菱形）+ 底盘网格开关 + 纵深透明度渐变蒙版 + 贴图/文本对象与关键帧动画（线性/贝塞尔） |
 | `Spectrum_2d.py` | 2D频谱竖条 | 经典FFT频谱 |
 | `WMPVisualizer.py` | 瀑布图，也叫随机场景可视化 | Windows Media Player XP风格 |
 | `VU_Meter.py` | 电平表 | 带回落+峰值保持+峰值dB数字图例（`--legend`/`--no-legend`） |
@@ -142,6 +142,40 @@ Spectrum3DAudacious.py 歌.mp3 -o out.mp4 \
 | `-c` | Center | 相邻两点渐变过渡中点 0~1（默认 0.5） |
 
 `--preset-type` 内置预设：`none`(默认，不套用) / `white-to-black`(近端白实→远端黑透)；手动 `-p/-a/-l/-c` 优先于预设。示例：`-p 1 -a 1.0 -l 0.0 -c 0.5 -p 2 -a 0.15 -l 1.0 -c 0.5`（近端实、远端渐隐）。
+
+#### 贴图 / 文本对象（选中式，可多对象）
+
+```bash
+--image-add cover=cover.png --select cover --image-x 0.3 --image-z 0.4 --image-scale 0.3 --obj-rot-z 10
+--text-add title=频谱墙标题 --select title --text-size 32 --text-z 0.2 --text-align center --text-thickness 0.12
+```
+
+| 参数 | 作用 |
+| --- | --- |
+| `--image-add <id>=<路径>` | 注册图像对象（可重复多张）；`--select <id>` 选中后续属性作用对象 |
+| `--image-x/y/z` | 对象 3D 位置；`--image-scale` 缩放；`--image-alpha` 透明度 0~1 |
+| `--image-thickness` | 沿纵深挤出厚度 0~0.5；`--image-solid` 实体 3D 具象化；`--obj-rot-x/y/z` 对象旋转角（度） |
+| `--text-add <id>=<文本>` | 注册文本对象；`--text-font/size/width/align` 字体/字号/框宽/对齐 |
+| `--text-x/y/z` | 文本位置；`--text-rot-x/y/z` 旋转角；`--text-thickness` 立体厚度；`--text-clip` 被柱条遮挡(默认开)；`--text-float` 浮最前 |
+
+#### 对象关键帧动画（多对象独立轨道，线性 / 贝塞尔混用）
+
+```bash
+--text-add title=开场标题
+-ko title
+  -kp 1 -kt 0    -k-y 0.35 -k-z 0.1  -k-rot-y 0
+  -kp 2 -kt 1.5  -ktp bezier -kcb 0.25,0.1,0.25,1 -k-y 0.75 -k-rot-y 20
+  -kp 3 -kt 3    -ktp linear -k-y 0.4  -k-rot-y -10
+```
+
+| 参数 | 作用 |
+| --- | --- |
+| `-ko <id>` | 切换当前动画轨道对象（须已注册） |
+| `-kp <n>` | 新建关键帧点；`-kt <秒>` 当前帧时间（可小数） |
+| `-ktp linear\|bezier` | 段间类型；`-kcb x1,y1,x2,y2` bezier cubic-bezier 四元组（缺省默认缓出） |
+| `-k-x/y/z/scale/alpha/thickness/size/rot-x/rot-y/rot-z <值>` | 当前帧属性值（image 无 size，text 无 scale） |
+
+> 完整参数与默认值见 Wiki「支持的可视化模式列表」。
 
 ---
 
