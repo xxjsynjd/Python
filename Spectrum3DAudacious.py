@@ -19,6 +19,11 @@ Spectrum3DAudacious.py —— Audacious 风格 3D 频谱（第八版）
     --image-thickness 图像厚度（沿纵深挤出比例 0~0.5）、--image-solid 开启该对象
     3D 具象化实体模式（侧面明暗 + 棱边轮廓），--obj-rot-x/y/z 对象级旋转角
     作用于该对象；兼容旧 --image <路径>
+  - 文本对象（选中式，可多段）：--text-add <id>=<文本> 注册；--text-font 字体、
+    --text-size 字号、--text-width 文本框宽度(px,0=不换行)、--text-align
+    center/left/right、--text-x/y/z 位置、--text-rot-x/y/z 角度、
+    --text-thickness 立体厚度(0~0.5)；--text-clip 被前方柱条遮挡裁剪(默认开)，
+    --text-float 文本浮在最前不被遮挡
   - 场景静态三轴旋转：--rot-x/--rot-y/--rot-z 绕 X/Y/Z 轴旋转角（度），
     作用于整个场景，叠加在动态摆动与俯仰之上，默认 0 不改变原画面
 """
@@ -31,13 +36,22 @@ import subprocess
 import sys
 
 import numpy as np
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 
 FFMPEG = shutil.which("ffmpeg")
 FFPROBE = shutil.which("ffprobe")
 
 BG = (4, 5, 10)
 TEXT_COL = (200, 210, 220)
+
+# 默认中文字体（Noto Sans CJK SC，ttc 索引 2）；加载失败时依次回退
+DEFAULT_FONT = "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc"
+FONT_FALLBACK = [
+    DEFAULT_FONT,
+    "/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc",
+    "/usr/share/fonts/truetype/droid/DroidSansFallbackFull.ttf",
+]
+FONT_SC_INDEX = 2
 
 
 def hue_to_rgb(h):
@@ -284,6 +298,147 @@ def _avg_rgb(im):
     return tuple(int(min(255, max(0, v))) for v in arr)
 
 
+def _resolve_font_path(ref):
+    """字体参数解析：存在的文件路径直接用；否则按关键词在系统字体里模糊匹配。"""
+    if ref and os.path.isfile(ref):
+        return ref
+    if ref:
+        key = ref.lower()
+        try:
+            import glob
+            for ext in ("ttf", "ttc", "otf"):
+                for f in glob.glob(f"/usr/share/fonts/**/*.{ext}", recursive=True):
+                    if key in os.path.basename(f).lower():
+                        return f
+        except Exception:
+            pass
+    return DEFAULT_FONT
+
+
+def _load_font(ref, size):
+    """加载字体，Noto CJK 取 SC 子字体；失败逐级回退。"""
+    path = _resolve_font_path(ref)
+    candidates = [path] + [f for f in FONT_FALLBACK if f != path]
+    for cand in candidates:
+        try:
+            if cand.endswith(".ttc"):
+                return ImageFont.truetype(cand, size, index=FONT_SC_INDEX)
+            return ImageFont.truetype(cand, size)
+        except Exception:
+            continue
+    return ImageFont.load_default()
+
+
+def _wrap_text(text, font, max_w, draw):
+    """按文本框宽度折行；max_w<=0 不折行，仅按换行符分段。中文按字符断行。"""
+    lines = []
+    for raw in text.split("\n"):
+        if max_w <= 0:
+            lines.append(raw)
+            continue
+        cur = ""
+        for ch in raw:
+            if not cur:
+                cur = ch
+            elif draw.textlength(cur + ch, font=font) <= max_w:
+                cur += ch
+            else:
+                lines.append(cur)
+                cur = ch
+        lines.append(cur)
+    return lines
+
+
+def _render_text_image(obj, persp):
+    """把文本对象渲染成 RGBA 离屏贴图，返回 (image, 行高)。"""
+    size = max(8, int(obj["size"] * persp))
+    font = _load_font(obj["font"], size)
+    box_w = max(0, int(obj["box_w"] * persp)) if obj["box_w"] > 0 else 0
+
+    tmp = ImageDraw.Draw(Image.new("RGBA", (10, 10)))
+    lines = _wrap_text(obj["text"], font, box_w, tmp)
+    asc, desc = font.getmetrics()
+    line_h = int((asc + desc) * 1.15)
+    widths = [tmp.textlength(ln, font=font) for ln in lines]
+    tw = int(max(widths)) if widths else 1
+    th = line_h * len(lines)
+    bw = box_w if box_w > 0 else tw
+
+    im = Image.new("RGBA", (max(1, bw), max(1, th)), (0, 0, 0, 0))
+    dd = ImageDraw.Draw(im)
+    align = obj["align"]
+    for k, ln in enumerate(lines):
+        w = dd.textlength(ln, font=font)
+        if align == "left":
+            tx = 0
+        elif align == "right":
+            tx = bw - w
+        else:
+            tx = (bw - w) / 2
+        dd.text((tx, k * line_h), ln, font=font,
+                fill=TEXT_COL + (255,))
+    return im, line_h
+
+
+def _compose_object(obj, W, H, yaw, cfg):
+    """按对象类型生成贴图并投影定位，返回 (贴图, 屏幕x, 屏幕y, persp, depth)。"""
+    sx, sy, depth = project(
+        obj["x"], obj["y"], obj["z"], W, H, yaw, cfg,
+        obj_rot=(obj["rot_x"], obj["rot_y"], obj["rot_z"]))
+    persp = 1.0 / (1.0 + depth * cfg["persp"])
+    if obj["kind"] == "text":
+        im, _ = _render_text_image(obj, persp)
+    else:
+        img = obj["image"]
+        iw = max(1, int(W * obj["scale"] * persp))
+        ih = max(1, int(iw * img.height / img.width))
+        im = img.resize((iw, ih), Image.LANCZOS)
+    if obj["rot_z"]:
+        im = im.rotate(-obj["rot_z"], expand=True,
+                       resample=Image.BICUBIC)
+    if obj["alpha"] < 1.0:
+        im = im.convert("RGBA")
+        im.putalpha(im.getchannel("A").point(
+            lambda v: int(v * obj["alpha"])))
+    return im, sx, sy, persp, depth
+
+
+def _paint_object(canvas, draw, obj, im, sx, sy, persp,
+                  W, H, yaw, cfg):
+    """绘制对象：按需沿纵深挤出实体侧面/背面/棱边，再贴正面贴图。"""
+    fw, fh = im.width, im.height
+    front = [(sx - fw / 2, sy - fh / 2),
+             (sx + fw / 2, sy - fh / 2),
+             (sx + fw / 2, sy + fh / 2),
+             (sx - fw / 2, sy + fh / 2)]
+    thick = obj.get("thickness", 0.0)
+    extrude = thick > 0 and (obj["kind"] == "text" or obj.get("solid", False))
+    if extrude:
+        bx, by, bdepth = project(
+            obj["x"], obj["y"] + thick, obj["z"], W, H, yaw, cfg,
+            obj_rot=(obj["rot_x"], obj["rot_y"], obj["rot_z"]))
+        bpersp = 1.0 / (1.0 + bdepth * cfg["persp"])
+        k = bpersp / persp
+        bw = max(1, int(fw * k))
+        bh = max(1, int(fh * k))
+        back = [(bx - bw / 2, by - bh / 2),
+                (bx + bw / 2, by - bh / 2),
+                (bx + bw / 2, by + bh / 2),
+                (bx - bw / 2, by + bh / 2)]
+        avg = _avg_rgb(im)
+        al = obj["alpha"]
+        side_shades = [0.5, 0.66, 0.58, 0.45]
+        for q in range(4):
+            q2 = (q + 1) % 4
+            draw.polygon([front[q], front[q2], back[q2], back[q]],
+                         fill=blend(shade(avg, side_shades[q]), al))
+        draw.polygon(back, fill=blend(shade(avg, 0.32), al))
+        draw.line(front + [front[0]],
+                  fill=blend(shade(avg, 1.12), al), width=1)
+    canvas.paste(im, (int(sx - fw / 2), int(sy - fh / 2)),
+                 im if im.mode == "RGBA" else None)
+
+
 # 图像对象属性令牌 → 对象字段（选中式：作用于当前 --select 的对象）
 _OBJ_PROP = {
     "--image-x": "x", "--image-y": "y", "--image-z": "z",
@@ -291,6 +446,16 @@ _OBJ_PROP = {
     "--image-thickness": "thickness",
     "--obj-rot-x": "rot_x", "--obj-rot-y": "rot_y", "--obj-rot-z": "rot_z",
 }
+
+# 文本对象数值属性令牌 → 对象字段
+_TEXT_PROP = {
+    "--text-x": "x", "--text-y": "y", "--text-z": "z",
+    "--text-size": "size", "--text-width": "box_w",
+    "--text-thickness": "thickness",
+    "--text-rot-x": "rot_x", "--text-rot-y": "rot_y", "--text-rot-z": "rot_z",
+}
+
+_TEXT_ALIGNS = ("center", "left", "right")
 
 
 def _load_image(path):
@@ -309,7 +474,7 @@ def _load_image(path):
 
 def _new_object(oid, path):
     return {
-        "id": oid, "image": _load_image(path),
+        "id": oid, "kind": "image", "image": _load_image(path),
         "x": 0.0, "y": 0.5, "z": 0.0,
         "scale": 0.5, "alpha": 1.0,
         "thickness": 0.12, "solid": False,
@@ -317,11 +482,24 @@ def _new_object(oid, path):
     }
 
 
-def parse_image_objects(argv):
-    """按命令行顺序解析图像对象（方案 A 选中式）。
+def _new_text_object(oid, text):
+    return {
+        "id": oid, "kind": "text", "text": text,
+        "font": DEFAULT_FONT, "size": 28, "box_w": 0, "align": "center",
+        "x": 0.0, "y": 0.5, "z": 0.0, "alpha": 1.0,
+        "thickness": 0.0, "clip": True,
+        "rot_x": 0.0, "rot_y": 0.0, "rot_z": 0.0,
+    }
 
-    - `--image-add id=路径` 注册对象；`--select id` 选中后续属性作用对象；
-    - 属性 `--image-x/y/z/scale/alpha`、`--obj-rot-x/y/z` 归入当前选中对象；
+
+def parse_image_objects(argv):
+    """按命令行顺序解析图像 / 文本对象（方案 A 选中式）。
+
+    - `--image-add id=路径` 注册图像对象；`--text-add id=文本` 注册文本对象；
+      `--select id` 选中后续属性作用对象；
+    - 图像属性 `--image-x/y/z/scale/alpha/thickness`、`--image-solid`、
+      `--obj-rot-x/y/z`；文本属性 `--text-x/y/z/size/width/align/font/thickness`、
+      `--text-rot-x/y/z`、`--text-clip`/`--text-float`；
     - 兼容旧 `--image 路径`（等价注册默认对象 image）。
     返回 (objects 列表, 剩余待 argparse 解析的 argv)。
     """
@@ -342,6 +520,19 @@ def parse_image_objects(argv):
             else:
                 objs[oid]["image"] = _load_image(path)
             current = oid
+        elif tok == "--text-add":
+            val = argv[i + 1]
+            i += 2
+            if "=" not in val:
+                raise SystemExit("--text-add 格式: <id>=<文本内容>")
+            oid, text = val.split("=", 1)
+            if oid not in objs:
+                objs[oid] = _new_text_object(oid, text)
+                order.append(oid)
+            else:
+                objs[oid]["text"] = text
+                objs[oid]["kind"] = "text"
+            current = oid
         elif tok == "--select":
             current = argv[i + 1]
             i += 2
@@ -360,6 +551,38 @@ def parse_image_objects(argv):
             if current is None:
                 raise SystemExit("--image-solid 需先用 --image-add 或 --select 指定对象")
             objs[current]["solid"] = True
+            i += 1
+        elif tok in _TEXT_PROP:
+            if current is None:
+                raise SystemExit(f"{tok} 需先用 --text-add/--image-add 或 --select 指定对象")
+            field = _TEXT_PROP[tok]
+            val = float(argv[i + 1])
+            if field == "thickness":
+                val = min(0.5, max(0.0, val))
+            objs[current][field] = val
+            i += 2
+        elif tok == "--text-font":
+            if current is None:
+                raise SystemExit("--text-font 需先用 --text-add 或 --select 指定对象")
+            objs[current]["font"] = argv[i + 1]
+            i += 2
+        elif tok == "--text-align":
+            if current is None:
+                raise SystemExit("--text-align 需先用 --text-add 或 --select 指定对象")
+            al = argv[i + 1].lower()
+            if al not in _TEXT_ALIGNS:
+                raise SystemExit(f"--text-align 可选: center / left / right")
+            objs[current]["align"] = al
+            i += 2
+        elif tok == "--text-clip":
+            if current is None:
+                raise SystemExit("--text-clip 需先用 --text-add 或 --select 指定对象")
+            objs[current]["clip"] = True
+            i += 1
+        elif tok == "--text-float":
+            if current is None:
+                raise SystemExit("--text-float 需先用 --text-add 或 --select 指定对象")
+            objs[current]["clip"] = False
             i += 1
         elif tok == "--image":
             path = argv[i + 1]
@@ -425,58 +648,20 @@ def render(spec_db, cfg, out_path):
             canvas = Image.new("RGB", (W, H), BG)
             draw = ImageDraw.Draw(canvas, "RGBA")
 
-            # —— 贴图对象列表（各自 3D 坐标定位，正平面跟随视角投影，背景层）——
+            # —— 对象列表（图像 / 文本；各自 3D 坐标定位，背景层先画，可被柱条遮挡裁剪）——
+            front_objs = []
             for obj in cfg.get("objects", []):
-                img = obj.get("image")
-                if img is None:
+                if obj["kind"] == "image" and obj.get("image") is None:
                     continue
-                sx, sy, depth = project(
-                    obj["x"], obj["y"], obj["z"], W, H, yaw, cfg,
-                    obj_rot=(obj["rot_x"], obj["rot_y"], obj["rot_z"]))
-                persp = 1.0 / (1.0 + depth * cfg["persp"])
-                iw = max(1, int(W * obj["scale"] * persp))
-                ih = max(1, int(iw * img.height / img.width))
-                im = img.resize((iw, ih), Image.LANCZOS)
-                if obj["rot_z"]:
-                    im = im.rotate(-obj["rot_z"], expand=True,
-                                   resample=Image.BICUBIC)
-                if obj["alpha"] < 1.0:
-                    im = im.convert("RGBA")
-                    im.putalpha(im.getchannel("A").point(
-                        lambda v: int(v * obj["alpha"])))
-                fw, fh = im.width, im.height
-                front = [(sx - fw / 2, sy - fh / 2),
-                         (sx + fw / 2, sy - fh / 2),
-                         (sx + fw / 2, sy + fh / 2),
-                         (sx - fw / 2, sy + fh / 2)]
-
-                # —— 3D 具象化：沿纵深挤出厚度，绘制侧面明暗、背面与棱边 ——
-                solid = obj.get("solid", False)
-                thick = obj.get("thickness", 0.0)
-                if solid and thick > 0:
-                    bx, by, bdepth = project(
-                        obj["x"], obj["y"] + thick, obj["z"], W, H, yaw, cfg,
-                        obj_rot=(obj["rot_x"], obj["rot_y"], obj["rot_z"]))
-                    bpersp = 1.0 / (1.0 + bdepth * cfg["persp"])
-                    bw = max(1, int(W * obj["scale"] * bpersp))
-                    bh = max(1, int(bw * img.height / img.width))
-                    back = [(bx - bw / 2, by - bh / 2),
-                            (bx + bw / 2, by - bh / 2),
-                            (bx + bw / 2, by + bh / 2),
-                            (bx - bw / 2, by + bh / 2)]
-                    avg = _avg_rgb(im)
-                    al = obj["alpha"]
-                    side_shades = [0.5, 0.66, 0.58, 0.45]
-                    for k in range(4):
-                        k2 = (k + 1) % 4
-                        draw.polygon([front[k], front[k2], back[k2], back[k]],
-                                     fill=blend(shade(avg, side_shades[k]), al))
-                    draw.polygon(back, fill=blend(shade(avg, 0.32), al))
-                    draw.line(front + [front[0]],
-                              fill=blend(shade(avg, 1.12), al), width=1)
-
-                canvas.paste(im, (int(sx - fw / 2), int(sy - fh / 2)),
-                             im if im.mode == "RGBA" else None)
+                if obj["kind"] == "text" and not obj.get("text"):
+                    continue
+                # --text-float 的文本不参与遮挡，延后到柱条之后贴在最前
+                if obj["kind"] == "text" and not obj.get("clip", True):
+                    front_objs.append(obj)
+                    continue
+                im, sx, sy, persp, _ = _compose_object(obj, W, H, yaw, cfg)
+                _paint_object(canvas, draw, obj, im, sx, sy, persp,
+                              W, H, yaw, cfg)
 
             # —— 底盘网格线（地面 z=0，随视角一同投影）——
             # 格子数跟随频谱墙：横向 bands 列、纵深 rows 排，每格对齐一根柱条底面；
@@ -580,6 +765,12 @@ def render(spec_db, cfg, out_path):
 
                 draw.polygon(top, fill=blend(shade(col, 1.18), alpha))
 
+            # —— 前景层：--text-float 的文本贴在柱条之上，不被遮挡 ——
+            for obj in front_objs:
+                im, sx, sy, persp, _ = _compose_object(obj, W, H, yaw, cfg)
+                _paint_object(canvas, draw, obj, im, sx, sy, persp,
+                              W, H, yaw, cfg)
+
             draw.text((24, 22), "AUDACIOUS 3D SPECTRUM",
                       fill=TEXT_COL)
 
@@ -667,11 +858,12 @@ def main():
     ap.add_argument("--scale-y", type=float, default=0.32, help="纵向屏幕缩放系数")
     ap.add_argument("--y-offset", type=float, default=0.68, help="画面纵向偏移（0~1，越低越靠下）")
 
-    # —— 图像对象（选中式，由 parse_image_objects 在 parse_args 前顺序解析）——
-    #   --image-add <id>=<路径>  注册对象；--select <id> 选中后续属性作用对象；
-    #   --image-x/y/z 位置、--image-scale 缩放、--image-alpha 透明度、
-    #   --image-thickness 厚度(0~0.5)、--image-solid 实体 3D 具象化开关；
-    #   --obj-rot-x/y/z 对象级旋转角（度）；兼容旧 --image <路径>。
+    # —— 图像 / 文本对象（选中式，由 parse_image_objects 在 parse_args 前顺序解析）——
+    #   图像：--image-add <id>=<路径> 注册；--image-x/y/z、--image-scale、
+    #   --image-alpha、--image-thickness、--image-solid、--obj-rot-x/y/z；
+    #   文本：--text-add <id>=<文本> 注册；--text-font、--text-size、--text-width、
+    #   --text-align、--text-x/y/z、--text-rot-x/y/z、--text-thickness、
+    #   --text-clip / --text-float；--select 选中后续属性作用对象。
     #   这些令牌不在此注册，避免 argparse 按无顺序覆盖。
 
     # —— 场景静态三轴 3D 旋转（叠加在动态摆动/俯仰之上，默认 0 不改变原画面）——
