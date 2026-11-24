@@ -168,12 +168,11 @@ def compute_wave(data, sr, fps, window_ms, n_points):
         b = a + win
 
         seg = np.zeros(win, dtype=np.float32)
-        if a < 0:
-            seg[-a:min(b, n)] = mono[:max(0, min(b, n))]
-        elif b > n:
-            seg[:n - a] = mono[a:]
-        else:
-            seg[:] = mono[a:b]
+        # 窗口与音频实际重叠区间；短音频末尾窗口越界时重叠为空，seg 保持全 0
+        lo = max(a, 0)
+        hi = min(b, n)
+        if hi > lo:
+            seg[lo - a:hi - a] = mono[lo:hi]
 
         waves[i] = seg[idx]
         peaks[i] = float(seg.max()) if len(seg) else 0.0
