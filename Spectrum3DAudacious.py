@@ -14,6 +14,10 @@ Spectrum3DAudacious.py —— Audacious 风格 3D 频谱（第八版）
   - 纵深透明度渐变蒙版：-p Point 点序号 -a Alpha 透明度(0~1) -l Location
     纵深位置(0~1) -c Center 相邻点插值中点(0~1)；可成组重复，按位置排序线性插值；
     --preset-type 可套用内置预设 white-to-black（近端白实→远端黑透），手动控制点优先
+  - 贴图：--image 指定图像，--image-x/-y/-z 指定 3D 空间位置，--image-scale
+    缩放，--image-alpha 透明度；贴图为正平面，跟随视角投影定位
+  - 静态三轴旋转：--rot-x/--rot-y/--rot-z 绕 X/Y/Z 轴旋转角（度），叠加在
+    动态摆动与俯仰之上，默认 0 不改变原画面
 """
 
 import argparse
@@ -125,6 +129,29 @@ def project(x, y, z, W, H, yaw, cfg):
     wx = x * cfg["x_span"]
     wy = (y - 0.5) * cfg["depth"]
     wz = z
+
+    # —— 静态三轴旋转（欧拉 X→Y→Z，默认 0 不改变原画面）——
+    # 绕 X 轴（俯仰）
+    ax = math.radians(cfg.get("rot_x", 0.0))
+    if ax:
+        cx, sx = math.cos(ax), math.sin(ax)
+        ry = wy * cx - wz * sx
+        rz = wy * sx + wz * cx
+        wy, wz = ry, rz
+    # 绕 Y 轴（偏航）
+    ay = math.radians(cfg.get("rot_y", 0.0))
+    if ay:
+        cy, sy = math.cos(ay), math.sin(ay)
+        rx = wx * cy + wz * sy
+        rz = -wx * sy + wz * cy
+        wx, wz = rx, rz
+    # 绕 Z 轴（翻滚）
+    az = math.radians(cfg.get("rot_z", 0.0))
+    if az:
+        cz, sz = math.cos(az), math.sin(az)
+        rx = wx * cz - wy * sz
+        ry = wx * sz + wy * cz
+        wx, wy = rx, ry
 
     yaw_total = yaw + math.radians(cfg["yaw_offset"])
     ca = math.cos(yaw_total)
@@ -292,6 +319,22 @@ def render(spec_db, cfg, out_path):
 
             canvas = Image.new("RGB", (W, H), BG)
             draw = ImageDraw.Draw(canvas, "RGBA")
+
+            # —— 贴图（按 3D 坐标定位，正平面跟随视角投影，置于背景层）——
+            img = cfg.get("image")
+            if img is not None:
+                ix, iy, iz = cfg["image_x"], cfg["image_y"], cfg["image_z"]
+                sx, sy, depth = project(ix, iy, iz, W, H, yaw, cfg)
+                persp = 1.0 / (1.0 + depth * cfg["persp"])
+                iw = max(1, int(W * cfg["image_scale"] * persp))
+                ih = max(1, int(iw * img.height / img.width))
+                im = img.resize((iw, ih), Image.LANCZOS)
+                if cfg["image_alpha"] < 1.0:
+                    im = im.convert("RGBA")
+                    im.putalpha(im.getchannel("A").point(
+                        lambda v: int(v * cfg["image_alpha"])))
+                canvas.paste(im, (int(sx - iw / 2), int(sy - ih / 2)),
+                             im if im.mode == "RGBA" else None)
 
             # —— 底盘网格线（地面 z=0，随视角一同投影）——
             # 格子数跟随频谱墙：横向 bands 列、纵深 rows 排，每格对齐一根柱条底面；
@@ -482,6 +525,28 @@ def main():
     ap.add_argument("--scale-y", type=float, default=0.32, help="纵向屏幕缩放系数")
     ap.add_argument("--y-offset", type=float, default=0.68, help="画面纵向偏移（0~1，越低越靠下）")
 
+    # —— 贴图（按 3D 坐标插入一张图像）——
+    ap.add_argument("--image", default=None,
+                    help="插入贴图图像路径（png/jpg…），不指定则不贴图")
+    ap.add_argument("--image-x", type=float, default=0.0,
+                    help="贴图在 3D 空间 X 轴位置（-1~1，0=居中）")
+    ap.add_argument("--image-y", type=float, default=0.5,
+                    help="贴图在 3D 空间纵深 Y 位置（0~1，0=最近，1=最远）")
+    ap.add_argument("--image-z", type=float, default=0.0,
+                    help="贴图在 3D 空间高度 Z 位置（0=底面，越大越抬升）")
+    ap.add_argument("--image-scale", type=float, default=0.5,
+                    help="贴图缩放系数（相对画面宽度，1.0=撑满宽）")
+    ap.add_argument("--image-alpha", type=float, default=1.0,
+                    help="贴图透明度 0~1（1=不透明）")
+
+    # —— 静态三轴 3D 旋转（叠加在动态摆动/俯仰之上，默认 0 不改变原画面）——
+    ap.add_argument("--rot-x", type=float, default=0.0,
+                    help="绕 X 轴静态旋转角（度，俯仰）")
+    ap.add_argument("--rot-y", type=float, default=0.0,
+                    help="绕 Y 轴静态旋转角（度，偏航）")
+    ap.add_argument("--rot-z", type=float, default=0.0,
+                    help="绕 Z 轴静态翻滚角（度）")
+
     a = ap.parse_args()
 
     if not FFMPEG:
@@ -505,6 +570,17 @@ def main():
         base = os.path.splitext(os.path.basename(a.input))[0]
         out_path = base + "_audacious.mp4"
 
+    img_obj = None
+    if a.image:
+        if not os.path.isfile(a.image):
+            print(f"  警告: 贴图文件不存在 {a.image}，忽略贴图", file=sys.stderr)
+        else:
+            try:
+                img_obj = Image.open(a.image).convert("RGBA")
+            except Exception as e:
+                print(f"  警告: 贴图加载失败 {a.image}: {e}，忽略贴图",
+                      file=sys.stderr)
+
     print("[1/3] 读取音频", file=sys.stderr)
     data, sr = load_audio(a.input)
     print(f"      {sr} Hz, {data.shape[1]}ch, {len(data)/sr:.2f}s",
@@ -526,6 +602,10 @@ def main():
         persp=a.persp, x_span=a.x_span, depth=a.depth,
         scale_x=a.scale_x, scale_y=a.scale_y,
         y_offset=a.y_offset,
+        image=img_obj,
+        image_x=a.image_x, image_y=a.image_y, image_z=a.image_z,
+        image_scale=a.image_scale, image_alpha=a.image_alpha,
+        rot_x=a.rot_x, rot_y=a.rot_y, rot_z=a.rot_z,
     )
 
     print(f"[3/3] 渲染 {spec.shape[0]} 帧 → {out_path}",
