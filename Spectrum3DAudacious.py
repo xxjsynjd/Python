@@ -539,6 +539,28 @@ _KF_PROP = {
 # cubic-bezier 默认缓出曲线（bezier 帧未给四元组时使用）
 DEFAULT_BEZIER = (0.25, 0.1, 0.25, 1.0)
 
+# 对象 / 文本 / 关键帧令牌说明：这些令牌由 parse_image_objects 顺序解析，
+# 不注册进 argparse，故集中写到 --help 尾部 epilog。
+OBJECT_EPILOG = """\
+对象 / 文本 / 关键帧令牌（按命令行顺序解析，可与上面选项混用）：
+
+  图像对象：
+    --image-add <id>=<路径>   注册图像对象；--select <id> 选中后续属性作用对象
+    --image-x/y/z <值>        3D 位置；--image-scale <系数> 缩放；--image-alpha 0~1 透明度
+    --image-thickness 0~0.5  沿纵深挤出厚度；--image-solid 实体 3D 具象化
+    --obj-rot-x/y/z <角度>    对象级绕 X/Y/Z 轴旋转（度）
+  文本对象：
+    --text-add <id>=<文本>    注册文本对象；--text-font / --text-size / --text-width /
+                              --text-align center|left|right
+    --text-x/y/z <值>         位置；--text-rot-x/y/z <角度> 旋转；--text-thickness 0~0.5 厚度
+    --text-clip               被前方柱条遮挡裁剪（默认开）；--text-float 浮在最前不被遮挡
+  关键帧动画（多对象独立轨道，相邻段可混用线性 / 贝塞尔）：
+    -ko <id>                  切换当前动画轨道对象（须已注册）
+    -kp <n>                   在当前轨道新建关键帧点；-kt <秒> 当前帧时间（可小数）
+    -ktp linear|bezier        段间插值类型；-kcb x1,y1,x2,y2 bezier cubic-bezier 四元组
+    -k-x/y/z/scale/alpha/thickness/size/rot-x/rot-y/rot-z <值>
+                              当前帧该属性值（image 无 size，text 无 scale）"""
+
 
 def _load_image(path):
     """加载贴图为 RGBA，失败/缺失返回 None 并告警。"""
@@ -930,7 +952,9 @@ def render(spec_db, cfg, out_path):
 
 def main():
     ap = argparse.ArgumentParser(
-        description="Audacious gl-spectrum 风格（第八版）")
+        description="Audacious gl-spectrum 风格（第八版）",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=OBJECT_EPILOG)
     ap.add_argument("input", help="输入音频文件（mp3 / wav / flac / m4a …）")
     ap.add_argument("-o", "--output", default=None, help="输出视频文件（默认按音频名加 _audacious.mp4）")
     ap.add_argument("--fps", type=int, default=60, help="视频帧率")
