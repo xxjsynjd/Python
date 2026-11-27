@@ -8,6 +8,8 @@ LyricsDisplayAI.py —— 歌词显示（AI 对齐 + 上滑 + 对齐/排版/排�
   2. --auto-vocals 用 Demucs 分离人声（带缓存，秒读）
   3. Whisper 对人声轨逐字对齐
   4. 唱到哪弹哪 + 上滑过渡 + 水平对齐 + 排版模式 + 排列方向
+  5. 读取不到歌词时不退出：画面以跨平台等宽字体红字显示
+     “fatal: Unable to read ID3 tag: No Lyrics”
 """
 
 import argparse
@@ -30,6 +32,10 @@ COL_NOW_BASE = (225, 228, 235, 245)
 COL_NOW_HL = (255, 80, 80, 255)
 COL_FUTURE = (170, 178, 190, 225)
 COL_SHADOW = (0, 0, 0, 190)
+
+# 无歌词时画面红字报错文本（等宽字体渲染）
+FATAL_TEXT = "fatal: Unable to read ID3 tag: No Lyrics"
+COL_FATAL = (255, 56, 56, 255)
 
 
 def _decode_ffmpeg(path):
@@ -170,7 +176,9 @@ def load_lyrics(audio_path, lrc_path=None):
         print(f"  歌词来源: ID3 ({len(lines)} 行)", file=sys.stderr)
         return lines
 
-    raise SystemExit("找不到歌词：既没有指定 .lrc，也没有同名 .lrc，也没有 ID3 歌词")
+    print("  未读取到歌词（无指定 .lrc / 同名 .lrc / ID3 歌词）",
+          file=sys.stderr)
+    return []
 
 
 def find_or_create_vocals(audio_path, cache_dir=".vocals_cache"):
@@ -335,6 +343,35 @@ def load_font(path, size):
     return ImageFont.load_default()
 
 
+def load_mono_font(size):
+    """跨平台加载等宽字体（Android Termux / Linux / Windows / macOS）。
+
+    找不到等宽字体时回退到通用字体，再退回 PIL 默认字体。
+    """
+    candidates = (
+        # Android / Termux
+        "/system/fonts/DroidSansMono.ttf",
+        "/data/data/com.termux/files/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",
+        # Linux
+        "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",
+        "/usr/share/fonts/truetype/liberation/LiberationMono-Regular.ttf",
+        "/usr/share/fonts/truetype/noto/NotoSansMono-Regular.ttf",
+        "/usr/share/fonts/truetype/ubuntu/UbuntuMono-R.ttf",
+        # Windows
+        "C:/Windows/Fonts/consola.ttf",
+        "C:/Windows/Fonts/cour.ttf",
+        # macOS
+        "/System/Library/Fonts/Menlo.ttc",
+    )
+    for p in candidates:
+        if os.path.isfile(p):
+            try:
+                return ImageFont.truetype(p, size)
+            except Exception:
+                continue
+    return load_font(None, size)
+
+
 def is_punct(ch):
     return ch in "，。！？、；：,.!?;:—… \t\n\"'（）()《》【】"
 
@@ -358,26 +395,81 @@ def _text_bbox(font, text):
     return font.getbbox(text)
 
 
+def _char_w(font, ch):
+    bbox = font.getbbox(ch)
+    return bbox[2] - bbox[0]
+
+
+def _wrap_idx_h(font, text, max_w):
+    """横排按宽度贪心折行，返回每行对应的原字符索引列表。
+    英文/数字单词整体不拆，优先在空格处断行；单词自身超宽才逐字硬拆。"""
+    n = len(text)
+    if not max_w or max_w <= 0:
+        return [list(range(n))]
+    spans = [m.span() for m in re.finditer(
+        r"[A-Za-z0-9]+(?:[.\-'][A-Za-z0-9]+)*|\s|.", text)]
+    lines_idx, cur_idx, cur_w = [], [], 0
+    for a, b in spans:
+        idx = list(range(a, b))
+        tw = sum(_char_w(font, text[k]) for k in idx)
+        tok = text[a:b]
+        is_word = bool(tok) and not tok.isspace() and re.match(r"[A-Za-z0-9]", tok[0])
+        if cur_idx and cur_w + tw > max_w:
+            lines_idx.append(cur_idx)
+            cur_idx, cur_w = [], 0
+        if is_word and tw > max_w:
+            # 单词比可用宽度还宽：逐字硬拆，保证不横向溢出
+            for k in idx:
+                cw = _char_w(font, text[k])
+                if cur_idx and cur_w + cw > max_w:
+                    lines_idx.append(cur_idx)
+                    cur_idx, cur_w = [k], cw
+                else:
+                    cur_idx.append(k)
+                    cur_w += cw
+        else:
+            cur_idx += idx
+            cur_w += tw
+    if cur_idx:
+        lines_idx.append(cur_idx)
+    return [sl for sl in lines_idx if sl]
+
+
+def wrap_text_h(font, text, max_w):
+    """横排按最大宽度贪心折行，返回行文本列表；max_w 为空/<=0 时不折行。"""
+    if not text:
+        return []
+    if not max_w or max_w <= 0:
+        return [text]
+    return [text[sl[0]:sl[-1] + 1].rstrip()
+            for sl in _wrap_idx_h(font, text, max_w)]
+
+
 def _draw_text_static(canvas, x, y, text, font, col, shadow_col):
     draw = ImageDraw.Draw(canvas, "RGBA")
     draw.text((x + 2, y + 2), text, font=font, fill=shadow_col)
     draw.text((x, y), text, font=font, fill=col)
 
 
-def draw_line_h(canvas, cx, y, text, font, col, shadow_col, align):
-    """横排一行（静态）"""
+def draw_line_h(canvas, cx, y, text, font, col, shadow_col, align, max_w=None):
+    """横排静态句；超出 max_w 时自动折成多行，垂直居中堆叠。"""
     draw = ImageDraw.Draw(canvas, "RGBA")
-    bbox = draw.textbbox((0, 0), text, font=font)
-    tw = bbox[2] - bbox[0]
-    th = bbox[3] - bbox[1]
-    if align == "center":
-        x = cx - tw / 2 - bbox[0]
-    elif align == "left":
-        x = cx - bbox[0]
-    else:
-        x = cx - tw - bbox[0]
-    yy = y - th / 2 - bbox[1]
-    _draw_text_static(canvas, x, yy, text, font, col, shadow_col)
+    lines = wrap_text_h(font, text, max_w)
+    lh = int(font.size * 1.35)
+    total_h = lh * len(lines)
+    for j, line in enumerate(lines):
+        bbox = draw.textbbox((0, 0), line, font=font)
+        tw = bbox[2] - bbox[0]
+        th = bbox[3] - bbox[1]
+        if align == "center":
+            x = cx - tw / 2 - bbox[0]
+        elif align == "left":
+            x = cx - bbox[0]
+        else:
+            x = cx - tw - bbox[0]
+        line_y = y - total_h / 2 + j * lh
+        yy = line_y + lh / 2 - th / 2 - bbox[1]
+        _draw_text_static(canvas, x, yy, line, font, col, shadow_col)
 
 
 def draw_line_v(canvas, cx, cy, text, font, col, shadow_col, align):
@@ -409,28 +501,34 @@ def draw_current_h(canvas, cx, y_center, text, font,
                    char_times, cur_sec,
                    base_col, hl_col, shadow_col,
                    bounce_scale=1.35, bounce_dur=0.18,
-                   align="center"):
-    """横排当前句：逐字弹跳"""
+                   align="center", max_w=None):
+    """横排当前句：逐字弹跳；超出 max_w 时自动折成多行。"""
     n = len(text)
     if n == 0:
         return
-    widths = []
-    for ch in text:
-        bbox = font.getbbox(ch)
-        widths.append(bbox[2] - bbox[0])
-    total_w = sum(widths)
-    if align == "center":
-        x = cx - total_w / 2
-    elif align == "left":
-        x = cx
+    widths = [_char_w(font, ch) for ch in text]
+
+    # 按宽度贪心分行，记录每行的原字符索引（英文单词整体不拆）
+    if max_w and max_w > 0:
+        lines_idx = _wrap_idx_h(font, text, max_w)
     else:
-        x = cx - total_w
+        lines_idx = [list(range(n))]
+
+    row_w = [sum(widths[k] for k in idxs) for idxs in lines_idx]
+    char_row, char_prefix = {}, {}
+    for j, idxs in enumerate(lines_idx):
+        run = 0
+        for k in idxs:
+            char_row[k] = j
+            char_prefix[k] = run
+            run += widths[k]
 
     base_bbox = font.getbbox("测Ag")
     line_h = base_bbox[3] - base_bbox[1]
+    lh = int(line_h * 1.3)
     pad = int(line_h * 0.9)
-    layer_w = int(total_w) + pad * 2
-    layer_h = int(line_h * 2.5) + pad * 2
+    layer_w = int(max(row_w)) + pad * 2
+    layer_h = int(lh * len(lines_idx)) + pad * 2
     layer = Image.new("RGBA", (layer_w, layer_h), (0, 0, 0, 0))
 
     for k in range(n):
@@ -442,8 +540,16 @@ def draw_current_h(canvas, cx, y_center, text, font,
         bbox = font.getbbox(ch)
         cw = bbox[2] - bbox[0]
         ch_h = bbox[3] - bbox[1]
-        char_cx = x + sum(widths[:k]) + cw / 2
-        char_cy = layer_h / 2
+
+        j = char_row[k]
+        if align == "center":
+            row_x = (layer_w - row_w[j]) / 2
+        elif align == "left":
+            row_x = pad
+        else:
+            row_x = layer_w - pad - row_w[j]
+        char_cx_layer = row_x + char_prefix[k] + cw / 2
+        char_cy_layer = pad + lh * (j + 0.5)
 
         if is_punct(ch):
             sx = sy = 1.0
@@ -469,10 +575,8 @@ def draw_current_h(canvas, cx, y_center, text, font,
             cimg = cimg.resize((max(1, int(cw_i * sx)),
                                 max(1, int(ch_i * sy))),
                                Image.BILINEAR)
-        # 图层坐标系里字符中心
-        char_cx_layer = char_cx - x + pad
         paste_x = char_cx_layer - cimg.width / 2
-        paste_y = char_cy - cimg.height / 2 + dy
+        paste_y = char_cy_layer - cimg.height / 2 + dy
         layer.alpha_composite(cimg, (int(paste_x), int(paste_y)))
 
     if align == "center":
@@ -480,7 +584,7 @@ def draw_current_h(canvas, cx, y_center, text, font,
     elif align == "left":
         layer_x = cx - pad
     else:
-        layer_x = cx - total_w - pad
+        layer_x = cx - layer_w + pad
     canvas.alpha_composite(layer, (int(layer_x),
                                    int(y_center - layer_h / 2)))
 
@@ -550,7 +654,7 @@ def draw_lyrics(canvas, cx, cy, lyrics, char_times_map, cur_sec,
                 bounce_scale=1.35, bounce_dur=0.18,
                 scroll_threshold=0.85, scroll_ease="smoothstep",
                 align="center", layout="stack", arrange="h",
-                stagger=60):
+                stagger=60, max_w=None):
     if not lyrics:
         return
     times = [t for t, _ in lyrics]
@@ -599,6 +703,16 @@ def draw_lyrics(canvas, cx, cy, lyrics, char_times_map, cur_sec,
             return 0
         return stagger if (i % 2 == 0) else -stagger
 
+    # ---- 当前句折多行时的纵向避让：把上下紧邻句各推开溢出量的一半 ----
+    h_ov = 0.0
+    if arrange in ("h", "h-stagger") and 0 <= idx < n and max_w:
+        rows_cur = len(wrap_text_h(font_cur, lyrics[idx][1], max_w))
+        if rows_cur > 1:
+            lh_cur = font_cur.size * 1.3
+            pad_cur = font_cur.size * 0.9
+            h_cur = lh_cur * rows_cur + pad_cur * 2
+            h_ov = max(0.0, (h_cur - line_h) / 2.0)
+
     for slot in range(visible_lines):
         offset = slot - (visible_lines // 2)
         i = idx + offset
@@ -606,6 +720,11 @@ def draw_lyrics(canvas, cx, cy, lyrics, char_times_map, cur_sec,
             continue
 
         y = y_start + slot * line_h + scroll_offset + stagger_dy(i)
+        if arrange in ("h", "h-stagger"):
+            if i < idx:
+                y -= int(h_ov)
+            elif i > idx:
+                y += int(h_ov)
         x = cx + stagger_dx(i)
         text = lyrics[i][1]
 
@@ -616,21 +735,21 @@ def draw_lyrics(canvas, cx, cy, lyrics, char_times_map, cur_sec,
                 draw_current_h(canvas, x, y, text, font_cur,
                                char_times_map[i], cur_sec,
                                COL_NOW_BASE, COL_NOW_HL, COL_SHADOW,
-                               bounce_scale, bounce_dur, align)
+                               bounce_scale, bounce_dur, align, max_w)
             else:
                 col = COL_PAST if i < idx else COL_FUTURE
                 draw_line_h(canvas, x, y, text, font_other,
-                            col, COL_SHADOW, align)
+                            col, COL_SHADOW, align, max_w)
         elif arrange == "h-stagger":
             if is_current and i in char_times_map:
                 draw_current_h(canvas, x, y, text, font_cur,
                                char_times_map[i], cur_sec,
                                COL_NOW_BASE, COL_NOW_HL, COL_SHADOW,
-                               bounce_scale, bounce_dur, align)
+                               bounce_scale, bounce_dur, align, max_w)
             else:
                 col = COL_PAST if i < idx else COL_FUTURE
                 draw_line_h(canvas, x, y, text, font_other,
-                            col, COL_SHADOW, align)
+                            col, COL_SHADOW, align, max_w)
         elif arrange == "v":
             if is_current and i in char_times_map:
                 draw_current_v(canvas, x, y, text, font_cur,
@@ -657,9 +776,27 @@ def render(lyrics, char_times_map, total_sec, cfg, out_path):
     W = cfg["width"] // 2 * 2
     H = cfg["height"] // 2 * 2
     fps = cfg["fps"]
+    ratio = cfg.get("width_ratio", 0.8)
+    # 可用宽度占视频宽度的比例，限制在 70%~100%，不按很小的固定值折行
+    ratio = min(1.0, max(0.7, float(ratio)))
+    max_w = int(W * ratio)
     n_frames = max(1, int(math.ceil(total_sec * fps)))
     font_cur = load_font(cfg["font"], cfg["font_size_cur"])
     font_other = load_font(cfg["font"], cfg["font_size_other"])
+
+    # 无歌词报错模式：等宽红字，字号自适应到整行不超出可用宽度
+    fatal = bool(cfg.get("fatal_error", False))
+    mono_font = None
+    if fatal:
+        avail_w = int(W * 0.9)
+        mono_size = max(16, int(H * 0.045))
+        mono_font = load_mono_font(mono_size)
+        while mono_size > 12:
+            bb = mono_font.getbbox(FATAL_TEXT)
+            if bb[2] - bb[0] <= avail_w:
+                break
+            mono_size -= 2
+            mono_font = load_mono_font(mono_size)
 
     cmd = [
         FFMPEG, "-y", "-loglevel", "error",
@@ -680,19 +817,28 @@ def render(lyrics, char_times_map, total_sec, cfg, out_path):
             base = Image.new("RGB", (W, H), BG)
             canvas = base.convert("RGBA")
             cur_sec = i / float(fps)
-            draw_lyrics(canvas, W // 2, int(H * cfg["y_ratio"]),
-                        lyrics, char_times_map, cur_sec,
-                        font_cur, font_other,
-                        visible_lines=cfg["visible_lines"],
-                        line_gap=cfg["line_gap"],
-                        bounce_scale=cfg["bounce_scale"],
-                        bounce_dur=cfg["bounce_dur"],
-                        scroll_threshold=cfg["scroll_threshold"],
-                        scroll_ease=cfg["scroll_ease"],
-                        align=cfg["align"],
-                        layout=cfg["layout"],
-                        arrange=cfg["arrange"],
-                        stagger=cfg["stagger"])
+            if fatal:
+                d = ImageDraw.Draw(canvas)
+                bb = mono_font.getbbox(FATAL_TEXT)
+                tw, th = bb[2] - bb[0], bb[3] - bb[1]
+                tx = (W - tw) // 2 - bb[0]
+                ty = (H - th) // 2 - bb[1]
+                d.text((tx, ty), FATAL_TEXT, font=mono_font, fill=COL_FATAL)
+            else:
+                draw_lyrics(canvas, W // 2, int(H * cfg["y_ratio"]),
+                            lyrics, char_times_map, cur_sec,
+                            font_cur, font_other,
+                            visible_lines=cfg["visible_lines"],
+                            line_gap=cfg["line_gap"],
+                            bounce_scale=cfg["bounce_scale"],
+                            bounce_dur=cfg["bounce_dur"],
+                            scroll_threshold=cfg["scroll_threshold"],
+                            scroll_ease=cfg["scroll_ease"],
+                            align=cfg["align"],
+                            layout=cfg["layout"],
+                            arrange=cfg["arrange"],
+                            stagger=cfg["stagger"],
+                            max_w=max_w)
             proc.stdin.write(canvas.convert("RGB").tobytes("raw", "RGB"))
             if i % report == 0:
                 print(f"\r渲染中… {i * 100 // n_frames:3d}%",
@@ -708,31 +854,32 @@ def render(lyrics, char_times_map, total_sec, cfg, out_path):
 
 def main():
     ap = argparse.ArgumentParser(description="歌词显示（AI 对齐 + 全排版）")
-    ap.add_argument("input")
-    ap.add_argument("-o", "--output", default=None)
-    ap.add_argument("--fps", type=int, default=30)
-    ap.add_argument("--width", type=int, default=720)
-    ap.add_argument("--height", type=int, default=1280)
+    ap.add_argument("input", help="输入音频文件（mp3 / wav / flac / m4a …）")
+    ap.add_argument("-o", "--output", default=None, help="输出视频文件")
+    ap.add_argument("--fps", type=int, default=30, help="视频帧率")
+    ap.add_argument("--width", type=int, default=720, help="画面宽度（px）")
+    ap.add_argument("--height", type=int, default=1280, help="画面高度（px）")
     ap.add_argument("--model", default="base",
                     help="whisper 模型: tiny / base / small / medium")
     ap.add_argument("--lang", default="zh", help="语言代码")
     ap.add_argument("--auto-vocals", dest="auto_vocals",
                     action="store_true", help="Demucs 分离人声后再对齐")
-    ap.add_argument("--cache-dir", default=".vocals_cache")
-    ap.add_argument("--vocals", default=None)
+    ap.add_argument("--cache-dir", default=".vocals_cache", help="人声分离中间结果缓存目录")
+    ap.add_argument("--vocals", default=None, help="直接指定已分离好的人声音频文件（跳过分离）")
     ap.add_argument("--lrc", default=None,
                     help="手动指定 .lrc 文件路径")
-    ap.add_argument("--font", default=None)
-    ap.add_argument("--font-size-cur", type=int, default=52)
-    ap.add_argument("--font-size-other", type=int, default=36)
-    ap.add_argument("--visible-lines", type=int, default=5)
-    ap.add_argument("--line-gap", type=float, default=1.7)
-    ap.add_argument("--y-ratio", type=float, default=0.5)
-    ap.add_argument("--bounce-scale", type=float, default=1.35)
-    ap.add_argument("--bounce-dur", type=float, default=0.18)
-    ap.add_argument("--scroll-threshold", type=float, default=0.85)
+    ap.add_argument("--font", default=None, help="中文字体路径")
+    ap.add_argument("--font-size-cur", type=int, default=52, help="当前高亮行字号（px）")
+    ap.add_argument("--font-size-other", type=int, default=36, help="其它行字号（px）")
+    ap.add_argument("--visible-lines", type=int, default=5, help="屏幕同时显示的歌词行数")
+    ap.add_argument("--line-gap", type=float, default=1.7, help="行间距倍数（相对行高）")
+    ap.add_argument("--y-ratio", type=float, default=0.5, help="歌词整体纵向位置 0~1")
+    ap.add_argument("--bounce-scale", type=float, default=1.35, help="当前行弹跳放大倍数")
+    ap.add_argument("--bounce-dur", type=float, default=0.18, help="弹跳动画时长（秒）")
+    ap.add_argument("--scroll-threshold", type=float, default=0.85, help="触发滚动的进度阈值 0~1")
     ap.add_argument("--scroll-ease", default="smoothstep",
-                    choices=["linear", "smoothstep", "smootherstep", "easeout"])
+                    choices=["linear", "smoothstep", "smootherstep", "easeout"],
+                    help="滚动缓动曲线")
     ap.add_argument("--align", default="center",
                     choices=["left", "center", "right"],
                     help="水平对齐（或竖排时的顶/中/底对齐）")
@@ -744,6 +891,9 @@ def main():
                     help="排列方式：h=横排；v=竖排；h-stagger=横排错开；v-stagger=竖排错开")
     ap.add_argument("--stagger", type=int, default=60,
                     help="错开模式下的像素偏移量")
+    ap.add_argument("--width-ratio", type=float, default=0.8,
+                    help="横排可用宽度占视频宽度的比例（0.7~1.0），默认 0.8；"
+                         "超出该宽度的句子自动折行")
     a = ap.parse_args()
 
     if not FFMPEG:
@@ -761,41 +911,48 @@ def main():
 
     print("[2/4] 读取歌词", file=sys.stderr)
     lyrics = load_lyrics(a.input, a.lrc)
-    for t, txt in lyrics[:3]:
-        print(f"      [{t:6.2f}s] {txt}", file=sys.stderr)
-
-    align_path = a.input
-    if a.vocals and os.path.isfile(a.vocals):
-        align_path = a.vocals
-        print(f"      人声轨: {a.vocals}", file=sys.stderr)
-    elif a.auto_vocals:
-        vp = find_or_create_vocals(a.input, a.cache_dir)
-        if vp:
-            align_path = vp
-            print(f"      使用人声: {vp}", file=sys.stderr)
-        else:
-            print("      分离失败，退回原曲", file=sys.stderr)
-
-    print("[3/4] AI 逐字对齐", file=sys.stderr)
-    char_times = align_words_with_whisper(align_path, lyrics,
-                                          a.model, a.lang)
+    no_lyrics = len(lyrics) == 0
+    if no_lyrics:
+        print("      未读取到歌词：画面将以等宽红字报错提示", file=sys.stderr)
+    else:
+        for t, txt in lyrics[:3]:
+            print(f"      [{t:6.2f}s] {txt}", file=sys.stderr)
 
     char_times_map = {}
-    if char_times:
-        pos = 0
-        for i, (t, txt) in enumerate(lyrics):
-            n = len(txt)
-            char_times_map[i] = char_times[pos:pos + n]
-            pos += n
-        print(f"      对齐 {len(char_times)} 个字", file=sys.stderr)
+    if not no_lyrics:
+        align_path = a.input
+        if a.vocals and os.path.isfile(a.vocals):
+            align_path = a.vocals
+            print(f"      人声轨: {a.vocals}", file=sys.stderr)
+        elif a.auto_vocals:
+            vp = find_or_create_vocals(a.input, a.cache_dir)
+            if vp:
+                align_path = vp
+                print(f"      使用人声: {vp}", file=sys.stderr)
+            else:
+                print("      分离失败，退回原曲", file=sys.stderr)
+
+        print("[3/4] AI 逐字对齐", file=sys.stderr)
+        char_times = align_words_with_whisper(align_path, lyrics,
+                                              a.model, a.lang)
+
+        if char_times:
+            pos = 0
+            for i, (t, txt) in enumerate(lyrics):
+                n = len(txt)
+                char_times_map[i] = char_times[pos:pos + n]
+                pos += n
+            print(f"      对齐 {len(char_times)} 个字", file=sys.stderr)
+        else:
+            for i, (t, txt) in enumerate(lyrics):
+                t_end = lyrics[i + 1][0] if i + 1 < len(lyrics) else t + 4.0
+                n = len(txt)
+                step = (t_end - t) / max(n, 1)
+                char_times_map[i] = [(txt[k], t + k * step, t + (k + 1) * step)
+                                     for k in range(n)]
+            print("      使用均匀分配（无 AI 时间戳）", file=sys.stderr)
     else:
-        for i, (t, txt) in enumerate(lyrics):
-            t_end = lyrics[i + 1][0] if i + 1 < len(lyrics) else t + 4.0
-            n = len(txt)
-            step = (t_end - t) / max(n, 1)
-            char_times_map[i] = [(txt[k], t + k * step, t + (k + 1) * step)
-                                 for k in range(n)]
-        print("      使用均匀分配（无 AI 时间戳）", file=sys.stderr)
+        print("[3/4] 跳过 AI 对齐（无歌词）", file=sys.stderr)
 
     cfg = dict(
         input=a.input, fps=a.fps, width=a.width, height=a.height,
@@ -813,6 +970,8 @@ def main():
         layout=a.layout,
         arrange=a.arrange,
         stagger=a.stagger,
+        width_ratio=a.width_ratio,
+        fatal_error=no_lyrics,
     )
 
     print(f"[4/4] 渲染 {int(total_sec * a.fps)} 帧 → {out_path}",

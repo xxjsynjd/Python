@@ -36,18 +36,18 @@ MODES = {
     "vibration":  ("VibrationMeter.py", "_vib.mp4", []),
     "noisegate":  ("NoiseGateMeter.py", "_gate.mp4", []),
     "phase":      ("PhaseMeter.py", "_phase.mp4", []),
+    "scope":      ("Oscilloscope.py", "_scope.mp4", []),
     "timeline":   ("TimelineRoll.py", "_timeline.mp4", []),
-    "pitch":      ("PitchMeter1.py", "_pitch.mp4", ["--auto-vocals"]),
+    "pitch":      ("PitchMeter.py", "_pitch.mp4", ["--auto-vocals"]),
     "lyrics":     ("LyricsDisplayAI.py", "_lyrics.mp4", [
         "--auto-vocals", "--model", "base", "--lang", "zh",
     ]),
     "progress":   ("ProgressBar.py", "_progress.mp4", []),
     "speaker":    ("SpeakerMeter.py", "_speaker.mp4", []),
-    "physics":    ("SpeakerPhysics.py", "_physics.mp4", []),
+    "status":     ("StatusBarOverlay.py", "_status.mp4", []),
+    "TitleLineBar":("TitleLineBar.py", "_title.mp4", []),
     "wmp":        ("WMPVisualizer.py", "_wmp.mp4", []),
-    "waterfall":  ("WaterfallWMP.py", "_waterfall.mp4", []),
-    "waterfall3d":("Waterfall3D.py", "_wf3d.mp4", []),
-    "vu":         ("VU_Meter.py", "_vu.mp4", []),
+    "vu":         ("VU_Meter.py", "_meter.mp4", []),
 }
 
 DEFAULT_ORDER = list(MODES.keys())
@@ -100,9 +100,9 @@ def main():
     ap.add_argument("--modes", default="all",
                     help="要跑的模式，逗号分隔，或 all。可选: " +
                          ",".join(MODES.keys()))
-    ap.add_argument("--width", type=int, default=720)
-    ap.add_argument("--height", type=int, default=1280)
-    ap.add_argument("--fps", type=int, default=30)
+    ap.add_argument("--width", type=int, default=720, help="各模式画面宽度（px）")
+    ap.add_argument("--height", type=int, default=1280, help="各模式画面高度（px）")
+    ap.add_argument("--fps", type=int, default=30, help="各模式视频帧率")
     ap.add_argument("--skip-existing", action="store_true",
                     help="已存在的跳过")
     ap.add_argument("--no-auto-vocals", action="store_true",

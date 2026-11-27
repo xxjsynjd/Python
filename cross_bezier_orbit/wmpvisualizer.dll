@@ -1,0 +1,163 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+# ==============================================================================
+# cross_bezier_orbit —— 左右双贝塞尔交叉旋转场景
+#
+# 契约（twmpxpem 插件）：
+#   audio_tick(data, spectrum, dt)  逻辑更新
+#   video_render(screen, data, audio_data)  画面渲染
+#
+# 视觉：
+#   - 左右两条三次贝塞尔曲线（两端锚点 + 两个控制柄），互为镜像在中心交叉成 X
+#   - 整体绕画面中心顺时针自转
+#   - 整体按音量（bass/treble 均值）比例缩放；控制柄随各自声道能量外扩
+#   - 示波器余晖模糊范式：旧残影先高斯模糊扩散，再向背景淡出，最后叠加当前轮廓
+# ==============================================================================
+
+import math
+
+import pygame
+
+# ---- 视觉常量 ----
+BG_COLOR = (15, 15, 25)
+LEFT_COL = (0, 255, 180)      # 左条（低音 / bass）荧光青
+RIGHT_COL = (255, 94, 184)    # 右条（高音 / treble）品红
+LINE_W = 3
+SAMPLES = 64                  # 每条贝塞尔采样点数
+ROT_SPEED = 0.55              # 顺时针自转角速度（弧度 / 秒）
+SCALE_BASE = 0.62             # 静态基础缩放（相对画面短边）
+SCALE_BOOST = 0.55            # 音量带来的额外缩放幅度
+TRAIL_DECAY = 0.86            # 余晖每帧残留系数（越大拖尾越长）
+BLUR_RADIUS = 1.4             # 余晖高斯模糊半径（像素）
+
+_state = {}
+
+
+def _chan_energy(spectrum, side):
+    """取某一侧能量；兼容未来 waves 结构，缺失时回退 bass / treble。"""
+    waves = spectrum.get("waves")
+    ch = "ch0" if side == "L" else "ch1"
+    if isinstance(waves, dict) and ch in waves:
+        vals = waves[ch]
+        if vals:
+            return min(1.0, math.sqrt(sum(v * v for v in vals) / len(vals)))
+    if side == "L":
+        return float(spectrum.get("bass", 0.0))
+    return float(spectrum.get("treble", 0.0))
+
+
+def audio_tick(data, spectrum, dt):
+    bass = _chan_energy(spectrum, "L")
+    treble = _chan_energy(spectrum, "R")
+    level = (bass + treble) * 0.5
+
+    st = _state
+    if not st:
+        st.update({
+            "rot": 0.0,
+            "bass": bass,
+            "treble": treble,
+            "level": level,
+            "trail": None,
+        })
+
+    # 平滑跟随，避免电平跳变
+    st["bass"] += (bass - st["bass"]) * 0.25
+    st["treble"] += (treble - st["treble"]) * 0.25
+    st["level"] += (level - st["level"]) * 0.18
+    # 顺时针自转（屏幕 y 轴向下，正角在视觉上即顺时针）
+    st["rot"] += ROT_SPEED * dt
+
+
+def _cubic(p0, p1, p2, p3, t):
+    """三次贝塞尔插值。"""
+    u = 1.0 - t
+    x = u ** 3 * p0[0] + 3 * u * u * t * p1[0] + 3 * u * t * t * p2[0] + t ** 3 * p3[0]
+    y = u ** 3 * p0[1] + 3 * u * u * t * p1[1] + 3 * u * t * t * p2[1] + t ** 3 * p3[1]
+    return x, y
+
+
+def _bezier_points(p0, p1, p2, p3, n):
+    return [_cubic(p0, p1, p2, p3, i / (n - 1)) for i in range(n)]
+
+
+def _rotate(x, y, ang):
+    c, s = math.cos(ang), math.sin(ang)
+    return x * c - y * s, x * s + y * c
+
+
+def video_render(screen, data, audio_data):
+    W, H = screen.get_size()
+    cx, cy = W / 2.0, H / 2.0
+    st = _state
+    if not st:
+        audio_tick(None, audio_data or {}, 1.0 / 30)
+
+    # 余晖缓冲按需创建 / 尺寸变化时重建
+    if st["trail"] is None or st["trail"].get_size() != (W, H):
+        trail = pygame.Surface((W, H))
+        trail.fill(BG_COLOR)
+        st["trail"] = trail
+    trail = st["trail"]
+
+    level = st["level"]
+    scale = SCALE_BASE + level * SCALE_BOOST
+    half = min(W, H) * 0.34
+    rot = st["rot"]
+
+    def build(side):
+        e = st["bass"] if side == "L" else st["treble"]
+        spread = 1.0 + 0.9 * e  # 控制柄随该侧能量外扩
+        if side == "L":
+            p0 = (-half, 0.0)
+            p1 = (-half * 0.35, -half * 0.8 * spread)
+            p2 = ( half * 0.35,  half * 0.8 * spread)
+            p3 = ( half, 0.0)
+            col = LEFT_COL
+        else:
+            p0 = ( half, 0.0)
+            p1 = ( half * 0.35, -half * 0.8 * spread)
+            p2 = (-half * 0.35,  half * 0.8 * spread)
+            p3 = (-half, 0.0)
+            col = RIGHT_COL
+
+        pts = _bezier_points(p0, p1, p2, p3, SAMPLES)
+        out = []
+        for x, y in pts:
+            x *= scale
+            y *= scale
+            rx, ry = _rotate(x, y, rot)
+            out.append((cx + rx, cy + ry))
+        return out, col
+
+    # 当前帧轮廓层（透明）
+    layer = pygame.Surface((W, H), pygame.SRCALPHA)
+    for side in ("L", "R"):
+        pts, col = build(side)
+        if len(pts) >= 2:
+            pygame.draw.lines(layer, col, False, pts, LINE_W)
+
+    # —— 示波器模糊范式：旧余晖先高斯模糊扩散，再向背景淡出，最后叠加当前轮廓 ——
+    try:
+        from PIL import Image, ImageFilter
+        blur_img = Image.frombytes("RGB", (W, H), pygame.image.tostring(trail, "RGB"))
+        blur_img = blur_img.filter(ImageFilter.GaussianBlur(BLUR_RADIUS))
+        trail = pygame.image.fromstring(blur_img.tobytes(), (W, H), "RGB")
+    except Exception:
+        # 无 PIL 时退化为缩小再放大的 box 模糊近似
+        small = pygame.transform.smoothscale(
+            trail, (max(1, W // 2), max(1, H // 2)))
+        trail = pygame.transform.smoothscale(small, (W, H))
+
+    # 向背景淡出（残留系数 TRAIL_DECAY）
+    fade_alpha = int(255 * (1.0 - TRAIL_DECAY))
+    overlay = pygame.Surface((W, H))
+    overlay.fill(BG_COLOR)
+    overlay.set_alpha(fade_alpha)
+    trail.blit(overlay, (0, 0))
+
+    # 叠加当前轮廓
+    trail.blit(layer, (0, 0))
+    st["trail"] = trail
+
+    screen.blit(trail, (0, 0))

@@ -299,11 +299,11 @@ def render(db, state, since, cfg, out_path):
 def main():
     ap = argparse.ArgumentParser(
         description="噪声门指示灯（迟滞 + 保持 + 阈值标尺）")
-    ap.add_argument("input")
-    ap.add_argument("-o", "--output", default=None)
-    ap.add_argument("--fps", type=int, default=60)
-    ap.add_argument("--width", type=int, default=1280)
-    ap.add_argument("--height", type=int, default=720)
+    ap.add_argument("input", help="输入音频文件（mp3 / wav / flac / m4a …）")
+    ap.add_argument("-o", "--output", default=None, help="输出视频文件")
+    ap.add_argument("--fps", type=int, default=60, help="视频帧率")
+    ap.add_argument("--width", type=int, default=1280, help="画面宽度（px）")
+    ap.add_argument("--height", type=int, default=720, help="画面高度（px）")
 
     ap.add_argument("--open", dest="open_db", type=float, default=-30.0,
                     help="开阈值 dB")

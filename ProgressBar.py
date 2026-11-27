@@ -274,11 +274,11 @@ def render(total_sec, cfg, out_path):
 # ==========================================================================
 def main():
     ap = argparse.ArgumentParser(description="纯播放进度条")
-    ap.add_argument("input")
-    ap.add_argument("-o", "--output", default=None)
-    ap.add_argument("--fps", type=int, default=60)
-    ap.add_argument("--width", type=int, default=1280)
-    ap.add_argument("--height", type=int, default=720)
+    ap.add_argument("input", help="输入音频文件（mp3 / wav / flac / m4a …）")
+    ap.add_argument("-o", "--output", default=None, help="输出视频文件")
+    ap.add_argument("--fps", type=int, default=60, help="视频帧率")
+    ap.add_argument("--width", type=int, default=1280, help="画面宽度（px）")
+    ap.add_argument("--height", type=int, default=720, help="画面高度（px）")
 
     ap.add_argument("--thickness", type=int, default=14,
                     help="进度条厚度 px")
@@ -288,20 +288,16 @@ def main():
                     help="纵向位置 0~1")
 
     ap.add_argument("--font", default=None, help="中文字体路径")
-    ap.add_argument("--font-size", type=int, default=22)
+    ap.add_argument("--font-size", type=int, default=22, help="时间文字字号（px）")
 
     ap.add_argument("--show-time", dest="show_time",
                     action="store_true", help="显示时间文字（默认开）")
-    ap.add_argument("--no-time", dest="show_time",
-                    action="store_false")
     ap.set_defaults(show_time=True)
 
     ap.add_argument("--show-countdown", dest="show_countdown",
                     action="store_true", help="显示剩余时间倒计时")
     ap.set_defaults(show_countdown=False)
 
-    ap.add_argument("--no-knob", dest="knob",
-                    action="store_false", help="不显示拖拽圆点")
     ap.set_defaults(knob=True)
 
     a = ap.parse_args()

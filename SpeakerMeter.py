@@ -338,17 +338,17 @@ def render(sub, tw, cfg, out_path):
 # ==========================================================================
 def main():
     ap = argparse.ArgumentParser(description="低音炮 + 高音喇叭模拟仪")
-    ap.add_argument("input")
-    ap.add_argument("-o", "--output", default=None)
-    ap.add_argument("--fps", type=int, default=60)
-    ap.add_argument("--width", type=int, default=1280)
-    ap.add_argument("--height", type=int, default=720)
+    ap.add_argument("input", help="输入音频文件（mp3 / wav / flac / m4a …）")
+    ap.add_argument("-o", "--output", default=None, help="输出视频文件")
+    ap.add_argument("--fps", type=int, default=60, help="视频帧率")
+    ap.add_argument("--width", type=int, default=1280, help="画面宽度（px）")
+    ap.add_argument("--height", type=int, default=720, help="画面高度（px）")
 
     ap.add_argument("--sub-max", type=float, default=200.0,
                     help="低音分频点 Hz")
     ap.add_argument("--tweet-min", type=float, default=4000.0,
                     help="高音分频点 Hz")
-    ap.add_argument("--fft-size", type=int, default=4096)
+    ap.add_argument("--fft-size", type=int, default=4096, help="FFT 窗大小（点数，自动取 2 的幂）")
 
     a = ap.parse_args()
 
