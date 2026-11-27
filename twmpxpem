@@ -379,37 +379,83 @@ class TwmpxpemManager:
     # ==========================================================================
     # 6. 开发者打包工具 (wheel)
     # ==========================================================================
-    def wheel(self, source_dir):
+    # 打包时排除的目录名（构建/版本控制/IDE 产物）
+    WHEEL_EXCLUDE_DIRS = {"__pycache__", ".git", ".svn", ".hg", ".idea", ".vscode"}
+    # 打包时排除的文件后缀（缓存、备份、旧包、日志等）
+    WHEEL_EXCLUDE_SUFFIX = (".pyc", ".pyo", ".bak", ".wvwhl", ".whl", ".log")
+
+    def wheel(self, source_dir, output=None):
         if not os.path.isdir(source_dir):
             self._log("ERROR", f"路径无效: {source_dir}")
-            return
+            return None
+
         toml_path = os.path.join(source_dir, "twmpxpem-project.toml")
         if not os.path.exists(toml_path):
             self._log("ERROR", "缺少 twmpxpem-project.toml")
-            return
-        
-        with open(toml_path, "rb") as f:
-            config = tomllib.load(f)
-        name = config["project"]["name"]
-        version = config["project"]["version"]
-        
-        output = f"{name}-{version}.wvwhl"
-        self._log("INFO", f"正在打包至: {output}")
-        
-        with zipfile.ZipFile(output, 'w', zipfile.ZIP_DEFLATED) as zf:
-            for root, _, files in os.walk(source_dir):
-                for file in files:
-                    file_path = os.path.join(root, file)
-                    arcname = os.path.relpath(file_path, source_dir)
-                    zf.write(file_path, arcname)
-        
-        # 魔改加壳
-        with open(output, 'rb') as f:
+            return None
+
+        # 解析配置并做契约字段校验
+        try:
+            with open(toml_path, "rb") as f:
+                config = tomllib.load(f)
+        except Exception as e:
+            self._log("ERROR", f"解析 twmpxpem-project.toml 失败: {e}")
+            return None
+
+        project = config.get("project", {})
+        name = project.get("name")
+        version = project.get("version")
+        category = project.get("category")
+        if not name or not version:
+            self._log("ERROR", "[project] 缺少必填字段 name 或 version")
+            return None
+        if not category:
+            self._log("WARN", "未填写 category，安装/加载时可能被引擎拒绝")
+
+        # 契约入口文件校验
+        entry = os.path.join(source_dir, "wmpvisualizer.dll")
+        if not os.path.exists(entry):
+            self._log("ERROR", "缺少插件入口文件 wmpvisualizer.dll（契约要求）")
+            return None
+
+        # 收集待打包文件（剔除构建垃圾与隐藏文件）
+        packed = []
+        for root, dirs, files in os.walk(source_dir):
+            dirs[:] = [d for d in dirs if d not in self.WHEEL_EXCLUDE_DIRS and not d.startswith(".")]
+            for file in files:
+                if file.startswith("."):
+                    continue
+                if file.lower().endswith(self.WHEEL_EXCLUDE_SUFFIX):
+                    continue
+                file_path = os.path.join(root, file)
+                arcname = os.path.relpath(file_path, source_dir)
+                packed.append((file_path, arcname))
+
+        if not packed:
+            self._log("ERROR", "目录内没有可打包的文件")
+            return None
+
+        if output:
+            out_dir = os.path.dirname(os.path.abspath(output))
+            os.makedirs(out_dir, exist_ok=True)
+            out_path = output
+        else:
+            out_path = f"{name}-{version}.wvwhl"
+
+        self._log("INFO", f"正在打包至: {out_path}")
+        with zipfile.ZipFile(out_path, 'w', zipfile.ZIP_DEFLATED) as zf:
+            for file_path, arcname in packed:
+                zf.write(file_path, arcname)
+
+        # 魔改加壳（与 install 端脱壳逻辑对应：首 4 字节 PK\x03\x04 -> TWMP）
+        with open(out_path, 'rb') as f:
             data = f.read()
         if data.startswith(STANDARD_ZIP_HEADER):
-            with open(output, 'wb') as f:
+            with open(out_path, 'wb') as f:
                 f.write(MAGIC_HEADER + data[4:])
-        self._log("DONE", f"🎉 打包完成: {output}")
+
+        self._log("DONE", f"🎉 打包完成: {out_path}（共 {len(packed)} 个文件）")
+        return out_path
 
 # ==============================================================================
 # CLI 入口
@@ -449,6 +495,7 @@ def main():
     # wheel
     p_wheel = subparsers.add_parser("wheel", help="打包插件")
     p_wheel.add_argument("source_dir")
+    p_wheel.add_argument("-o", "--output", help="输出 .wvwhl 路径（默认 名称-版本.wvwhl）")
 
     args = parser.parse_args()
     manager = TwmpxpemManager(verbosity=args.verbose)
@@ -469,7 +516,7 @@ def main():
     elif args.command == "fix-broken":
         manager.fix_broken()
     elif args.command == "wheel":
-        manager.wheel(args.source_dir)
+        manager.wheel(args.source_dir, output=args.output)
 
 if __name__ == "__main__":
     main()
