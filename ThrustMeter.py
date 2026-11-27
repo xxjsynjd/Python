@@ -255,9 +255,9 @@ def main():
     ap.add_argument("input", help="输入音频文件")
     ap.add_argument("-o", "--output", default=None, help="输出视频文件")
 
-    ap.add_argument("--fps", type=int, default=60)
-    ap.add_argument("--width", type=int, default=1280)
-    ap.add_argument("--height", type=int, default=720)
+    ap.add_argument("--fps", type=int, default=60, help="视频帧率")
+    ap.add_argument("--width", type=int, default=1280, help="画面宽度（px）")
+    ap.add_argument("--height", type=int, default=720, help="画面高度（px）")
 
     ap.add_argument("--window", type=float, default=40.0,
                     help="推力计算窗口（毫秒）")
@@ -268,8 +268,6 @@ def main():
     ap.add_argument("--seg", type=int, default=4,
                     help="分段刻痕像素，0 表示不分段")
 
-    ap.add_argument("--no-peak-hold", dest="peak_hold",
-                    action="store_false", help="关闭峰值保持")
     ap.set_defaults(peak_hold=True)
 
     a = ap.parse_args()

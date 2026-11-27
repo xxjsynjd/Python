@@ -1,0 +1,8 @@
+[project]
+name = "cross_bezier_orbit"
+version = "1.0.0"
+category = "video-effects"
+author = "xxjsynjd"
+description = "左右声道双三次贝塞尔曲线交叉成 X，整体顺时针自转，按音量比例缩放；示波器余晖模糊拖尾范式"
+dependencies = ["pygame"]
+# 注: Pillow 为可选增强依赖（高斯模糊）；缺失时插件自动退化为缩放 box 模糊近似。

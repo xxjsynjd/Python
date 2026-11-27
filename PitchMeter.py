@@ -721,35 +721,35 @@ def main():
     ap.add_argument("--vocals", default=None,
                     help="手动指定人声轨（覆盖 --auto-vocals）")
 
-    ap.add_argument("--fps", type=int, default=60)
-    ap.add_argument("--width", type=int, default=1280)
-    ap.add_argument("--height", type=int, default=720)
+    ap.add_argument("--fps", type=int, default=60, help="视频帧率")
+    ap.add_argument("--width", type=int, default=1280, help="画面宽度（px）")
+    ap.add_argument("--height", type=int, default=720, help="画面高度（px）")
 
-    ap.add_argument("--fmin", type=float, default=80.0)
-    ap.add_argument("--fmax", type=float, default=1000.0)
-    ap.add_argument("--frame-ms", type=float, default=60.0)
-    ap.add_argument("--threshold", type=float, default=0.08)
-    ap.add_argument("--hold-ms", type=float, default=150.0)
-    ap.add_argument("--energy-gate", type=float, default=-50.0)
+    ap.add_argument("--fmin", type=float, default=80.0, help="音高检测最低频率（Hz）")
+    ap.add_argument("--fmax", type=float, default=1000.0, help="音高检测最高频率（Hz）")
+    ap.add_argument("--frame-ms", type=float, default=60.0, help="分析帧长（毫秒）")
+    ap.add_argument("--threshold", type=float, default=0.08, help="音高检测置信阈值（越小越敏感）")
+    ap.add_argument("--hold-ms", type=float, default=150.0, help="音高保持时间（毫秒），防止抖动")
+    ap.add_argument("--energy-gate", type=float, default=-50.0, help="能量门限（dB），低于判为无声")
 
-    ap.add_argument("--width-ratio", type=float, default=0.9)
-    ap.add_argument("--height-px", type=int, default=300)
-    ap.add_argument("--y-ratio", type=float, default=0.35)
-    ap.add_argument("--window-sec", type=float, default=8.0)
+    ap.add_argument("--width-ratio", type=float, default=0.9, help="轨迹区宽度占画面比例")
+    ap.add_argument("--height-px", type=int, default=300, help="音高轨迹区高度（px）")
+    ap.add_argument("--y-ratio", type=float, default=0.35, help="轨迹区纵向位置 0~1")
+    ap.add_argument("--window-sec", type=float, default=8.0, help="滚动时间窗长度（秒）")
 
-    ap.add_argument("--line-width", type=int, default=5)
-    ap.add_argument("--dot-size", type=int, default=5)
+    ap.add_argument("--line-width", type=int, default=5, help="音高轨迹线宽（px）")
+    ap.add_argument("--dot-size", type=int, default=5, help="音高标记点大小（px）")
 
-    ap.add_argument("--beats-per-bar", type=int, default=4)
-    ap.add_argument("--beat-unit", type=int, default=4)
-    ap.add_argument("--beat-offset", type=float, default=0.0)
+    ap.add_argument("--beats-per-bar", type=int, default=4, help="每小节拍数")
+    ap.add_argument("--beat-unit", type=int, default=4, help="节拍分母（几分音符为一拍）")
+    ap.add_argument("--beat-offset", type=float, default=0.0, help="节拍起始偏移（拍）")
     ap.add_argument("--bpm", type=float, default=0.0,
                     help="手动 BPM，0=自动检测")
 
-    ap.add_argument("--gliss-semitones", type=float, default=2.0)
-    ap.add_argument("--gliss-win", type=float, default=0.12)
-    ap.add_argument("--legato-min", type=float, default=0.35)
-    ap.add_argument("--legato-jitter", type=float, default=0.35)
+    ap.add_argument("--gliss-semitones", type=float, default=2.0, help="判定滑音的半音阈值")
+    ap.add_argument("--gliss-win", type=float, default=0.12, help="滑音检测窗口（秒）")
+    ap.add_argument("--legato-min", type=float, default=0.35, help="连音最短时长（秒）")
+    ap.add_argument("--legato-jitter", type=float, default=0.35, help="连音允许抖动（半音）")
 
     a = ap.parse_args()
 

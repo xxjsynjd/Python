@@ -9,11 +9,13 @@ import os
 import sys
 import json
 import shutil
+import hashlib
 import argparse
 import zipfile
 import io
 import subprocess
 import urllib.request
+import time
 from datetime import datetime
 
 try:
@@ -39,6 +41,9 @@ SOURCES_D = os.path.join(ETC_DIR, "sources.list.d")
 MAGIC_HEADER = b'TWMP'
 STANDARD_ZIP_HEADER = b'PK\x03\x04'
 
+# --- Debian 索引架构（Store 产物为 all 架构）---
+INDEX_ARCH = "all"
+
 class TwmpxpemManager:
     def __init__(self, verbosity=0, debug=False, bash_print=False):
         self.verbosity = verbosity
@@ -46,6 +51,7 @@ class TwmpxpemManager:
         self.bash_print = bash_print
         self._ensure_dirs()
         self.db = self._load_status()
+        self._index_cache = {}
 
     def _ensure_dirs(self):
         os.makedirs(INFO_DIR, exist_ok=True)
@@ -62,12 +68,38 @@ class TwmpxpemManager:
                 f.write("# 默认官方源\nwvwhl https://repo.twmpxpem.dev/xp/ stable main\n")
 
     def _load_status(self):
-        with open(STATUS_FILE, "r") as f:
-            return json.load(f)
+        if not os.path.exists(STATUS_FILE):
+            return {}
+        try:
+            with open(STATUS_FILE, "r") as f:
+                data = json.load(f)
+            if not isinstance(data, dict):
+                raise ValueError("状态文件根节点不是对象")
+            return data
+        except (json.JSONDecodeError, ValueError, OSError) as e:
+            # 状态损坏：备份坏文件后回退空状态，避免管理器启动即崩
+            bak = STATUS_FILE + ".corrupt"
+            try:
+                shutil.copy(STATUS_FILE, bak)
+            except OSError:
+                bak = "<备份失败>"
+            print(f"[WARN] 状态文件损坏，已备份至 {bak} 并重置为空状态: {e}")
+            # 同步把空状态原子落盘，避免下次启动再次读到坏文件重复告警
+            try:
+                tmp = STATUS_FILE + ".tmp"
+                with open(tmp, "w") as f:
+                    json.dump({}, f)
+                os.replace(tmp, STATUS_FILE)
+            except OSError:
+                pass
+            return {}
 
     def _save_status(self):
-        with open(STATUS_FILE, "w") as f:
+        # 先写临时文件再原子替换，避免写到一半被打断导致 status 截断损坏
+        tmp = STATUS_FILE + ".tmp"
+        with open(tmp, "w") as f:
             json.dump(self.db, f, indent=4)
+        os.replace(tmp, STATUS_FILE)
 
     def _log(self, level, message):
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -95,13 +127,109 @@ class TwmpxpemManager:
                 _parse_file(os.path.join(SOURCES_D, f))
         return repos
 
-    def _resolve_urls(self, package_name):
-        repos = self._parse_sources()
-        urls = []
-        for repo in repos:
+    def _fetch_packages_index(self, repo):
+        """拉取 Debian 风格 Packages 纯文本索引，返回 {Package: meta}。
+
+        索引路径: {base}/dists/{dist}/{comp}/binary-{arch}/Packages
+        结果按源缓存；拉取失败（404/网络/解析）时返回空 dict，由调用方回退旧规则。
+        """
+        base = repo["url"].rstrip("/")
+        dist = repo["dist"]
+        components = repo.get("components") or ["main"]
+        cache_key = f"{base}|{dist}|{','.join(components)}"
+        if cache_key in self._index_cache:
+            return self._index_cache[cache_key]
+
+        index = {}
+        for comp in components:
+            index_url = f"{base}/dists/{dist}/{comp}/binary-{INDEX_ARCH}/Packages"
+            text = None
+            for attempt in range(1, 4):
+                try:
+                    self._log("DEBUG", f"拉取索引: {index_url}")
+                    with urllib.request.urlopen(index_url, timeout=15) as resp:
+                        text = resp.read().decode("utf-8", errors="replace")
+                    break
+                except Exception as e:
+                    self._log("DEBUG", f"第 {attempt}/3 次索引拉取失败 {index_url}: {e}")
+                    if attempt < 3:
+                        time.sleep(1)
+            if text is None:
+                continue
+            for block in text.split("\n\n"):
+                block = block.strip()
+                if not block:
+                    continue
+                meta = {}
+                for line in block.splitlines():
+                    if ":" not in line:
+                        continue
+                    key, _, val = line.partition(":")
+                    meta[key.strip()] = val.strip()
+                pkg = meta.get("Package")
+                if pkg:
+                    index[pkg] = meta
+        self._index_cache[cache_key] = index
+        return index
+
+    def _resolve_package(self, package_name):
+        """返回候选下载列表: [{"url":..., "meta": {...}}, ...]。
+
+        优先按 Debian Packages 索引的 Filename(pool 路径) 定位；
+        索引不可用或未命中时，回退旧规则 {base}/{dist}/visualizers/{name}.wvwhl。
+        """
+        candidates = []
+        for repo in self._parse_sources():
             base = repo["url"].rstrip("/")
-            urls.append(f"{base}/{repo['dist']}/visualizers/{package_name}.wvwhl")
-        return urls
+            index = self._fetch_packages_index(repo)
+            meta = index.get(package_name)
+            if meta and meta.get("Filename"):
+                rel = meta["Filename"].lstrip("/")
+                candidates.append({"url": f"{base}/{rel}", "meta": meta})
+                self._log("DEBUG", f"索引命中 {package_name}: {rel}")
+            else:
+                fallback = f"{base}/{repo['dist']}/visualizers/{package_name}.wvwhl"
+                candidates.append({"url": fallback, "meta": {}})
+        return candidates
+
+    def _resolve_urls(self, package_name):
+        """兼容旧调用：仅返回候选 URL 列表。"""
+        return [c["url"] for c in self._resolve_package(package_name)]
+
+    def _index_has_package(self, package_name):
+        """判断任一软件源的 Packages 索引是否收录该包。"""
+        for repo in self._parse_sources():
+            if package_name in self._fetch_packages_index(repo):
+                return True
+        return False
+
+    def _verify_package(self, path, meta):
+        """按索引元数据校验包大小 / MD5 / SHA256；meta 为空则跳过。返回是否通过。"""
+        if not meta:
+            return True
+        try:
+            with open(path, "rb") as f:
+                data = f.read()
+        except OSError as e:
+            self._log("ERROR", f"读取包失败: {e}")
+            return False
+        size = meta.get("Size")
+        if size:
+            if str(len(data)) != str(size).strip():
+                self._log("ERROR", f"包大小不符: 期望 {size} 字节, 实际 {len(data)} 字节")
+                return False
+        md5 = meta.get("MD5sum")
+        if md5:
+            if hashlib.md5(data).hexdigest() != md5.strip().lower():
+                self._log("ERROR", "MD5 校验不符，包可能已损坏")
+                return False
+        sha = meta.get("SHA256")
+        if sha:
+            if hashlib.sha256(data).hexdigest() != sha.strip().lower():
+                self._log("ERROR", "SHA256 校验不符，包可能已损坏")
+                return False
+        self._log("DEBUG", "完整性校验通过")
+        return True
 
     # ==========================================================================
     # 2. 核心安装逻辑
@@ -117,6 +245,7 @@ class TwmpxpemManager:
             os.makedirs(CACHE_DIR, exist_ok=True)
 
         # 判断是 URL 还是包名
+        pkg_meta = {}
         if one_time_url:
             self._log("INFO", f"使用一次性地址: {one_time_url}")
             download_url = one_time_url
@@ -126,24 +255,43 @@ class TwmpxpemManager:
             local_wvwhl = package_name
             download_url = None
         else:
-            urls = self._resolve_urls(package_name)
-            if not urls:
+            candidates = self._resolve_package(package_name)
+            if not candidates:
                 self._log("ERROR", f"无法在软件源中找到 {package_name}")
                 return
-            download_url = urls[0]
+            chosen = candidates[0]
+            download_url = chosen["url"]
+            pkg_meta = chosen["meta"]
             local_wvwhl = os.path.join(CACHE_DIR, f"{package_name}.wvwhl")
 
-        # 下载
+        # 下载（偶发断流重试 3 次，失败清掉残留半截文件）
         if download_url:
             self._log("INFO", f"正在抓取: {download_url}")
-            try:
-                urllib.request.urlretrieve(download_url, local_wvwhl)
-            except Exception as e:
-                self._log("ERROR", f"下载失败: {e}")
+            last_err = None
+            for attempt in range(1, 4):
+                try:
+                    urllib.request.urlretrieve(download_url, local_wvwhl)
+                    last_err = None
+                    break
+                except Exception as e:
+                    last_err = e
+                    self._log("WARN", f"第 {attempt}/3 次下载失败: {e}")
+                    if os.path.exists(local_wvwhl):
+                        try:
+                            os.remove(local_wvwhl)
+                        except OSError:
+                            pass
+                    if attempt < 3:
+                        time.sleep(1)
+            if last_err:
+                self._log("ERROR", f"下载失败: {last_err}")
                 return
 
         if not os.path.exists(local_wvwhl):
             self._log("ERROR", "包文件不存在")
+            return
+
+        if not self._verify_package(local_wvwhl, pkg_meta):
             return
 
         with open(local_wvwhl, 'rb') as f:
@@ -248,14 +396,19 @@ class TwmpxpemManager:
 
         for dep in deps:
             dep_name = dep.split("==")[0].strip()
-            if dep_name not in self.db:
-                self._log("WARN", f"{plugin_name} 缺少依赖: {dep_name}，正在自动安装...")
-                try:
-                    self.install(dep_name)
-                except Exception as e:
-                    self._log("ERROR", f"依赖安装失败: '{dep_name}' 返回错误: {e}")
-            else:
+            if dep_name in self.db:
                 self._log("DEBUG", f"依赖 {dep_name} 已存在")
+                continue
+            # 先查索引：仅当某源索引收录该依赖时才作为插件自动安装；
+            # 未收录的视为系统 / 第三方库（如 pygame），跳过自动下载，避免无意义 404 重试。
+            if not self._index_has_package(dep_name):
+                self._log("WARN", f"{plugin_name} 依赖 {dep_name} 未收录于插件源，需自行通过系统包管理器安装")
+                continue
+            self._log("WARN", f"{plugin_name} 缺少依赖: {dep_name}，正在自动安装...")
+            try:
+                self.install(dep_name)
+            except Exception as e:
+                self._log("ERROR", f"依赖安装失败: '{dep_name}' 返回错误: {e}")
 
     def fix_broken(self):
         """【自治版】扫描所有已安装插件，修复缺失依赖"""
@@ -379,37 +532,83 @@ class TwmpxpemManager:
     # ==========================================================================
     # 6. 开发者打包工具 (wheel)
     # ==========================================================================
-    def wheel(self, source_dir):
+    # 打包时排除的目录名（构建/版本控制/IDE 产物）
+    WHEEL_EXCLUDE_DIRS = {"__pycache__", ".git", ".svn", ".hg", ".idea", ".vscode"}
+    # 打包时排除的文件后缀（缓存、备份、旧包、日志等）
+    WHEEL_EXCLUDE_SUFFIX = (".pyc", ".pyo", ".bak", ".wvwhl", ".whl", ".log")
+
+    def wheel(self, source_dir, output=None):
         if not os.path.isdir(source_dir):
             self._log("ERROR", f"路径无效: {source_dir}")
-            return
+            return None
+
         toml_path = os.path.join(source_dir, "twmpxpem-project.toml")
         if not os.path.exists(toml_path):
             self._log("ERROR", "缺少 twmpxpem-project.toml")
-            return
-        
-        with open(toml_path, "rb") as f:
-            config = tomllib.load(f)
-        name = config["project"]["name"]
-        version = config["project"]["version"]
-        
-        output = f"{name}-{version}.wvwhl"
-        self._log("INFO", f"正在打包至: {output}")
-        
-        with zipfile.ZipFile(output, 'w', zipfile.ZIP_DEFLATED) as zf:
-            for root, _, files in os.walk(source_dir):
-                for file in files:
-                    file_path = os.path.join(root, file)
-                    arcname = os.path.relpath(file_path, source_dir)
-                    zf.write(file_path, arcname)
-        
-        # 魔改加壳
-        with open(output, 'rb') as f:
+            return None
+
+        # 解析配置并做契约字段校验
+        try:
+            with open(toml_path, "rb") as f:
+                config = tomllib.load(f)
+        except Exception as e:
+            self._log("ERROR", f"解析 twmpxpem-project.toml 失败: {e}")
+            return None
+
+        project = config.get("project", {})
+        name = project.get("name")
+        version = project.get("version")
+        category = project.get("category")
+        if not name or not version:
+            self._log("ERROR", "[project] 缺少必填字段 name 或 version")
+            return None
+        if not category:
+            self._log("WARN", "未填写 category，安装/加载时可能被引擎拒绝")
+
+        # 契约入口文件校验
+        entry = os.path.join(source_dir, "wmpvisualizer.dll")
+        if not os.path.exists(entry):
+            self._log("ERROR", "缺少插件入口文件 wmpvisualizer.dll（契约要求）")
+            return None
+
+        # 收集待打包文件（剔除构建垃圾与隐藏文件）
+        packed = []
+        for root, dirs, files in os.walk(source_dir):
+            dirs[:] = [d for d in dirs if d not in self.WHEEL_EXCLUDE_DIRS and not d.startswith(".")]
+            for file in files:
+                if file.startswith("."):
+                    continue
+                if file.lower().endswith(self.WHEEL_EXCLUDE_SUFFIX):
+                    continue
+                file_path = os.path.join(root, file)
+                arcname = os.path.relpath(file_path, source_dir)
+                packed.append((file_path, arcname))
+
+        if not packed:
+            self._log("ERROR", "目录内没有可打包的文件")
+            return None
+
+        if output:
+            out_dir = os.path.dirname(os.path.abspath(output))
+            os.makedirs(out_dir, exist_ok=True)
+            out_path = output
+        else:
+            out_path = f"{name}-{version}.wvwhl"
+
+        self._log("INFO", f"正在打包至: {out_path}")
+        with zipfile.ZipFile(out_path, 'w', zipfile.ZIP_DEFLATED) as zf:
+            for file_path, arcname in packed:
+                zf.write(file_path, arcname)
+
+        # 魔改加壳（与 install 端脱壳逻辑对应：首 4 字节 PK\x03\x04 -> TWMP）
+        with open(out_path, 'rb') as f:
             data = f.read()
         if data.startswith(STANDARD_ZIP_HEADER):
-            with open(output, 'wb') as f:
+            with open(out_path, 'wb') as f:
                 f.write(MAGIC_HEADER + data[4:])
-        self._log("DONE", f"🎉 打包完成: {output}")
+
+        self._log("DONE", f"🎉 打包完成: {out_path}（共 {len(packed)} 个文件）")
+        return out_path
 
 # ==============================================================================
 # CLI 入口
@@ -449,6 +648,7 @@ def main():
     # wheel
     p_wheel = subparsers.add_parser("wheel", help="打包插件")
     p_wheel.add_argument("source_dir")
+    p_wheel.add_argument("-o", "--output", help="输出 .wvwhl 路径（默认 名称-版本.wvwhl）")
 
     args = parser.parse_args()
     manager = TwmpxpemManager(verbosity=args.verbose)
@@ -469,7 +669,7 @@ def main():
     elif args.command == "fix-broken":
         manager.fix_broken()
     elif args.command == "wheel":
-        manager.wheel(args.source_dir)
+        manager.wheel(args.source_dir, output=args.output)
 
 if __name__ == "__main__":
     main()

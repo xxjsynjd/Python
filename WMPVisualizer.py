@@ -593,9 +593,15 @@ def render(ctx, timeline, cfg, scene_list, out_path):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("input"); ap.add_argument("-o", "--output", default=None)
-    ap.add_argument("--fps", type=int, default=60); ap.add_argument("--width", type=int, default=1280); ap.add_argument("--height", type=int, default=720)
-    ap.add_argument("--min-dur", type=float, default=6.0); ap.add_argument("--max-dur", type=float, default=14.0); ap.add_argument("--fade", type=float, default=0.6); ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("input", help="输入音频文件（mp3 / wav / flac / m4a …）")
+    ap.add_argument("-o", "--output", default=None, help="输出视频文件")
+    ap.add_argument("--fps", type=int, default=60, help="视频帧率")
+    ap.add_argument("--width", type=int, default=1280, help="画面宽度（px）")
+    ap.add_argument("--height", type=int, default=720, help="画面高度（px）")
+    ap.add_argument("--min-dur", type=float, default=6.0, help="单个随机场景最短时长（秒）")
+    ap.add_argument("--max-dur", type=float, default=14.0, help="单个随机场景最长时长（秒）")
+    ap.add_argument("--fade", type=float, default=0.6, help="场景之间淡入淡出时长（秒）")
+    ap.add_argument("--seed", type=int, default=0, help="随机种子（0=随机，固定值可复现场景）")
     a = ap.parse_args()
 
     data, sr = load_audio(a.input)
